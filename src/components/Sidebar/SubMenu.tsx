@@ -6,7 +6,7 @@ import { SubMenuContent } from './SubMenuContent';
 import { StyledMenuLabel } from '../styles/StyledMenuLabel';
 import { StyledMenuIcon } from '../styles/StyledMenuIcon';
 import { StyledMenuPrefix } from '../styles/StyledMenuPrefix';
-import { useMenu } from '../hooks/useMenu';
+import { useMenu } from '../../hooks/useMenu';
 import { StyledMenuSuffix } from '../styles/StyledMenuSuffix';
 import { menuClasses } from '../utils/utilityClasses';
 import {
@@ -14,7 +14,7 @@ import {
   StyledExpandIconCollapsed,
   StyledExpandIconWrapper,
 } from '../styles/StyledExpandIcon';
-import { usePopper } from '../hooks/usePopper';
+import { usePopper } from '../../hooks/usePopper';
 import { MenuButton, menuButtonStyles } from './MenuButton';
 import { SidebarContext } from './Sidebar';
 import { LevelContext } from './Menu';

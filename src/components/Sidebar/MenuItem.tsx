@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { StyledMenuLabel } from '../styles/StyledMenuLabel';
 import { StyledMenuIcon } from '../styles/StyledMenuIcon';
 import { StyledMenuPrefix } from '../styles/StyledMenuPrefix';
-import { useMenu } from '../hooks/useMenu';
+import { useMenu } from '../../hooks/useMenu';
 import { StyledMenuSuffix } from '../styles/StyledMenuSuffix';
 import { menuClasses } from '../utils/utilityClasses';
 import { MenuButton, menuButtonStyles } from './MenuButton';

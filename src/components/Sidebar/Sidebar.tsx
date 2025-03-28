@@ -1,8 +1,8 @@
 import React from 'react';
 import styled, { CSSObject } from '@emotion/styled';
 import classnames from 'classnames';
-import { useLegacySidebar } from '../hooks/useLegacySidebar';
-import { useMediaQuery } from '../hooks/useMediaQuery';
+import { useLegacySidebar } from '../../hooks/useLegacySidebar';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { sidebarClasses } from '../utils/utilityClasses';
 import { StyledBackdrop } from '../styles/StyledBackdrop';
 

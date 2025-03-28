@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { CSSObject } from '@emotion/styled';
 import { StyledUl } from '../styles/StyledUl';
 import { menuClasses } from '../utils/utilityClasses';
-import { useMenu } from '../hooks/useMenu';
+import { useMenu } from '../../hooks/useMenu';
 
 interface SubMenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
   transitionDuration?: number;
