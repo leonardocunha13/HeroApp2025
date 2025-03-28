@@ -16,7 +16,6 @@ function App() {
               <MenuItem component={<Link to="/editforms" />}> Edit Form</MenuItem>
               <MenuItem component={<Link to="/deleteforms" />}> Delete Form</MenuItem>
             </SubMenu>
-            <MenuItem > Form</MenuItem>
             <MenuItem component={<Link to="/dashboard" />}> Dashboard</MenuItem>
             <MenuItem component={<Link to="/other" />}> Other</MenuItem>
           </Menu>
