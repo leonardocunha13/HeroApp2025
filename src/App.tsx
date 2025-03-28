@@ -16,18 +16,28 @@ function App() {
       onValueChange={(tab) => setTab(tab)}
       items={[
         {
-          label: 'First',
+          label: 'Forms',
           value: '1',
-          content: 'Content of the first tab',
+          content: (
+            <>
+              <p>Content of the First tab.</p>
+              <Button isFullWidth onClick={() => setTab('1')}>
+                Create Form
+              </Button>
+              <Button isFullWidth onClick={() => setTab('1')}>
+                Delete Form
+              </Button>
+            </>
+          ),
         },
         {
-          label: 'Second',
+          label: 'Dashboard',
           value: '2',
           content: (
             <>
               <p>Content of the second tab.</p>
-              <Button isFullWidth onClick={() => setTab('1')}>
-                Go to first tab
+              <Button isFullWidth onClick={() => setTab('2')}>
+                Go to Dashboard
               </Button>
             </>
           ),
