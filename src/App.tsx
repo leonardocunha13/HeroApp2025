@@ -1,5 +1,5 @@
 import { useAuthenticator } from '@aws-amplify/ui-react'
-import { Sidebar, Menu, MenuItem, SubMenu, sidebarClasses } from 'react-pro-sidebar';
+import { Sidebar, Menu, MenuItem, SubMenu} from 'react-pro-sidebar';
 import { Link } from 'react-router-dom';
 import '@aws-amplify/ui-react/styles.css';
 
