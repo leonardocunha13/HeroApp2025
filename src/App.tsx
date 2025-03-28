@@ -1,75 +1,42 @@
+import React from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import FormBuilder from './pages/FormBuilder';
 import { useAuthenticator } from '@aws-amplify/ui-react'
-//import { Sidebar, Menu, MenuItem, SubMenu} from 'react-pro-sidebar';
-//import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import { Tabs, Button } from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
 
-
-function App() {
+const App: React.FC = () => {
   const { signOut } = useAuthenticator();
-  const [tab, setTab] = useState('1');
   return (
-    <>
-    <Tabs
-      value={tab}
-      onValueChange={(tab) => setTab(tab)}
-      items={[
-        {
-          label: 'Forms',
-          value: '1',
-          content: (
-            <>
-              <p>Content of the First tab.</p>
-              <Button isFullWidth onClick={() => setTab('1')}>
-                Create Form
-              </Button>
-              <Button isFullWidth onClick={() => setTab('1')}>
-                Delete Form
-              </Button>
-            </>
-          ),
-        },
-        {
-          label: 'Dashboard',
-          value: '2',
-          content: (
-            <>
-              <p>Content of the second tab.</p>
-              <Button isFullWidth onClick={() => setTab('2')}>
-                Go to Dashboard
-              </Button>
-            </>
-          ),
-        },
-      ]}
-    />
-    <button onClick={signOut}>Sign out</button>
-    
-    </>
-    
-    
-    
-  );
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      {/* Navigation Bar */}
+      <nav
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingBottom: '20px',
+          borderBottom: '2px solid #ccc',
+        }}
+      >
+        <h1 style={{ margin: 0, fontSize: '24px' }}>Dynamic Form Builder</h1>
+        <div>
+          <Link to="/" style={{ marginRight: '15px', textDecoration: 'none' }}>
+            Home
+          </Link>
+          <Link to="/form-builder" style={{ textDecoration: 'none' }}>
+            Form Builder
+          </Link>
+        </div>
+      </nav>
 
- /* return (
-    <>
-      <div>
-        <Sidebar>
-          <Menu>
-            <SubMenu label='Forms'>
-              <MenuItem component={<Link to="/createforms" />}> Create Form</MenuItem>
-              <MenuItem component={<Link to="/editforms" />}> Edit Form</MenuItem>
-              <MenuItem component={<Link to="/deleteforms" />}> Delete Form</MenuItem>
-            </SubMenu>
-            <MenuItem component={<Link to="/dashboard" />}> Dashboard</MenuItem>
-            <MenuItem component={<Link to="/other" />}> Other</MenuItem>
-          </Menu>
-        </Sidebar>
-
-      </div>
+      {/* Routing between Home and Form Builder pages */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/form-builder" element={<FormBuilder />} />
+      </Routes>
       <button onClick={signOut}>Sign out</button>
-    </>
-  );*/
-}
+    </div>
+  );
+};
+
 export default App;

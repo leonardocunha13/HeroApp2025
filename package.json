@@ -13,6 +13,8 @@
     "@aws-amplify/ui-react": "^6.5.5",
     "aws-amplify": "^6.6.6",
     "react": "^18.2.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-mui-sidebar": "^1.6.3",
     "react-pro-sidebar": "^1.1.0",
