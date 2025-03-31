@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
-import FormBuilder from './pages/FormBuilder';
+import FormBuilder from '../actions/form';
 import { useAuthenticator } from '@aws-amplify/ui-react'
 
 const App: React.FC = () => {
@@ -18,13 +18,17 @@ const App: React.FC = () => {
           borderBottom: '2px solid #ccc',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: '24px' }}>Dynamic Form Builder</h1>
+        
         <div>
           <Link to="/" style={{ marginRight: '15px', textDecoration: 'none' }}>
-            Home
+          <button style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
+              Home
+            </button>
           </Link>
           <Link to="/form-builder" style={{ textDecoration: 'none' }}>
-            Form Builder
+            <button style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
+              Form Builder
+            </button>
           </Link>
         </div>
       </nav>

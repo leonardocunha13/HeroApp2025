@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "ap-southeast-2_OV2kREQqU",
+    "user_pool_id": "ap-southeast-2_4pUDSk78h",
     "aws_region": "ap-southeast-2",
-    "user_pool_client_id": "1ps25r6h1scj2k2joobf9nls9h",
-    "identity_pool_id": "ap-southeast-2:d16e252c-eed2-4dc5-93b9-0cb379622ff2",
+    "user_pool_client_id": "7ubc0hs82b2t5beoauje8itnri",
+    "identity_pool_id": "ap-southeast-2:c0c43ed1-a74f-437b-a620-c4eebe3f21ba",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -25,9 +25,9 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://45e6vazhgrbahbkmar5dci4j6e.appsync-api.ap-southeast-2.amazonaws.com/graphql",
+    "url": "https://dnm5fvtpangkvch74jkjf3jcsi.appsync-api.ap-southeast-2.amazonaws.com/graphql",
     "aws_region": "ap-southeast-2",
-    "api_key": "da2-prrm7wtyczfyjemeajjz7dm4oy",
+    "api_key": "da2-bz2czkfxs5du3cmu4xgpptm62y",
     "default_authorization_type": "API_KEY",
     "authorization_types": [
       "AMAZON_COGNITO_USER_POOLS",
@@ -36,14 +36,49 @@
     "model_introspection": {
       "version": 1,
       "models": {
-        "Todo": {
-          "name": "Todo",
+        "Form": {
+          "name": "Form",
           "fields": {
             "id": {
               "name": "id",
               "isArray": false,
               "type": "ID",
               "isRequired": true,
+              "attributes": []
+            },
+            "userId": {
+              "name": "userId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "published": {
+              "name": "published",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "description": {
+              "name": "description",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
               "attributes": []
             },
             "content": {
@@ -53,13 +88,49 @@
               "isRequired": false,
               "attributes": []
             },
-            "createdAt": {
-              "name": "createdAt",
+            "visits": {
+              "name": "visits",
               "isArray": false,
-              "type": "AWSDateTime",
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "submissions": {
+              "name": "submissions",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "shareURL": {
+              "name": "shareURL",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "client": {
+              "name": "client",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "formSubmissions": {
+              "name": "formSubmissions",
+              "isArray": true,
+              "type": {
+                "model": "FormSubmissions"
+              },
               "isRequired": false,
               "attributes": [],
-              "isReadOnly": true
+              "isArrayNullable": true,
+              "association": {
+                "connectionType": "HAS_MANY",
+                "associatedWith": [
+                  "formId"
+                ]
+              }
             },
             "updatedAt": {
               "name": "updatedAt",
@@ -71,11 +142,105 @@
             }
           },
           "syncable": true,
-          "pluralName": "Todos",
+          "pluralName": "Forms",
           "attributes": [
             {
               "type": "model",
               "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "public",
+                    "provider": "apiKey",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "FormSubmissions": {
+          "name": "FormSubmissions",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": true,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "formId": {
+              "name": "formId",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": false,
+              "attributes": []
+            },
+            "content": {
+              "name": "content",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "form": {
+              "name": "form",
+              "isArray": false,
+              "type": {
+                "model": "Form"
+              },
+              "isRequired": false,
+              "attributes": [],
+              "association": {
+                "connectionType": "BELONGS_TO",
+                "targetNames": [
+                  "formId"
+                ]
+              }
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "FormSubmissions",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "fields": [
+                  "id"
+                ]
+              }
             },
             {
               "type": "auth",
@@ -106,5 +271,5 @@
       "nonModels": {}
     }
   },
-  "version": "1.3"
+  "version": "1.2"
 }
