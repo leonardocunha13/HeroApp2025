@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
-import Sidebar from './Sidebar';
-import Canvas from './Canvas';
+
 import './Styles/FormBuilder.css';
 
 const FormBuilder: React.FC = () => {
@@ -15,10 +14,7 @@ const FormBuilder: React.FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="form-builder">
-        {/* Sidebar for dragging fields */}
-        <Sidebar />
-        {/* Full-page canvas */}
-        <Canvas fields={fields} onDrop={handleDrop} />
+   
       </div>
     </DndProvider>
   );

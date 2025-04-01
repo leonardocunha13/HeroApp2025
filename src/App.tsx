@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home';
-import FormBuilder from '../actions/form';
+import Home from '../src/(dashboard)/page';
 import { useAuthenticator } from '@aws-amplify/ui-react'
 
 const App: React.FC = () => {
@@ -20,11 +19,6 @@ const App: React.FC = () => {
       >
         
         <div>
-          <Link to="/" style={{ marginRight: '15px', textDecoration: 'none' }}>
-          <button style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
-              Home
-            </button>
-          </Link>
           <Link to="/form-builder" style={{ textDecoration: 'none' }}>
             <button style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
               Form Builder
@@ -35,8 +29,7 @@ const App: React.FC = () => {
 
       {/* Routing between Home and Form Builder pages */}
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/form-builder" element={<FormBuilder />} />
+         <Route path="/form-builder" element={<Home />} />
       </Routes>
       <button onClick={signOut}>Sign out</button>
     </div>

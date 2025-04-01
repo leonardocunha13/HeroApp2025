@@ -1,10 +1,10 @@
 import { Amplify } from 'aws-amplify';
 import { useState, useEffect } from "react";
-import outputs from '../amplify_outputs.json';
-import type { Schema } from "../amplify/data/resource";
+import outputs from '../../amplify_outputs.json';
+import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from 'aws-amplify/auth'; // Make sure getCurrentUser is imported correctly
-
+import { formSchema, formSchemaType } from "../schemas/form";
 
 
 Amplify.configure(outputs);
@@ -14,7 +14,7 @@ const client = generateClient<Schema>();
 // UserNotFoundErr class for custom error handling
 class UserNotFoundErr extends Error { }
 
-export default function GetFormStats() {
+export async function GetFormStats() {
   const [formStats, setFormStats] = useState({
     visits: 0,
     submissions: 0,
@@ -92,38 +92,27 @@ export default function GetFormStats() {
   }, [userId]); // Runs when userId changes
 
 
-  return (
-    <div>
-      <h1>Form Stats</h1>
-      <p>Visits: {formStats.visits}</p>
-      <p>Submissions: {formStats.submissions}</p>
-      <p>Submission Rate: {formStats.submissionRate.toFixed(2)}%</p>
-      <p>Bounce Rate: {formStats.bounceRate.toFixed(2)}%</p>
-    </div>
-  );
+  return formStats;
 }
 
-export async function CreateForm(name: string, description:string) {
+export async function CreateForm(data: formSchemaType) {
  
     const {userId} = await getCurrentUser();
     if (!userId) {
       throw new UserNotFoundErr();
     }
-
     const { errors, data: form } = await client.models.Form.create({
       userId: userId,
-      name: name, // Use the form name from the state
-      description: description,
+      name: data.name, // Use the form name from the state
+      description: data.description,
   
     });
-
     if (errors) {
       console.error("Error creating form:", errors);
       throw new Error("Something went wrong while creating the form");
     }
-
     return form?.id;  // Return the created form ID
-  };
+  }
 
 export async function GetForms() {
   
