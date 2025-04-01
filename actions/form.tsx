@@ -217,7 +217,7 @@ export async function GetFormContentByUrl(formUrl: string) {
   });
   // Handle errors or if no form is found
   if (errors || !forms || forms.length === 0) {
-    console.error(errors || "Form not found.");
+    console.error(errors || "Form not found please try again.");
     throw new Error("Form not found.");
   }
 

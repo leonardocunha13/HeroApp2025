@@ -56,7 +56,7 @@
             "createdAt": {
               "name": "createdAt",
               "isArray": false,
-              "type": "String",
+              "type": "AWSDateTime",
               "isRequired": false,
               "attributes": []
             },
@@ -109,15 +109,8 @@
               "isRequired": false,
               "attributes": []
             },
-            "client": {
-              "name": "client",
-              "isArray": false,
-              "type": "String",
-              "isRequired": false,
-              "attributes": []
-            },
-            "formSubmissions": {
-              "name": "formSubmissions",
+            "FormSubmissions": {
+              "name": "FormSubmissions",
               "isArray": true,
               "type": {
                 "model": "FormSubmissions"
@@ -178,21 +171,21 @@
             "id": {
               "name": "id",
               "isArray": false,
-              "type": "Int",
+              "type": "ID",
               "isRequired": true,
-              "attributes": []
-            },
-            "createdAt": {
-              "name": "createdAt",
-              "isArray": false,
-              "type": "String",
-              "isRequired": false,
               "attributes": []
             },
             "formId": {
               "name": "formId",
               "isArray": false,
-              "type": "ID",
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
               "isRequired": false,
               "attributes": []
             },
@@ -200,7 +193,7 @@
               "name": "content",
               "isArray": false,
               "type": "String",
-              "isRequired": true,
+              "isRequired": false,
               "attributes": []
             },
             "form": {
@@ -233,14 +226,6 @@
             {
               "type": "model",
               "properties": {}
-            },
-            {
-              "type": "key",
-              "properties": {
-                "fields": [
-                  "id"
-                ]
-              }
             },
             {
               "type": "auth",
