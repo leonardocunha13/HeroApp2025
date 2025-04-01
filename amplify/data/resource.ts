@@ -3,7 +3,7 @@ import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
 const schema = a.schema({
   Form: a.model({
     userId: a.string(),
-    createdAt: a.datetime().default(() => new Date().toISOString()),
+    createdAt: a.datetime(),
     published: a.boolean().default(false),
     name: a.string(),
     description: a.string().default(""),
@@ -16,7 +16,7 @@ const schema = a.schema({
 
   FormSubmissions: a.model({
     formId: a.string(),
-    createdAt: a.datetime().default(() => new Date().toISOString()),
+    createdAt: a.datetime(),
     content: a.string(),
     form: a.belongsTo('Form', 'formId')
   }).authorization(allow => [allow.publicApiKey()])
