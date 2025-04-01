@@ -1,11 +1,9 @@
 import { Amplify } from 'aws-amplify';
-import { useState, useEffect } from "react";
 import outputs from '../../amplify_outputs.json';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getCurrentUser } from 'aws-amplify/auth'; // Make sure getCurrentUser is imported correctly
-import { formSchema, formSchemaType } from "../schemas/form";
-
+import { getCurrentUser } from 'aws-amplify/auth'; // Ensure getCurrentUser is imported correctly
+import { formSchemaType } from "../schemas/form";
 
 Amplify.configure(outputs);
 
@@ -15,278 +13,280 @@ const client = generateClient<Schema>();
 class UserNotFoundErr extends Error { }
 
 export async function GetFormStats() {
-  const [formStats, setFormStats] = useState({
-    visits: 0,
-    submissions: 0,
-    submissionRate: 0,
-    bounceRate: 0,
-  });
-  const [userId, setUserId] = useState<string | null>(null); // State for userId
-
-  // Fetch current user info
-  const fetchCurrentUser = async () => {
-    try {
-      const { userId } = await getCurrentUser(); // Destructure directly here
-      if (!userId) {
-        throw new UserNotFoundErr();
-      }
-      setUserId(userId); // Store userId in state
-    } catch (error) {
-      console.error("Error fetching current user:", error);
-    }
-  };
-
-  // Fetch form stats only if userId is available
-  const fetchFormStats = async () => {
-    if (!userId) {
-      return; // Prevent fetching stats if userId isn't set
-    }
-
-    try {
-      // Fetch all forms associated with the current user
-      const { data: forms, errors } = await client.models.Form.list();
-
-      if (errors) {
-        console.error(errors);
-        return;
-      }
-
-      // Filter forms belonging to the current user
-      const userForms = forms.filter((form) => form.userId === userId);
-      
-      // Calculate the stats
-      const visits = userForms.reduce((sum, form) => sum + (form.visits || 0), 0);
-      const submissions = userForms.reduce(
-        (sum, form) => sum + (form.submissions || 0),
-        0
-      );
-
-      let submissionRate = 0;
-      if (visits > 0) {
-        submissionRate = (submissions / visits) * 100;
-      }
-
-      const bounceRate = 100 - submissionRate;
-
-      // Set the stats to state
-      setFormStats({
-        visits,
-        submissions,
-        submissionRate,
-        bounceRate,
-      });
-    } catch (error) {
-      console.error("Error fetching form stats:", error);
-    }
-  };
-
-  // Fetch user info and form stats on mount
-  useEffect(() => {
-    fetchCurrentUser(); // Get the current user info
-  }, []); // Empty dependency array, so it runs only once when the component mounts
-
-  useEffect(() => {
-    if (userId) {
-      fetchFormStats(); // Fetch stats only if userId is available
-    }
-  }, [userId]); // Runs when userId changes
-
-
-  return formStats;
-}
-
-export async function CreateForm(data: formSchemaType) {
- 
-    const {userId} = await getCurrentUser();
+  try {
+    const { userId } = await getCurrentUser();
     if (!userId) {
       throw new UserNotFoundErr();
     }
+
+    // Fetch all forms associated with the current user
+    const { data: forms, errors } = await client.models.Form.list();
+
+    if (errors) {
+      console.error(errors);
+      return { visits: 0, submissions: 0, submissionRate: 0, bounceRate: 0 };
+    }
+
+    // Filter forms belonging to the current user
+    const userForms = forms.filter((form) => form.userId === userId);
+
+    // Calculate the stats
+    const visits = userForms.reduce((sum, form) => sum + (form.visits || 0), 0);
+    const submissions = userForms.reduce(
+      (sum, form) => sum + (form.submissions || 0),
+      0
+    );
+
+    let submissionRate = 0;
+    if (visits > 0) {
+      submissionRate = (submissions / visits) * 100;
+    }
+
+    const bounceRate = 100 - submissionRate;
+
+    // Return the stats object
+    return {
+      visits,
+      submissions,
+      submissionRate,
+      bounceRate,
+    };
+  } catch (error) {
+    console.error("Error fetching form stats:", error);
+    return { visits: 0, submissions: 0, submissionRate: 0, bounceRate: 0 };
+  }
+}
+
+export async function CreateForm(data: formSchemaType) {
+  try {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
+
     const { errors, data: form } = await client.models.Form.create({
       userId: userId,
-      name: data.name, // Use the form name from the state
+      name: data.name,
       description: data.description,
-  
     });
+
     if (errors) {
       console.error("Error creating form:", errors);
       throw new Error("Something went wrong while creating the form");
     }
-    return form?.id;  // Return the created form ID
+
+    return form?.id;
+  } catch (error) {
+    console.error("Error in CreateForm:", error);
+    throw new Error("Failed to create form.");
   }
+}
 
 export async function GetForms() {
-  
-  const {userId} = await getCurrentUser();
-  if (!userId) {
-    throw new UserNotFoundErr();
-  }
-  // Fetch all forms associated with the current user using Amplify's Data API
-  const { data: forms, errors } = await client.models.Form.list({
-    filter: { userId: { eq: userId } }, // Filter by userId
-  });
-  
-  if (errors) {
-    console.error(errors);
-    return []; // Return an empty array if there's an error
-  }
+  try {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
 
-  return forms; // Return the fetched forms
+    // Fetch all forms associated with the current user
+    const { data: forms, errors } = await client.models.Form.list({
+      filter: { userId: { eq: userId } },
+    });
+
+    if (errors) {
+      console.error(errors);
+      return [];
+    }
+
+    return forms;
+  } catch (error) {
+    console.error("Error fetching forms:", error);
+    return [];
+  }
 }
 
 export async function GetFormById(id: string) {
-  const {userId} = await getCurrentUser();
-  if (!userId) {
-    throw new UserNotFoundErr();
-  }
-  // Fetch a specific form by its ID for the current user
-  const { data: form, errors } = await client.models.Form.get({
-    id,
-  });
-  if (errors) {
-    console.error(errors);
+  try {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
+
+    const { data: form, errors } = await client.models.Form.get({
+      id,
+    });
+
+    if (errors) {
+      console.error(errors);
+      return null;
+    }
+
+    if (form && form.userId === userId) {
+      return form;
+    }
+
+    throw new Error("Form not found or doesn't belong to the current user.");
+  } catch (error) {
+    console.error("Error fetching form by ID:", error);
     return null;
   }
-  // Ensure the form belongs to the current user
-  if (form && form.userId === userId) {
-    return form;
-  }
-  throw new Error("Form not found or doesn't belong to the current user.");
 }
 
-//Update function to update the form content
 export async function UpdateFormContent(id: string, content: string) {
-  const {userId} = await getCurrentUser();
-  if (!userId) {
-    throw new UserNotFoundErr();
-  }
-  const form = {
-    id: id,
-    userId: userId,
-    content: content
-  }
-  // Update form content for the current user
-  const { data: updatedForm, errors } = await client.models.Form.update(form);
-  if (errors) {
-    console.error(errors);
+  try {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
+
+    const form = {
+      id: id,
+      userId: userId,
+      content: content,
+    };
+
+    const { data: updatedForm, errors } = await client.models.Form.update(form);
+
+    if (errors) {
+      console.error(errors);
+      throw new Error("Failed to update form content.");
+    }
+
+    return updatedForm;
+  } catch (error) {
+    console.error("Error updating form content:", error);
     throw new Error("Failed to update form content.");
   }
-
-  return updatedForm;
 }
 
-//###Function to publish new form
 export async function PublishForm(id: string) {
-  const {userId} = await getCurrentUser();
-  if (!userId) {
-    throw new UserNotFoundErr();
-  }
-  const form = {
-    id: id,
-    userId: userId,
-    published: true
+  try {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
 
-  }
-  // Publish the form for the current user
-  const { data: updatedForm, errors } = await client.models.Form.update(form)
-  if (errors) {
-    console.error(errors);
+    const form = {
+      id: id,
+      userId: userId,
+      published: true,
+    };
+
+    const { data: updatedForm, errors } = await client.models.Form.update(form);
+
+    if (errors) {
+      console.error(errors);
+      throw new Error("Failed to publish the form.");
+    }
+
+    return updatedForm;
+  } catch (error) {
+    console.error("Error publishing form:", error);
     throw new Error("Failed to publish the form.");
   }
-  return updatedForm;
 }
 
 export async function GetFormContentByUrl(formUrl: string) {
-  const {userId} = await getCurrentUser();
-  if (!userId) {
-    throw new UserNotFoundErr();
+  try {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
+
+    const { data: forms, errors } = await client.models.Form.list({
+      filter: { shareURL: { eq: formUrl } },
+    });
+
+    if (errors || !forms || forms.length === 0) {
+      console.error(errors || "Form not found, please try again.");
+      throw new Error("Form not found.");
+    }
+
+    const form = forms[0];
+    const updatedVisits = form.visits ? form.visits + 1 : 1;
+
+    const updatedForm = {
+      id: form.id,
+      visits: updatedVisits,
+    };
+
+    const { errors: updateErrors } = await client.models.Form.update(updatedForm);
+
+    if (updateErrors) {
+      console.error(updateErrors);
+      throw new Error("Failed to update form visits.");
+    }
+
+    return form.content;
+  } catch (error) {
+    console.error("Error fetching form content by URL:", error);
+    throw new Error("Error fetching form content by URL.");
   }
-  // Fetch the form that matches the given shareURL
-  const { data: forms, errors } = await client.models.Form.list({
-    filter: { shareURL: { eq: formUrl } },
-  });
-  // Handle errors or if no form is found
-  if (errors || !forms || forms.length === 0) {
-    console.error(errors || "Form not found please try again.");
-    throw new Error("Form not found.");
-  }
-
-  const form = forms[0]; // Get the first form (assuming shareURL is unique)
-  const updatedVisits = form.visits ? form.visits + 1 : 1; // Default to 1 if visits is null or undefined
-  // Increment the visits count by 1
-  const updatedForm = {
-    id: form.id,
-    visits: updatedVisits, // Increment visits
-  };
-
-  // Update the form with the incremented visits field
-  const { errors: updateErrors } = await client.models.Form.update(updatedForm);
-
-  // Handle errors during the update operation
-  if (updateErrors) {
-    console.error(updateErrors);
-    throw new Error("Failed to update form visits.");
-  }
-
-  // Return the form content
-  return form.content;
 }
 
 export async function SubmitForm(formUrl: string, content: string) {
-  // Step 1: Fetch the Form using `filter` by `shareURL`
-  const {data: forms} = await client.models.Form.list({
-    filter: {
-      shareURL: { eq: formUrl },  // Filter the form by its shareURL
-      published: { eq: true },    // Ensure that the form is published
-    },
-  });
-  const form = forms[0]; // Get the first form from the result
-  // Step 2: Create a new FormSubmission
-  const newFormSubmission = await client.models.FormSubmissions.create({
-    formId: form.id,  // Link the submission to the form via formId
-    content: content, // The content of the submission
-  });
+  try {
+    const { data: forms } = await client.models.Form.list({
+      filter: {
+        shareURL: { eq: formUrl },
+        published: { eq: true },
+      },
+    });
 
-  // Step 3: Update the Form's submissions count
-  const updatedSubmissions = form.submissions ? form.submissions + 1 : 1; // Default to 1 if visits is null or undefined
+    const form = forms[0];
+
+    const newFormSubmission = await client.models.FormSubmissions.create({
+      formId: form.id,
+      content: content,
+    });
+
+    const updatedSubmissions = form.submissions ? form.submissions + 1 : 1;
 
     const updatedForm = await client.models.Form.update({
-    id: form.id,  // Identify the form by its ID
-    submissions: updatedSubmissions,  // Update the submission count
-  });
+      id: form.id,
+      submissions: updatedSubmissions,
+    });
 
-  // Return the updated form and the new form submission
-  return {
-    form: updatedForm,
-    newSubmission: newFormSubmission,
-  };
+    return {
+      form: updatedForm,
+      newSubmission: newFormSubmission,
+    };
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    throw new Error("Failed to submit the form.");
+  }
 }
 
 export async function GetFormWithSubmissions(id: string) {
-  const {userId} = await getCurrentUser();
-  if (!userId) {
-    throw new UserNotFoundErr();
-  }
-
-  const { data: form, errors } = await client.models.Form.get({id});
-
-  if (errors) {
-    console.error(errors);
-    return null;
-  }
-
-  // Ensure the form belongs to the current user
-  if (form && form.userId === userId) {
-    // Fetch associated form submissions
-    const { data: submissions, errors: submissionErrors } = await client.models.FormSubmissions.list({
-      filter: { formId: { eq: form.id } },
-    });
-
-    if (submissionErrors) {
-      console.error(submissionErrors);
+  try {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
     }
 
-    return { ...form, submissions };
-  }
+    const { data: form, errors } = await client.models.Form.get({ id });
 
-  throw new Error("Form not found or doesn't belong to the current user.");
+    if (errors) {
+      console.error(errors);
+      return null;
+    }
+
+    if (form && form.userId === userId) {
+      const { data: submissions, errors: submissionErrors } = await client.models.FormSubmissions.list({
+        filter: { formId: { eq: form.id } },
+      });
+
+      if (submissionErrors) {
+        console.error(submissionErrors);
+      }
+
+      return { ...form, submissions };
+    }
+
+    throw new Error("Form not found or doesn't belong to the current user.");
+  } catch (error) {
+    console.error("Error fetching form with submissions:", error);
+    throw new Error("Failed to fetch form with submissions.");
+  }
 }
