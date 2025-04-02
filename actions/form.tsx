@@ -325,6 +325,54 @@ export async function InsertClient(NameClient: string) {
 }
 //InsertClient("FMG");
 
+export async function GetClients() {
+  try {
+    const { errors, data } = await client.models.Client.list();
+
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to fetch clients.");
+    }
+
+    const clientNames = data.map(client => client.ClientName);
+
+    return clientNames;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+const clients = await GetClients();
+console.log('Clients', clients);
+
+export async function GetProjects() {
+  try {
+    const { errors, data } = await client.models.Projectt.list();
+    
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to fetch projects.");
+    }
+
+    // Separate projectIDs and projectNames
+    const projectIDs = data.map(project => project.projectID); // List of all projectIDs
+    const projectNames = data.map(project => project.projectName); // List of all projectNames
+
+    // Return both separately
+    return { projectIDs, projectNames };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+
+const { projectIDs, projectNames } = await GetProjects();
+console.log("Project IDs:", projectIDs);
+console.log("Project Details:", projectNames);
+
+
 export async function InsertProject(NameProject: string, IDProject: string, ClientID: string) {
   try {
       const { errors, data } = await client.models.Projectt.create({
@@ -377,49 +425,49 @@ export async function GetClientWithProjects(ClientID: string) {
   .then((data) => console.log("Client with Projects:", data))
   .catch((error) => console.error("Error fetching client with projects:", error));*/
 
-  export async function GetFormsWithClient(ClientID: string) {
-    const { userId } = await getCurrentUser();
-    if (!userId) {
-      throw new UserNotFoundErr();
-    }
-
-    try {
-      // Fetch projects linked to the ClientID
-      const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
-        filter: { ClientID: { eq: ClientID } }
-      });
-      console.log("Projects Found:", projects);
-      if (projectErrors || !projects || projects.length === 0) {
-        console.error(projectErrors || "No projects found for this client.");
-        throw new Error("No projects found for this client.");
-      }
-  
-      // Fetch forms for each project
-      const forms = await Promise.all(
-        projects.map(async (project) => {
-          const { data: projectForms } = await client.models.Form.list({
-            filter: { projID: { eq: project.projectID } }
-          });
-          console.log ('Project ID:', project.projectID);
-          console.log(`Forms for Project ${project.projectName}:`, projectForms);
-
-          return projectForms.map(form => ({ 
-            ...form,
-             projectName: project.projectName 
-          }));
-        })
-      );
-
-      return forms.flat();
-    } catch (error) {
-      console.error("Error fetching forms with client:", error);
-      throw new Error("Failed to fetch forms for the client.");
-    }
+export async function GetFormsWithClient(ClientID: string) {
+  const { userId } = await getCurrentUser();
+  if (!userId) {
+    throw new UserNotFoundErr();
   }
+
+  try {
+    // Fetch projects linked to the ClientID
+    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
+      filter: { ClientID: { eq: ClientID } }
+    });
+    console.log("Projects Found:", projects);
+    if (projectErrors || !projects || projects.length === 0) {
+      console.error(projectErrors || "No projects found for this client.");
+      throw new Error("No projects found for this client.");
+    }
+
+    // Fetch forms for each project
+    const forms = await Promise.all(
+      projects.map(async (project) => {
+        const { data: projectForms } = await client.models.Form.list({
+          filter: { projID: { eq: project.projectID } }
+        });
+        console.log ('Project ID:', project.projectID);
+        console.log(`Forms for Project ${project.projectName}:`, projectForms);
+
+        return projectForms.map(form => ({ 
+          ...form,
+            projectName: project.projectName 
+        }));
+      })
+    );
+
+    return forms.flat();
+  } catch (error) {
+    console.error("Error fetching forms with client:", error);
+    throw new Error("Failed to fetch forms for the client.");
+  }
+}
     
-  GetFormsWithClient("1ad74bce-bd9d-4131-83ef-effecba74c7d")
+  /*GetFormsWithClient("1ad74bce-bd9d-4131-83ef-effecba74c7d")
   .then((forms) => console.log("Forms:", forms))
-  .catch((error) => console.error("Error:", error));
+  .catch((error) => console.error("Error:", error));*/
 
 
 

@@ -27,7 +27,7 @@ const App: React.FC = () => {
           </Link>
           <Link to="/form-builder" style={{ textDecoration: 'none' }}>
             <button style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
-              Form Builder
+              Form Builders
             </button>
           </Link>
         </div>
