@@ -14,6 +14,7 @@
     "user_verification_types": [
       "email"
     ],
+    "groups": [],
     "mfa_configuration": "NONE",
     "password_policy": {
       "min_length": 8,
@@ -256,5 +257,5 @@
       "nonModels": {}
     }
   },
-  "version": "1.2"
+  "version": "1.3"
 }
