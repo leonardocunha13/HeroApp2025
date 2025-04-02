@@ -12,6 +12,95 @@ const client = generateClient<Schema>();
 // UserNotFoundErr class for custom error handling
 class UserNotFoundErr extends Error { }
 
+export async function InsertClient(NameClient: string) {
+  try {
+    const { errors, data } = await client.models.Client.create({
+      ClientName: NameClient,
+    });
+
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to insert client.");
+    }
+    return data; // Returns the inserted client data
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+export async function InsertMultipleClients(names: string[]) {
+  const insertedClients: any[] = []; // Array to store successfully inserted clients
+  const failedClients: string[] = []; // Array to store client names that failed to insert
+
+  for (let name of names) {
+    try {
+      const clientData = await InsertClient(name); // Call the single client insert function
+      insertedClients.push(clientData); // Store the successful insert result
+    } catch (error) {
+      console.error(`Failed to insert client: ${name}`, error);
+      failedClients.push(name); // Store the failed client name
+    }
+  }
+
+  // Return the results
+  return {
+    insertedClients,
+    failedClients,
+  };
+}
+
+/*const clientNames = ["Client1", "Client2", "Client3"]; // Example client names
+
+InsertMultipleClients(clientNames)
+  .then((result) => {
+    console.log("Successfully inserted clients:", result.insertedClients);
+    console.log("Failed to insert clients:", result.failedClients);
+  })
+  .catch((error) => {
+    console.error("Error inserting clients:", error);
+  });*/
+
+export async function GetClients() {
+  try {
+    const { errors, data } = await client.models.Client.list();
+
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to fetch clients.");
+    }
+
+    const clientNames = data.map(client => client.ClientName);
+
+    return clientNames;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+export async function GetProjects() {
+  try {
+    const { errors, data } = await client.models.Project.list();
+    
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to fetch projects.");
+    }
+
+    // Separate projectIDs and projectNames
+    const projectIDs = data.map(project => project.projectID); // List of all projectIDs
+    const projectNames = data.map(project => project.projectName); // List of all projectNames
+
+    // Return both separately
+    return { projectIDs, projectNames };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+
 export async function GetFormStats() {
   try {
     const { userId } = await getCurrentUser();

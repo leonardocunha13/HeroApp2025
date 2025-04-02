@@ -2,6 +2,8 @@ import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import CreateFormDialog from './components/CreateFormDialog';
 import { useAuthenticator } from '@aws-amplify/ui-react'
+import { Button } from "@radix-ui/themes";
+import "./pages/Styles/styles.css";
 
 const App: React.FC = () => {
   const { signOut } = useAuthenticator();
@@ -19,9 +21,10 @@ const App: React.FC = () => {
       >
         <div>
           <Link to="/" style={{ textDecoration: 'none' }}>
-            <button style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
-              Home
-            </button>
+          <Button className="Button violet">Home</Button>
+          </Link>
+          <Link to="/form-builder" style={{ textDecoration: 'none' }}>
+          <Button className="Button violet">Form Builder</Button>
           </Link>
         </div>
       </nav>

@@ -1,85 +1,98 @@
+import { useEffect, useState } from "react";
 import { Dialog } from "radix-ui";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import "./styles.css";
+import { GetClients, GetProjects } from "../actions/form";
+import "../pages/Styles/styles.css";
 
-// JSON object containing the role options
-const clients = {
-  project1: "Client-1",
-  project2: "Client-2",
-  project3: "Client-3"
-};
+const CreateFormDialog = () => {
+  // State for clients (array of strings) and projects (array of strings)
+  const [clients, setClients] = useState<string[]>([]); 
+  const [projectIDs, setProjectIDs] = useState<string[]>([]);
+  const [projectNames, setProjectNames] = useState<string[]>([]);
 
-const projectId = {
-  project1: "Project-1",
-  project2: "Project-2",
-  project3: "Project-3",
-}
+  // Fetch clients and projects on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      const clientsData = await GetClients(); // Assuming this returns an array of strings
+      setClients(clientsData); // Set clients state to the fetched data
+      
+      const { projectIDs, projectNames } = await GetProjects(); // Assuming this returns an object
+      setProjectIDs(projectIDs); // Set the project IDs state
+      setProjectNames(projectNames); // Set the project names state
+    };
 
-const CreateFormDialog = () => (
-  <Dialog.Root>
-    <Dialog.Trigger asChild>
-      <button className="Button violet">Create Form</button>
-    </Dialog.Trigger>
-    <Dialog.Portal>
-      <Dialog.Overlay className="DialogOverlay" />
-      <Dialog.Content className="DialogContent">
-        <Dialog.Title className="DialogTitle">Create New Form</Dialog.Title>
-        <Dialog.Description className="DialogDescription">
-          Add details to create your form
-        </Dialog.Description>
-        <fieldset className="Fieldset">
-          <label className="Label" htmlFor="name">
-            Name
-          </label>
-          <input className="Input" id="name" defaultValue="" />
-        </fieldset>
-        <fieldset className="Fieldset">
-          <label className="Label" htmlFor="desc">
-            Description
-          </label>
-          <input className="Input" id="desc" defaultValue="" />
-        </fieldset>
+    fetchData(); // Call the function to fetch data
+  }, []);
 
-        {/* Dropdown populated using the JSON object */}
-        <fieldset className="Fieldset">
-          <label className="Label" htmlFor="client">
-            Cient
-          </label>
-          <select className="Input" id="client" defaultValue="<Select client>">
-            {Object.keys(clients).map((key) => (
-              <option key={key} value={key}>
-                {clients[key as keyof typeof clients]} {/* Type assertion here */}
-              </option>
-            ))}
-          </select>
-        </fieldset>
-        <fieldset className="Fieldset">
-          <label className="Label" htmlFor="projectId">
-            ProjectId
-          </label>
-          <select className="Input" id="projectId" defaultValue="<Select project Id>">
-            {Object.keys(projectId).map((key) => (
-              <option key={key} value={key}>
-                {projectId[key as keyof typeof projectId]} {/* Type assertion here */}
-              </option>
-            ))}
-          </select>
-        </fieldset>
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger asChild>
+        <button className="Button violet">Create Form</button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="DialogOverlay" />
+        <Dialog.Content className="DialogContent">
+          <Dialog.Title className="DialogTitle">Create New Form</Dialog.Title>
+          <Dialog.Description className="DialogDescription">
+            Add details to create your form
+          </Dialog.Description>
+          
+          {/* Name and Description fields */}
+          <fieldset className="Fieldset">
+            <label className="Label" htmlFor="name">
+              Name
+            </label>
+            <input className="Input" id="name" defaultValue="" />
+          </fieldset>
+          <fieldset className="Fieldset">
+            <label className="Label" htmlFor="desc">
+              Description
+            </label>
+            <input className="Input" id="desc" defaultValue="" />
+          </fieldset>
 
+          {/* Dropdown populated using the fetched clients data */}
+          <fieldset className="Fieldset">
+            <label className="Label" htmlFor="client">
+              Client
+            </label>
+            <select className="Input" id="client" defaultValue="<Select client>">
+              {clients.map((client, index) => (
+                <option key={index} value={client}>
+                  {client}
+                </option>
+              ))}
+            </select>
+          </fieldset>
 
-        <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
+          {/* Dropdown populated using the fetched projects data */}
+          <fieldset className="Fieldset">
+            <label className="Label" htmlFor="projectId">
+              Project ID
+            </label>
+            <select className="Input" id="projectId" defaultValue="<Select project Id>">
+              {projectIDs.map((id, index) => (
+                <option key={id} value={id}>
+                  {projectNames[index]} {/* Display the project name */}
+                </option>
+              ))}
+            </select>
+          </fieldset>
+
+          <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
+            <Dialog.Close asChild>
+              <button className="Button green">Save changes</button>
+            </Dialog.Close>
+          </div>
           <Dialog.Close asChild>
-            <button className="Button green">Save changes</button>
+            <button className="IconButton" aria-label="Close">
+              <Cross2Icon />
+            </button>
           </Dialog.Close>
-        </div>
-        <Dialog.Close asChild>
-          <button className="IconButton" aria-label="Close">
-            <Cross2Icon />
-          </button>
-        </Dialog.Close>
-      </Dialog.Content>
-    </Dialog.Portal>
-  </Dialog.Root>
-);
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+};
 
 export default CreateFormDialog;

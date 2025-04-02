@@ -11,7 +11,42 @@ const schema = a.schema({
     visits: a.integer().default(0),
     submissions: a.integer().default(0),
     shareURL: a.string(),
-    FormSubmissions: a.hasMany('FormSubmissions', 'formId') // One-to-many relationship
+    FormSubmissions: a.hasMany('FormSubmissions', 'formId'), // One-to-many relationship
+    projID: a.id(),
+    projects: a.belongsTo('Project', 'projID'),
+    equipmentTAGs: a.hasMany('FormTag', 'formID')
+  }).authorization(allow => [allow.publicApiKey()]),
+
+  Client: a.model({
+    ClientName: a.string().required(),
+    //one to many - client has many projects
+    projects: a.hasMany('Project', 'ClientID')
+  }).authorization(allow => [allow.publicApiKey()]),
+
+  Project: a.model({
+    projectID: a.string().required(),
+    projectName: a.string().required(),
+    //one to many - project belongs to one client
+    ClientID: a.id(),
+    client: a.belongsTo('Client', 'ClientID'),
+    //one to many - project has many forms
+    forms: a.hasMany('Form', 'projID'),
+    //one to many - project has many equipmentTAGs
+   // equipmentTAGs: a.hasMany('EquipmentTag', 'ProjectID')
+  }).authorization(allow => [allow.publicApiKey()]),
+
+  EquipmentTag: a.model({
+    Tag: a.string().required(),
+    //many to many - equipmenttag has many forms
+    forms: a.hasMany('FormTag', 'tagID')
+  }).authorization(allow => [allow.publicApiKey()]),
+
+  //many to many - equipmenttag and forms
+  FormTag: a.model({
+    formID: a.id(),
+    tagID: a.id(),
+    equipmentTag: a.belongsTo('EquipmentTag', 'tagID'),
+    form: a.belongsTo('Form', 'formID')
   }).authorization(allow => [allow.publicApiKey()]),
 
   FormSubmissions: a.model({
