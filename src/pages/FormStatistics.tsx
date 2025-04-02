@@ -15,7 +15,7 @@ const FormStatistics: React.FC = () => {
       <div className="stats-container">
         {statistics.map((stat, index) => (
           <Box key={index} maxWidth="240px">
-            <Card padding="20px" boxShadow="medium" borderRadius="high">
+           <Card style={{ padding: "20px", boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}>
               <Flex gap="3" align="center">
                 {/* Avatar */}
                 <Avatar
