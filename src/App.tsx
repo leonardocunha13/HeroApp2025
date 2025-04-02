@@ -1,41 +1,43 @@
-import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
+import { Button } from '@radix-ui/themes';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import CreateFormDialog from './components/CreateFormDialog';
-import { useAuthenticator } from '@aws-amplify/ui-react'
-import { Button } from "@radix-ui/themes";
-import "./pages/Styles/styles.css";
+import HomePage from './pages/HomePage';
+import FormStatistics from './pages/FormStatistics';
+import './pages/Styles/styles.css';
 
 const App: React.FC = () => {
   const { signOut } = useAuthenticator();
+
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div className="app-container">
       {/* Navigation Bar */}
-      <nav
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingBottom: '20px',
-          borderBottom: '2px solid #ccc',
-        }}
-      >
-        <div>
-          <Link to="/" style={{ textDecoration: 'none' }}>
-          <Button className="Button violet">Home</Button>
-          </Link>
-          <Link to="/form-builder" style={{ textDecoration: 'none' }}>
+      <header className="header">
+        <h1 className="logo">MyApp</h1>
+      </header>
+
+      {/* Navigation Buttons */}
+      <nav className="navbar">
+        <Link to="/" className="nav-link">
+          <Button className="Button violet">Dashboard</Button>
+        </Link>
+        <Link to="/form-builder" className="nav-link">
           <Button className="Button violet">Form Builder</Button>
-          </Link>
-        </div>
+        </Link>
+        <Link to="/form-statistics" className="nav-link">
+          <Button className="Button violet">Form Statistics</Button>
+        </Link>
       </nav>
-      <div>
-        {/* Routing between Home and Form Builder pages */}
-        
-        <Routes>
-          <Route path="/form-builder" element={<CreateFormDialog />} />
-        </Routes>
-      </div>
-      <button onClick={signOut}>Sign out</button>
+
+      {/* Routing */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/form-builder" element={<CreateFormDialog />} />
+        <Route path="/form-statistics" element={<FormStatistics />} />
+      </Routes>
+
+      {/* Sign-out Button */}
+      <button className="signout-btn" onClick={signOut}>Sign out</button>
     </div>
   );
 };

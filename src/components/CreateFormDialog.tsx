@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Dialog } from "radix-ui";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { GetClients, GetProjects } from "../actions/form";
-import "../pages/Styles/styles.css";
+
 
 const CreateFormDialog = () => {
   // State for clients (array of strings) and projects (array of strings)
