@@ -18,15 +18,16 @@ const App: React.FC = () => {
         }}
       >
         <div>
-          <Link to="/form-builder" style={{ textDecoration: 'none' }}>
+          <Link to="/" style={{ textDecoration: 'none' }}>
             <button style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
-              Form Builder
+              Home
             </button>
           </Link>
         </div>
       </nav>
       <div>
         {/* Routing between Home and Form Builder pages */}
+        
         <Routes>
           <Route path="/form-builder" element={<CreateFormDialog />} />
         </Routes>

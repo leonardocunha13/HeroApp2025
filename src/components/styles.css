@@ -1,6 +1,6 @@
 /* Define your custom color palette */
 :root {
-	--black-alpha-9: rgba(0, 0, 0, 0.9);
+	--black-alpha-9: rgba(0, 0, 0, 0.3);
 	--green-4: #4caf50;
 	--green-11: #2e7d32;
 	--mauve-12: #1c1c1c;
@@ -31,7 +31,7 @@ input {
   background-color: var(--black-alpha-9);
   position: fixed;
   inset: 0;
-  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: contentShow cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Dialog Content */
@@ -47,7 +47,7 @@ input {
   max-width: 500px;
   max-height: 85vh;
   padding: 25px;
-  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: contentShow cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .DialogContent:focus {
@@ -167,4 +167,24 @@ input {
   color: var(--violet-11);
   box-shadow: 0 0 0 1px var(--violet-7);
   height: 35px;
+}
+
+@keyframes overlayShow {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes contentShow {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -48%) scale(0.96);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
 }

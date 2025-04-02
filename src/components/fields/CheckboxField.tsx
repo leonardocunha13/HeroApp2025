@@ -9,10 +9,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import useDesigner from "../hooks/useDesigner";
 import { IoMdCheckbox } from "react-icons/io";
-
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Switch } from "../ui/switch";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { Checkbox } from "../ui/checkbox";
 
 const type: ElementsType = "CheckboxField";
@@ -96,7 +95,7 @@ function FormComponent({
     setError(isInvalid === true);
   }, [isInvalid]);
 
-  const { label, required, placeHolder, helperText } = element.extraAttributes;
+  const { label, required, helperText } = element.extraAttributes;
   const id = `checkbox-${element.id}`;
   return (
     <div className="flex items-top space-x-2">

@@ -4,11 +4,17 @@ import { Button } from "./ui/button";
 import "./styles.css";
 
 // JSON object containing the role options
-const roles = {
-  project1: "project1",
-  project2: "project2",
-  project3: "project3"
+const clients = {
+  project1: "Client-1",
+  project2: "Client-2",
+  project3: "Client-3"
 };
+
+const projectId = {
+  project1: "Project-1",
+  project2: "Project-2",
+  project3: "Project-3",
+}
 
 const CreateFormDialog = () => (
   <Dialog.Root>
@@ -37,17 +43,30 @@ const CreateFormDialog = () => (
 
         {/* Dropdown populated using the JSON object */}
         <fieldset className="Fieldset">
-          <label className="Label" htmlFor="projectId">
-            Role
+          <label className="Label" htmlFor="client">
+            Cient
           </label>
-          <select className="Input" id="projectId" defaultValue="<Select project Id>">
-            {Object.keys(roles).map((key) => (
+          <select className="Input" id="client" defaultValue="<Select client>">
+            {Object.keys(clients).map((key) => (
               <option key={key} value={key}>
-                {roles[key as keyof typeof roles]} {/* Type assertion here */}
+                {clients[key as keyof typeof clients]} {/* Type assertion here */}
               </option>
             ))}
           </select>
         </fieldset>
+        <fieldset className="Fieldset">
+          <label className="Label" htmlFor="projectId">
+            ProjectId
+          </label>
+          <select className="Input" id="projectId" defaultValue="<Select project Id>">
+            {Object.keys(projectId).map((key) => (
+              <option key={key} value={key}>
+                {projectId[key as keyof typeof projectId]} {/* Type assertion here */}
+              </option>
+            ))}
+          </select>
+        </fieldset>
+        
 
         <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
           <Dialog.Close asChild>
