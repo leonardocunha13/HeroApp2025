@@ -1,6 +1,5 @@
 import { Dialog } from "radix-ui";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { Button } from "./ui/button";
 import "./styles.css";
 
 // JSON object containing the role options
@@ -19,7 +18,7 @@ const projectId = {
 const CreateFormDialog = () => (
   <Dialog.Root>
     <Dialog.Trigger asChild>
-      <Button className="Button violet">Create Form</Button>
+      <button className="Button violet">Create Form</button>
     </Dialog.Trigger>
     <Dialog.Portal>
       <Dialog.Overlay className="DialogOverlay" />
@@ -66,7 +65,7 @@ const CreateFormDialog = () => (
             ))}
           </select>
         </fieldset>
-        
+
 
         <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
           <Dialog.Close asChild>
