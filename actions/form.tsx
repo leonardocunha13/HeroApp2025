@@ -103,27 +103,32 @@ export default function GetFormStats() {
   );
 }
 
-export async function CreateForm(name: string, description:string) {
+export async function CreateForm(name: string, description:string, projID:string) {
  
-    const {userId} = await getCurrentUser();
-    if (!userId) {
-      throw new UserNotFoundErr();
-    }
+  const {userId} = await getCurrentUser();
+  if (!userId) {
+    throw new UserNotFoundErr();
+  }
 
-    const { errors, data: form } = await client.models.Form.create({
-      userId: userId,
-      name: name, // Use the form name from the state
-      description: description,
-  
-    });
+  const { errors, data: form } = await client.models.Form.create({
+    userId: userId,
+    projID: projID,
+    name: name, // Use the form name from the state
+    description: description,
 
-    if (errors) {
-      console.error("Error creating form:", errors);
-      throw new Error("Something went wrong while creating the form");
-    }
+  });
 
-    return form?.id;  // Return the created form ID
-  };
+  if (errors) {
+    console.error("Error creating form:", errors);
+    throw new Error("Something went wrong while creating the form");
+  }
+
+  return form?.id;  // Return the created form ID
+};
+
+/*CreateForm("Test name 5", "Test description 5", "6f20f3be-b793-4542-bfce-9aa0b3e1c392")
+  .then((formId) => console.log("Created Form ID:", formId)) 
+  .catch((error) => console.error("Error creating form:", error));*/
 
 export async function GetForms() {
   
@@ -301,3 +306,122 @@ export async function GetFormWithSubmissions(id: string) {
 
   throw new Error("Form not found or doesn't belong to the current user.");
 }
+
+export async function InsertClient(NameClient: string) {
+  try {
+    const { errors, data } = await client.models.Client.create({
+      ClientName: NameClient,
+    });
+
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to insert client.");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+//InsertClient("FMG");
+
+export async function InsertProject(NameProject: string, IDProject: string, ClientID: string) {
+  try {
+      const { errors, data } = await client.models.Projectt.create({
+        projectName: NameProject,
+        projectID: IDProject,
+        ClientID: ClientID,
+      });
+
+      if (errors) {
+        console.error("Error inserting project:", errors);
+        throw new Error("Failed to insert project.");
+      }
+
+      console.log("Project inserted successfully:", data);
+      return data; // Return the inserted project data
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+  }
+}
+
+//InsertProject("Waitsia Gas Plant EI Support" , "HE102P001", "27a41e74-4ab0-4f13-a347-95ebb7dcbab0");
+
+export async function GetClientWithProjects(ClientID: string) {
+  try {
+    const { errors, data } = await client.models.Client.get({ id: ClientID });
+
+    if (errors || !client) {
+      console.error("Error fetching client:", errors);
+      throw new Error("Client not found.");
+    }
+
+    // Fetch all projects related to this client
+    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
+      filter: { ClientID: { eq: ClientID } },
+    });
+
+    if (projectErrors) {
+      console.error("Error fetching projects:", projectErrors);
+    }
+
+    return { ...data, projects }; 
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+/*GetClientWithProjects("1ad74bce-bd9d-4131-83ef-effecba74c7d")
+  .then((data) => console.log("Client with Projects:", data))
+  .catch((error) => console.error("Error fetching client with projects:", error));*/
+
+  export async function GetFormsWithClient(ClientID: string) {
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
+
+    try {
+      // Fetch projects linked to the ClientID
+      const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
+        filter: { ClientID: { eq: ClientID } }
+      });
+      console.log("Projects Found:", projects);
+      if (projectErrors || !projects || projects.length === 0) {
+        console.error(projectErrors || "No projects found for this client.");
+        throw new Error("No projects found for this client.");
+      }
+  
+      // Fetch forms for each project
+      const forms = await Promise.all(
+        projects.map(async (project) => {
+          const { data: projectForms } = await client.models.Form.list({
+            filter: { projID: { eq: project.projectID } }
+          });
+          console.log ('Project ID:', project.projectID);
+          console.log(`Forms for Project ${project.projectName}:`, projectForms);
+
+          return projectForms.map(form => ({ 
+            ...form,
+             projectName: project.projectName 
+          }));
+        })
+      );
+
+      return forms.flat();
+    } catch (error) {
+      console.error("Error fetching forms with client:", error);
+      throw new Error("Failed to fetch forms for the client.");
+    }
+  }
+    
+  GetFormsWithClient("1ad74bce-bd9d-4131-83ef-effecba74c7d")
+  .then((forms) => console.log("Forms:", forms))
+  .catch((error) => console.error("Error:", error));
+
+
+
+  
+
