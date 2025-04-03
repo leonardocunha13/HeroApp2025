@@ -3,7 +3,7 @@ import outputs from '../../amplify_outputs.json';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from 'aws-amplify/auth'; // Ensure getCurrentUser is imported correctly
-import { formSchemaType } from "../schemas/form";
+//import { formSchemaType } from "../schemas/form";
 
 Amplify.configure(outputs);
 
@@ -81,8 +81,8 @@ export async function GetClients() {
 
 export async function GetProjects() {
   try {
-    const { errors, data } = await client.models.Project.list();
-    
+    const { errors, data } = await client.models.Projectt.list();
+
     if (errors) {
       console.error("Error:", errors);
       throw new Error("Failed to fetch projects.");
@@ -146,30 +146,7 @@ export async function GetFormStats() {
   }
 }
 
-export async function CreateForm(data: formSchemaType) {
-  try {
-    const { userId } = await getCurrentUser();
-    if (!userId) {
-      throw new UserNotFoundErr();
-    }
 
-    const { errors, data: form } = await client.models.Form.create({
-      userId: userId,
-      name: data.name,
-      description: data.description,
-    });
-
-    if (errors) {
-      console.error("Error creating form:", errors);
-      throw new Error("Something went wrong while creating the form");
-    }
-
-    return form?.id;
-  } catch (error) {
-    console.error("Error in CreateForm:", error);
-    throw new Error("Failed to create form.");
-  }
-}
 
 export async function GetForms() {
   try {
@@ -379,3 +356,213 @@ export async function GetFormWithSubmissions(id: string) {
     throw new Error("Failed to fetch form with submissions.");
   }
 }
+export async function GetClientWithProjects(ClientID: string) {
+  try {
+    const { errors, data } = await client.models.Client.get({ id: ClientID });
+
+    if (errors || !client) {
+      console.error("Error fetching client:", errors);
+      throw new Error("Client not found.");
+    }
+
+    // Fetch all projects related to this client
+    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
+      filter: { ClientID: { eq: ClientID } },
+    });
+
+    if (projectErrors) {
+      console.error("Error fetching projects:", projectErrors);
+    }
+
+    return { ...data, projects };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+/*GetClientWithProjects("1ad74bce-bd9d-4131-83ef-effecba74c7d")
+  .then((data) => console.log("Client with Projects:", data))
+  .catch((error) => console.error("Error fetching client with projects:", error));*/
+
+export async function GetFormsWithClient(ClientID: string) {
+  const { userId } = await getCurrentUser();
+  if (!userId) {
+    throw new UserNotFoundErr();
+  }
+
+  try {
+    // Fetch projects linked to the ClientID
+    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
+      filter: { ClientID: { eq: ClientID } }
+    });
+    console.log("Projects Found:", projects);
+    if (projectErrors || !projects || projects.length === 0) {
+      console.error(projectErrors || "No projects found for this client.");
+      throw new Error("No projects found for this client.");
+    }
+
+    // Fetch forms for each project
+    const forms = await Promise.all(
+      projects.map(async (project) => {
+        const { data: projectForms } = await client.models.Form.list({
+          filter: { projID: { eq: project.projectID } }
+        });
+        console.log('Project ID:', project.projectID);
+        console.log(`Forms for Project ${project.projectName}:`, projectForms);
+
+        return projectForms.map(form => ({
+          ...form,
+          projectName: project.projectName
+        }));
+      })
+    );
+
+    return forms.flat();
+  } catch (error) {
+    console.error("Error fetching forms with client:", error);
+    throw new Error("Failed to fetch forms for the client.");
+  }
+}
+
+/*GetFormsWithClient("1ad74bce-bd9d-4131-83ef-effecba74c7d")
+.then((forms) => console.log("Forms:", forms))
+.catch((error) => console.error("Error:", error));*/
+
+export async function GetFormsInformation() {
+  try {
+    const { errors: clientErrors, data: clientsData } = await client.models.Client.list();
+
+    if (clientErrors) {
+      console.error("Error:", clientErrors);
+      throw new Error("Failed to fetch forms.");
+    }
+
+    let results = [];
+
+    for (const clientItem of clientsData) {
+      const { errors: projectErrors, data: projectsData } = await client.models.Projectt.list({
+        filter: { ClientID: { eq: clientItem.id } },
+      });
+
+      if (projectErrors) {
+        console.error("Error:", projectErrors);
+        throw new Error("Error fetching projects");
+      }
+
+      for (const projectItem of projectsData) {
+        //console.log(`Fetching forms for project: ${projectItem.projectName}, ID: ${projectItem.projectID}`);
+
+        const { errors: formErrors, data: formsData } = await client.models.Form.list({
+          filter: { projID: { eq: projectItem.projectID } }, // Ensure the correct key is used
+        });
+
+        if (formErrors) {
+          console.error("Error:", formErrors);
+          throw new Error("Error fetching forms");
+        }
+
+        results.push({
+          clientName: clientItem.ClientName,
+          projectName: projectItem.projectName,
+          projectID: projectItem.projectID,
+          forms: formsData.map(form => ({
+            name: form.name,
+            description: form.description,
+          })),
+        });
+      }
+    }
+
+    return results;
+  } catch (error) {
+    console.error("Error", error);
+    throw error;
+  }
+}
+
+/*const formsInfo = await GetFormsInformation()
+console.log('Form Info:', formsInfo);*/
+
+export async function GetProjectsFromClientName(ClientName: string) {
+  try {
+    // Fetch Client based on ClientName
+    const { errors, data: clientData } = await client.models.Client.list({
+      filter: { ClientName: { eq: ClientName } }
+    });
+
+    if (errors || clientData.length === 0) {
+      console.error("Error fetching client or client not found:", errors);
+      throw new Error("Client not found.");
+    }
+
+    // Assuming each client has an array of projects
+    const Clients = clientData[0]; // Assuming the first client in the list is the one we're interested in
+    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
+      filter: { ClientID: { eq: Clients.id } },
+    });
+
+    if (projectErrors) {
+      console.error("Error fetching projects:", projectErrors);
+    }
+
+    // Return client and associated projects
+    return { ...Clients, projects };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+
+/*GetProjectsFromClientName("BHP")
+  .then((data) => console.log("Client with Projects:", data))
+  .catch((error) => console.error("Error fetching client with projects:", error));*/
+  export async function InsertProject(NameProject: string, IDProject: string, ClientID: string) {
+    try {
+      const { errors, data } = await client.models.Projectt.create({
+        projectName: NameProject,
+        projectID: IDProject,
+        ClientID: ClientID,
+      });
+  
+      if (errors) {
+        console.error("Error inserting project:", errors);
+        throw new Error("Failed to insert project.");
+      }
+  
+      console.log("Project inserted successfully:", data);
+      return data; // Return the inserted project data
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+    }
+  }
+  //InsertProject("Cage Winder Execute Phase" , "HE067P010", "741fa82d-6e1d-463c-a221-6565b2974a1a");
+
+  export async function CreateForm(name: string, description: string, projID: string) {
+
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
+  
+    const { errors, data: form } = await client.models.Form.create({
+      userId: userId,
+      projID: projID,
+      name: name, // Use the form name from the state
+      description: description,
+  
+    });
+  
+    if (errors) {
+      console.error("Error creating form:", errors);
+      throw new Error("Something went wrong while creating the form");
+    }
+  
+    return form?.id;  // Return the created form ID
+  };
+  
+ /* CreateForm("Test name 12", "Test description 12", "HE101P001")
+    .then((formId) => console.log("Created Form ID:", formId)) 
+    .catch((error) => console.error("Error creating form:", error));*/

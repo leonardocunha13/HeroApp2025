@@ -13,28 +13,17 @@ const schema = a.schema({
     shareURL: a.string(),
     FormSubmissions: a.hasMany('FormSubmissions', 'formId'), // One-to-many relationship
     projID: a.id(),
-<<<<<<< HEAD
     projects: a.belongsTo('Projectt', 'projID'),
-=======
-    projects: a.belongsTo('Project', 'projID'),
->>>>>>> 1a72ab387f3164c4cde24057a97e6d8ecde9fcea
     equipmentTAGs: a.hasMany('FormTag', 'formID')
   }).authorization(allow => [allow.publicApiKey()]),
 
   Client: a.model({
     ClientName: a.string().required(),
     //one to many - client has many projects
-<<<<<<< HEAD
     projects: a.hasMany('Projectt', 'ClientID')
   }).authorization(allow => [allow.publicApiKey()]),
 
   Projectt: a.model({
-=======
-    projects: a.hasMany('Project', 'ClientID')
-  }).authorization(allow => [allow.publicApiKey()]),
-
-  Project: a.model({
->>>>>>> 1a72ab387f3164c4cde24057a97e6d8ecde9fcea
     projectID: a.string().required(),
     projectName: a.string().required(),
     //one to many - project belongs to one client
