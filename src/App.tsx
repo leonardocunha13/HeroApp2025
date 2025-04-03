@@ -65,13 +65,13 @@ const App: React.FC = () => {
               }}
             >
               {/* Fallback content (Initials) */}
-              {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
+              {user?.userId ? user.userId.charAt(0).toUpperCase() : 'U'}
             </Avatar.Fallback>
           </Avatar.Root>
 
           {/* Username (next to avatar) */}
           <Text style={{ marginLeft: '10px', fontSize: '16px', color: '#333' }}>
-            {user?.username || 'User'}
+            {user?.userId || 'User'}
           </Text>
         </div>
       </div>

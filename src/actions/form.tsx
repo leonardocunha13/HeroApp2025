@@ -105,19 +105,9 @@ export async function InsertMultipleClients(names: string[]) {
   };
 }
 
-const clients = await GetClients();
 
-const cID = clients.clientIDs;
-console.log(cID);
-const projects = ["project1", "project2","project3","project4"];
-const  projNumbers = ["projNumber1","projNumber2","projNumber3","projNumber4"];
 
-InsertProject(projects[0],projNumbers[0],cID[0]);
-InsertProject(projects[1],projNumbers[1],cID[1]);
-InsertProject(projects[2],projNumbers[2],cID[2]);
-InsertProject(projects[3],projNumbers[3],cID[3]);
-
-/*const clientNames = ["Client4"]; // Example client names
+const clientNames = ["Client1","Client2", "Client3","Client4"]; // Example client names
 
 InsertMultipleClients(clientNames)
   .then((result) => {
@@ -126,7 +116,7 @@ InsertMultipleClients(clientNames)
   })
   .catch((error) => {
     console.error("Error inserting clients:", error);
-  });*/
+  });
 
   export async function GetClients() {
     try {
@@ -155,6 +145,22 @@ InsertMultipleClients(clientNames)
       throw error;
     }
   }
+
+  async function fetchData() {
+    const clients = await GetClients();
+    const cID = clients.clientIDs;
+    console.log(cID);
+    const projects = ["project1", "project2", "project3", "project4"];
+    const projNumbers = ["projNumber1", "projNumber2", "projNumber3", "projNumber4"];
+  
+    await InsertProject(projects[0], projNumbers[0], cID[0]);
+    await InsertProject(projects[1], projNumbers[1], cID[1]);
+    await InsertProject(projects[2], projNumbers[2], cID[2]);
+    await InsertProject(projects[3], projNumbers[3], cID[3]);
+  }
+  
+  fetchData().catch(console.error);
+  
   
 
 export async function GetProjects() {
