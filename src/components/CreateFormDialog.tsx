@@ -31,7 +31,7 @@ const CreateFormDialog = () => {
     <Dialog.Root>
       <Dialog.Trigger asChild>
         
-        <Button size="large" variation="primary" className="Button violet" ><IoIosCreate />Create Form</Button>
+        <Button size="large" variation="primary" className="Button violet" style={{width:'100%'}} ><IoIosCreate />Create Form</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />

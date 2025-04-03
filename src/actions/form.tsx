@@ -107,7 +107,7 @@ export async function InsertMultipleClients(names: string[]) {
 
 
 
-const clientNames = ["Client1","Client2", "Client3","Client4"]; // Example client names
+/*const clientNames = ["Client1","Client2", "Client3","Client4"]; // Example client names
 
 InsertMultipleClients(clientNames)
   .then((result) => {
@@ -116,7 +116,7 @@ InsertMultipleClients(clientNames)
   })
   .catch((error) => {
     console.error("Error inserting clients:", error);
-  });
+  });*/
 
   export async function GetClients() {
     try {
@@ -146,7 +146,7 @@ InsertMultipleClients(clientNames)
     }
   }
 
-  async function fetchData() {
+  /*async function fetchData() {
     const clients = await GetClients();
     const cID = clients.clientIDs;
     console.log(cID);
@@ -157,9 +157,9 @@ InsertMultipleClients(clientNames)
     await InsertProject(projects[1], projNumbers[1], cID[1]);
     await InsertProject(projects[2], projNumbers[2], cID[2]);
     await InsertProject(projects[3], projNumbers[3], cID[3]);
-  }
+  }*/
   
-  fetchData().catch(console.error);
+  //fetchData().catch(console.error);
   
   
 
