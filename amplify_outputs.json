@@ -14,6 +14,7 @@
     "user_verification_types": [
       "email"
     ],
+    "groups": [],
     "mfa_configuration": "NONE",
     "password_policy": {
       "min_length": 8,
@@ -136,7 +137,11 @@
               "name": "projects",
               "isArray": false,
               "type": {
+<<<<<<< HEAD
                 "model": "Projectt"
+=======
+                "model": "Project"
+>>>>>>> 1a72ab387f3164c4cde24057a97e6d8ecde9fcea
               },
               "isRequired": false,
               "attributes": [],
@@ -224,7 +229,11 @@
               "name": "projects",
               "isArray": true,
               "type": {
+<<<<<<< HEAD
                 "model": "Projectt"
+=======
+                "model": "Project"
+>>>>>>> 1a72ab387f3164c4cde24057a97e6d8ecde9fcea
               },
               "isRequired": false,
               "attributes": [],
@@ -284,8 +293,13 @@
             "sortKeyFieldNames": []
           }
         },
+<<<<<<< HEAD
         "Projectt": {
           "name": "Projectt",
+=======
+        "Project": {
+          "name": "Project",
+>>>>>>> 1a72ab387f3164c4cde24057a97e6d8ecde9fcea
           "fields": {
             "id": {
               "name": "id",
@@ -364,7 +378,11 @@
             }
           },
           "syncable": true,
+<<<<<<< HEAD
           "pluralName": "Projectts",
+=======
+          "pluralName": "Projects",
+>>>>>>> 1a72ab387f3164c4cde24057a97e6d8ecde9fcea
           "attributes": [
             {
               "type": "model",
@@ -668,5 +686,5 @@
       "nonModels": {}
     }
   },
-  "version": "1.2"
+  "version": "1.3"
 }
