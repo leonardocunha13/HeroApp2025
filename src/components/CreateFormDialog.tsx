@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Dialog } from "radix-ui";
-import { Cross2Icon } from "@radix-ui/react-icons";
+import { Cross2Icon} from "@radix-ui/react-icons";
+import { FaSave } from "react-icons/fa";
+import { IoIosCreate } from "react-icons/io";
 import { GetClients, GetProjects } from "../actions/form";
+import { Button } from '@aws-amplify/ui-react';
 
 
 const CreateFormDialog = () => {
@@ -14,7 +17,7 @@ const CreateFormDialog = () => {
   useEffect(() => {
     const fetchData = async () => {
       const clientsData = await GetClients(); // Assuming this returns an array of strings
-      setClients(clientsData); // Set clients state to the fetched data
+      setClients(clientsData.clientNames); // Set clients state to the fetched data
       
       const { projectIDs, projectNames } = await GetProjects(); // Assuming this returns an object
       setProjectIDs(projectIDs); // Set the project IDs state
@@ -27,7 +30,8 @@ const CreateFormDialog = () => {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="Button violet">Create Form</button>
+        
+        <Button size="large" variation="primary" className="Button violet" ><IoIosCreate />Create Form</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />
@@ -81,7 +85,7 @@ const CreateFormDialog = () => {
 
           <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
             <Dialog.Close asChild>
-              <button className="Button green">Save changes</button>
+              <Button className="Button green"><FaSave />Save changes</Button>
             </Dialog.Close>
           </div>
           <Dialog.Close asChild>

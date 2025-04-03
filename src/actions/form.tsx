@@ -29,6 +29,61 @@ export async function InsertClient(NameClient: string) {
   }
 }
 
+
+
+// Function to insert a single project (you may already have something like this)
+export async function InsertProject(name: string, projNum: string, clientID: string) {
+  try {
+    const { errors, data } = await client.models.Project.create({
+      projectID: projNum,
+      projectName: name,
+      ClientID: clientID
+    });
+
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to insert client.");
+    }
+    return data; // Returns the inserted client data
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+// Function to insert multiple projects
+/*export async function InsertMultipleProjects(names: string[], projNum: string[], clientIDs: string[]) {
+  const insertedProjects: any[] = []; // Array to store successfully inserted projects
+  const failedProjects: string[] = []; // Array to store project names that failed to insert
+
+  // Ensure that input arrays have the same length
+  if (names.length !== projNum.length || projNum.length !== clientIDs.length) {
+    throw new Error("Input arrays must have the same length.");
+  }
+
+  // Loop through the arrays and insert projects one by one
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    const projectNumber = projNum[i];
+    const clientID = clientIDs[i];
+
+    try {
+      const projectData = await InsertProject(name, projectNumber, clientID); // Call to insert a single project
+      insertedProjects.push(projectData); // Store the successful insert result
+    } catch (error) {
+      console.error(`Failed to insert project: ${name}`, error);
+      failedProjects.push(name); // Store the failed project name
+    }
+  }
+
+  // Return the results: successful insertions and failed ones
+  return {
+    insertedProjects,
+    failedProjects,
+  };
+}*/
+
+
 export async function InsertMultipleClients(names: string[]) {
   const insertedClients: any[] = []; // Array to store successfully inserted clients
   const failedClients: string[] = []; // Array to store client names that failed to insert
@@ -50,7 +105,19 @@ export async function InsertMultipleClients(names: string[]) {
   };
 }
 
-/*const clientNames = ["Client1", "Client2", "Client3"]; // Example client names
+const clients = await GetClients();
+
+const cID = clients.clientIDs;
+console.log(cID);
+const projects = ["project1", "project2","project3","project4"];
+const  projNumbers = ["projNumber1","projNumber2","projNumber3","projNumber4"];
+
+InsertProject(projects[0],projNumbers[0],cID[0]);
+InsertProject(projects[1],projNumbers[1],cID[1]);
+InsertProject(projects[2],projNumbers[2],cID[2]);
+InsertProject(projects[3],projNumbers[3],cID[3]);
+
+/*const clientNames = ["Client4"]; // Example client names
 
 InsertMultipleClients(clientNames)
   .then((result) => {
@@ -61,23 +128,34 @@ InsertMultipleClients(clientNames)
     console.error("Error inserting clients:", error);
   });*/
 
-export async function GetClients() {
-  try {
-    const { errors, data } = await client.models.Client.list();
-
-    if (errors) {
-      console.error("Error:", errors);
-      throw new Error("Failed to fetch clients.");
+  export async function GetClients() {
+    try {
+      const { errors, data } = await client.models.Client.list();
+  
+      if (errors) {
+        console.error("Error:", errors);
+        throw new Error("Failed to fetch clients.");
+      }
+  
+      // Extract client names and client IDs
+      const clientNames = data.map(client => client.ClientName);
+      const clientIDs = data.map(client => client.id);
+  
+      // Return both client names and IDs in an object or an array
+      return {
+        clientNames,
+        clientIDs
+      };
+  
+      // Alternatively, if you want to return an array:
+      // return [clientNames, clientIDs];
+  
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
     }
-
-    const clientNames = data.map(client => client.ClientName);
-
-    return clientNames;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
   }
-}
+  
 
 export async function GetProjects() {
   try {
@@ -99,7 +177,6 @@ export async function GetProjects() {
     throw error;
   }
 }
-
 
 export async function GetFormStats() {
   try {
@@ -157,6 +234,7 @@ export async function CreateForm(data: formSchemaType) {
       userId: userId,
       name: data.name,
       description: data.description,
+      
     });
 
     if (errors) {
@@ -377,5 +455,58 @@ export async function GetFormWithSubmissions(id: string) {
   } catch (error) {
     console.error("Error fetching form with submissions:", error);
     throw new Error("Failed to fetch form with submissions.");
+  }
+}
+
+
+export async function GetFormsInformation() {
+  try {
+    const { errors: clientErrors, data: clientsData } = await client.models.Client.list();
+
+    if (clientErrors) {
+      console.error("Error:", clientErrors);
+      throw new Error("Failed to fetch forms.");
+    }
+
+    let results = [];
+
+    for (const clientItem of clientsData) {
+      const { errors: projectErrors, data: projectsData } = await client.models.Project.list({
+        filter: { ClientID: { eq: clientItem.id } },
+      });
+
+      if (projectErrors) {
+        console.error("Error:", projectErrors);
+        throw new Error("Error fetching projects");
+      }
+
+      for (const projectItem of projectsData) {
+        //console.log(`Fetching forms for project: ${projectItem.projectName}, ID: ${projectItem.projectID}`);
+
+        const { errors: formErrors, data: formsData } = await client.models.Form.list({
+          filter: { projID: { eq: projectItem.projectID } }, // Ensure the correct key is used
+        });
+
+        if (formErrors) {
+          console.error("Error:", formErrors);
+          throw new Error("Error fetching forms");
+        }
+
+        results.push({
+          clientName: clientItem.ClientName,
+          projectName: projectItem.projectName,
+          projectID: projectItem.projectID,
+          forms: formsData.map(form => ({
+            name: form.name,
+            description: form.description,
+          })),
+        });
+      }
+    }
+
+    return results;
+  } catch (error) {
+    console.error("Error", error);
+    throw error;
   }
 }
