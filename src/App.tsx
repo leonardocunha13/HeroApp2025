@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage';
 import FormStatistics from './pages/FormStatistics';
 import './pages/Styles/styles.css';
 import RunForm from './pages/RunForm';
+import RunningForm from './pages/runningform';
+
 
 const App: React.FC = () => {
   const { signOut } = useAuthenticator();
@@ -39,6 +41,7 @@ const App: React.FC = () => {
         <Route path="/form-builder" element={<CreateFormDialog />} />
         <Route path="/form-statistics" element={<FormStatistics />} />
         <Route path="/RunForm" element={<RunForm />} />
+        <Route path="/RunningForm/:projectID" element={<RunningForm />} />
       </Routes>
 
       {/* Sign-out Button */}
