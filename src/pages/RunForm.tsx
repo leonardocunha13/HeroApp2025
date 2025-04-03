@@ -70,7 +70,7 @@ export const CollectionForms = () => {
                 </Flex>
             }
             searchFilter={(item, keyword) => {
-                const form = item as FormInfo; // Convertemos 'item' para 'FormInfo'
+                const form = item as FormInfo;
                 return form.clientName.toLowerCase().includes(keyword.toLowerCase());
             }}
         >
