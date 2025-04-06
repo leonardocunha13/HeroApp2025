@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
 import { DndContext, closestCenter, useDraggable, useDroppable } from '@dnd-kit/core';
 import { v4 as uuidv4 } from 'uuid';
-import { CSS } from '@dnd-kit/utilities';
+import { useState } from 'react';
 
 // Define the structure of form components
 interface FormComponent {
