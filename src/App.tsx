@@ -1,6 +1,5 @@
 import { Tabs, Text } from '@aws-amplify/ui-react';
 import { useEffect } from 'react';
-import * as Avatar from '@radix-ui/react-avatar';
 import './pages/Styles/styles.css';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { useState } from 'react';
