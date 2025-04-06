@@ -1,4 +1,5 @@
 import { Tabs, Text } from '@aws-amplify/ui-react';
+import { useEffect } from 'react';
 import * as Avatar from '@radix-ui/react-avatar';
 import './pages/Styles/styles.css';
 import { useAuthenticator } from '@aws-amplify/ui-react';
@@ -6,12 +7,25 @@ import { useState } from 'react';
 import HomePage from '../src/pages/HomePage';
 import CreateFormDialog from '../src/components/CreateFormDialog';
 import CollectionForms from '../src/pages/RunForm';
+import DynamicFormBuilder from './pages/BuildForm';
 import { FiSun, FiMoon } from 'react-icons/fi';
 
 const App: React.FC = () => {
+
   const { signOut } = useAuthenticator();
   const [tab, setTab] = useState('1');
   const [darkMode, setDarkMode] = useState(false);
+
+  
+
+useEffect(() => {
+  if (darkMode) {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
+}, [darkMode]);
+
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -21,6 +35,7 @@ const App: React.FC = () => {
     <div className={darkMode ? 'dark' : ''}>
       {/* Top Bar */}
       <div
+        className={`top-bar ${darkMode ? 'dark' : ''}`}
         style={{
           position: 'fixed',
           top: 0,
@@ -30,7 +45,6 @@ const App: React.FC = () => {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '12px 24px',
-          backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)',
           backdropFilter: 'blur(12px)',
           boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
           borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
@@ -38,129 +52,74 @@ const App: React.FC = () => {
           transition: 'background-color 0.3s ease',
         }}
       >
-        {/* App Name */}
-        <Text
-          fontWeight="bold"
-          fontSize="large"
-          style={{ fontSize: '24px', color: darkMode ? '#fdd835' : '#222' }}
-        >
-          Hero Engineering Audit App
-        </Text>
-
-        {/* Right Side: Dark Mode Toggle + Avatar */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {/* Dark Mode Toggle */}
+        {/* Top Bar Content */}
+        <Text color={darkMode ? 'white' : 'black'}>Hero Audit Form Builder</Text>
+        <div>
           <button
             onClick={toggleDarkMode}
             style={{
-              background: 'none',
+              backgroundColor: darkMode ? 'transparent' : '#444',
+              color: darkMode ? '#fff' : '#000',
+              padding: '8px 12px',
+              borderRadius: '8px',
               border: 'none',
               cursor: 'pointer',
-              marginRight: '16px',
-              color: darkMode ? '#fdd835' : '#333',
-              fontSize: '20px',
-              transition: 'color 0.3s',
+              fontSize: '18px',
+              marginLeft: '12px',
             }}
           >
             {darkMode ? <FiSun /> : <FiMoon />}
           </button>
-
-          {/* Avatar */}
-          <Avatar.Root style={{ display: 'inline-block', position: 'relative' }}>
-            <Avatar.Image
-              src=""
-              alt="User Avatar"
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '50%',
-                backgroundColor: 'transparent',
-                objectFit: 'cover',
-                boxShadow: darkMode
-                  ? '0 2px 6px rgba(255, 255, 255, 0.2)'
-                  : '0 2px 6px rgba(0, 0, 0, 0.1)',
-                transition: 'box-shadow 0.3s ease',
-              }}
-            />
-            <Avatar.Fallback
-              delayMs={600}
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '50%',
-                backgroundColor: darkMode ? '#555' : '#ddd',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#6f6e72',
-                fontSize: '18px',
-              }}
-            >
-              {'H'}
-            </Avatar.Fallback>
-          </Avatar.Root>
-
-          {/* Username */}
-          <Text
-            style={{
-              marginLeft: '12px',
-              fontSize: '16px',
-              fontWeight: '500',
-              color: darkMode ? '#eee' : '#333',
-              transition: 'color 0.3s',
-            }}
-          >
-            {'Hero'}
-          </Text>
         </div>
       </div>
-
+  
       {/* Main Content */}
-
-      <Tabs
-        value={tab}
-        onValueChange={(tab) => setTab(tab)}
-        items={[
-          {
-            label: 'Home',
-            value: '1',
-            content: <HomePage />,
-          },
-          {
-            label: 'Forms',
-            value: '2',
-            content: <CreateFormDialog />,
-          },
-          {
-            label: 'Forms List',
-            value: '3',
-            content: <CollectionForms />,
-          },
-        ]}
-        
-      />
-
+      <div style={{ marginTop: '60px' }}> {/* Add margin to avoid content being hidden behind the top bar */}
+        {/* Tabs */}
+        <Tabs
+          value={tab}
+          onValueChange={(tab) => setTab(tab)}
+          className={darkMode ? 'tabs dark' : 'tabs'}
+          items={[
+            {
+              label: 'Home',
+              value: '1',
+              content: <HomePage />,
+            },
+            {
+              label: 'Forms',
+              value: '2',
+              content: <CreateFormDialog />,
+            },
+            {
+              label: 'Forms List',
+              value: '3',
+              content: <CollectionForms />,
+            },
+             {
+              label: 'Form Builder',
+              value: '4',
+              content: <DynamicFormBuilder />,
+            },
+          ]}
+        />
+      </div>
+  
       {/* Sign-out Button */}
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
         <button
           onClick={signOut}
           style={{
-            backgroundColor: '#6f6e72',
-            color: '#000000',
+            backgroundColor: darkMode ? '#444' : '#6f6e72',
+            color: darkMode ? '#fff' : '#000',
             padding: '10px 16px',
             borderRadius: '8px',
             border: 'none',
             fontSize: '16px',
             cursor: 'pointer',
             transition: 'background-color 0.3s',
-            width: '100%'
+            width: '100%',
           }}
-          onMouseOver={(e) =>
-            (e.currentTarget.style.backgroundColor = '#f8f9fa')
-          }
-          onMouseOut={(e) =>
-            (e.currentTarget.style.backgroundColor = '#6f6e72')
-          }
         >
           Sign out
         </button>
