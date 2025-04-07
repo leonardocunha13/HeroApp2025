@@ -68,9 +68,9 @@ const CollectionForms = () => {
         fetchData();
     }, [refresh]); // Ensure the data gets re-fetched when the refresh state changes
 
-    const triggerRefresh = () => {
+    /*const triggerRefresh = () => {
         setRefresh(prev => !prev); // Toggle the refresh state to trigger useEffect
-    };
+    };*/
 
     const openDialog = (form: FormInfo) => {
         setSelectedForm(form);
