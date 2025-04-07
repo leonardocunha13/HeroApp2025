@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "ap-southeast-2_pQaVVrxIi",
+    "user_pool_id": "ap-southeast-2_HvoChyNej",
     "aws_region": "ap-southeast-2",
-    "user_pool_client_id": "6pn5f45r53nn2kucm9bl09s6vp",
-    "identity_pool_id": "ap-southeast-2:2d2a71aa-ffd5-4df0-9913-98a748bf982b",
+    "user_pool_client_id": "3uk62gfn0qbvmmdv4m90gma1h9",
+    "identity_pool_id": "ap-southeast-2:fcfe265c-ab37-4371-b214-eb86e8bcb2eb",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -25,9 +25,9 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://q7odujbcvnaehpcncouzqpjula.appsync-api.ap-southeast-2.amazonaws.com/graphql",
+    "url": "https://n2leum5qobcstdvius6g4mnbsu.appsync-api.ap-southeast-2.amazonaws.com/graphql",
     "aws_region": "ap-southeast-2",
-    "api_key": "da2-vut2efbejnfhpi2svbyx2kotwa",
+    "api_key": "da2-dgsq5faxp5e5rkzetcd4sbmhqa",
     "default_authorization_type": "API_KEY",
     "authorization_types": [
       "AMAZON_COGNITO_USER_POOLS",
@@ -151,7 +151,7 @@
               "name": "equipmentTAGs",
               "isArray": true,
               "type": {
-                "model": "FormTag"
+                "model": "FormTag2"
               },
               "isRequired": false,
               "attributes": [],
@@ -394,8 +394,8 @@
             "sortKeyFieldNames": []
           }
         },
-        "EquipmentTag": {
-          "name": "EquipmentTag",
+        "EquipmentTag2": {
+          "name": "EquipmentTag2",
           "fields": {
             "id": {
               "name": "id",
@@ -422,7 +422,7 @@
               "name": "forms",
               "isArray": true,
               "type": {
-                "model": "FormTag"
+                "model": "FormTag2"
               },
               "isRequired": false,
               "attributes": [],
@@ -452,7 +452,7 @@
             }
           },
           "syncable": true,
-          "pluralName": "EquipmentTags",
+          "pluralName": "EquipmentTag2s",
           "attributes": [
             {
               "type": "model",
@@ -482,8 +482,8 @@
             "sortKeyFieldNames": []
           }
         },
-        "FormTag": {
-          "name": "FormTag",
+        "FormTag2": {
+          "name": "FormTag2",
           "fields": {
             "id": {
               "name": "id",
@@ -510,7 +510,7 @@
               "name": "equipmentTag",
               "isArray": false,
               "type": {
-                "model": "EquipmentTag"
+                "model": "EquipmentTag2"
               },
               "isRequired": false,
               "attributes": [],
@@ -554,7 +554,7 @@
             }
           },
           "syncable": true,
-          "pluralName": "FormTags",
+          "pluralName": "FormTag2s",
           "attributes": [
             {
               "type": "model",

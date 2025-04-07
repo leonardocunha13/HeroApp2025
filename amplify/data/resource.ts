@@ -14,7 +14,7 @@ const schema = a.schema({
     FormSubmissions: a.hasMany('FormSubmissions', 'formId'), // One-to-many relationship
     projID: a.id(),
     projects: a.belongsTo('Projectt', 'projID'),
-    equipmentTAGs: a.hasMany('FormTag', 'formID')
+    equipmentTAGs: a.hasMany('FormTag2', 'formID')
   }).authorization(allow => [allow.publicApiKey()]),
 
   Client: a.model({
@@ -35,18 +35,18 @@ const schema = a.schema({
    // equipmentTAGs: a.hasMany('EquipmentTag', 'ProjectID')
   }).authorization(allow => [allow.publicApiKey()]),
 
-  EquipmentTag: a.model({
+  EquipmentTag2: a.model({
     Tag: a.string().required(),
     EquipmentName: a.string().required(),
     //many to many - equipmenttag has many forms
-    forms: a.hasMany('FormTag', 'tagID')
+    forms: a.hasMany('FormTag2', 'tagID')
   }).authorization(allow => [allow.publicApiKey()]),
 
   //many to many - equipmenttag and forms
-  FormTag: a.model({
+  FormTag2: a.model({
     formID: a.id(),
     tagID: a.id(),
-    equipmentTag: a.belongsTo('EquipmentTag', 'tagID'),
+    equipmentTag: a.belongsTo('EquipmentTag2', 'tagID'),
     form: a.belongsTo('Form', 'formID')
   }).authorization(allow => [allow.publicApiKey()]),
 

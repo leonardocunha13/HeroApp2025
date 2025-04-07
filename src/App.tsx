@@ -134,7 +134,7 @@ const App: React.FC = () => {
       </div>
       <Routes>
           {/*<Route path="/" element={<HomePage />} />*/}
-          {/*<Route path="/RunningForm/:projectID" element={<RunningForm />} />
+          {/*<Route path="/RunningForm/:projectID" element={<RunningForm />*/} 
           {/*<Route path="/FormsList" element={<CollectionForms />} />*/}
         </Routes>
     </>
