@@ -1,9 +1,10 @@
+
 /* Define custom color palette */
 :root {
   --black-alpha-9: rgba(0, 0, 0, 0.3);
   --green-4: #4caf50;
   --green-11: #2e7d32;
-  --mauve-12: #1c1c1c;
+  --mauve-12: #121212;
   --violet-4: #6c3a9f;
   --violet-6: #9b6dd6;
   --violet-7: #6a4e9f;
@@ -12,18 +13,20 @@
   --violet-12: #ffffff;
   --gray-1: #f1f1f1;
   --gray-3: #d1d1d1;
+  --gray-4: #d1d1d1;
   --shadow-6: 0px 4px 12px rgba(0, 0, 0, 0.1);
   --blue-gradient-start: #6a4cfc;
   --blue-gradient-end: #9b6dd6;
+  --yellow-1: #e8d900;
 }
 
 body {
   display: flex;
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  height: 100vh; /* Take full viewport height */
-  background: linear-gradient(to right, #FFEB3B, #FFFACD); /* Adjusted gradient */
-  color: var(--amplify-colors-font-secondary); /* Light text */
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(to right, #FFEB3B, #FFFACD); 
+  color: var(--amplify-colors-font-secondary); 
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
@@ -34,45 +37,89 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: var(--violet-12); /* Ensure container matches dark theme */
-  color: var(--amplify-font-primary); /* Ensure text color matches */
-  border-radius: 16px; /* Added rounded corners for a modern touch */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  background-color: var(--violet-12); 
+  color: var(--amplify-font-primary); 
+  border-radius: 16px; 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); 
   transition: all 0.3s ease;
 }
 
-/* Button Styles */
-.Button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50px; /* Rounded edges for a modern look */
-  padding: 0 20px;
-  font-size: 16px;
-  line-height: 1;
-  font-weight: 600;
-  height: 40px;
-  user-select: none;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  border: none;
-  background-color: var(--violet-6);
+/* Dark Mode Styles */
+.dark {
+  background: var(--mauve-12); 
   color: var(--violet-12);
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.Button:hover {
+
+
+/* Top Bar Styles */
+.dark .top-bar {
+  background-color: rgba(0, 0, 0, 0.7); /* Dark background for top bar */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Light border for top bar */
+}
+
+.dark .top-bar .Text {
+  color: #fdd835; /* Dark mode text color */
+}
+
+.dark .top-bar button {
+  color: #fdd835; /* Dark mode button color */
+}
+
+/* Dark mode for Dialog */
+.dark .DialogContent {
+  background-color: var(--mauve-12); 
+  color: var(--violet-12);
+}
+
+/* Dark mode for Input fields */
+.dark .Input {
+  background-color: var(--violet-12); 
+  color: var(--mauve-12);
+}
+
+/* Dark mode for buttons */
+.dark .Button {
+  background-color: var(--yellow-1); 
+  color: var(--yellow-1);
+}
+
+.dark .Button:hover {
+  background-color: var(--violet-6); 
+}
+
+/* Tab Styles */
+.dark .amplify-tabs__header {
+  background-color: var(--mauve-12); /* Dark background for tabs header */
+}
+
+.dark .amplify-tabs__item {
+  color: var(--violet-12); /* Light color for text on tabs */
+}
+
+.dark .amplify-tabs__item.selected {
+  background-color: var(--violet-7); /* Active tab color */
+}
+
+.dark .amplify-tabs__content {
+  background-color: var(--mauve-12); /* Dark background for tab content */
+  color: var(--violet-12); /* Light color for tab content text */
+}
+
+/* Hover effect for Tab items */
+.dark .amplify-tabs__item:hover {
+  color: var(--violet-6); /* Hover effect for tab items */
+}
+
+/* Dark mode button styles */
+.dark .amplify-button {
+  background-color: var(--yellow-1);
+  color: var(--violet-12);
+}
+
+.dark .amplify-button:hover {
   background-color: var(--violet-7);
-  transform: scale(1.05); /* Slightly scale up on hover */
-}
-
-.Button:focus-visible {
-  outline: 2px solid var(--violet-4);
-  outline-offset: 2px;
-}
-
-.Button:active {
-  transform: scale(0.98); /* Slight shrink on active for better interaction */
 }
 
 /* Dialog Overlay */
@@ -157,7 +204,7 @@ body {
 
 .Label {
   font-size: 14px;
-  color: var(--violet-7);
+  color: var(--gray-1);
   font-weight: 600;
 }
 
@@ -192,7 +239,7 @@ body {
   width: 100%;
   padding: 12px 0;
   font-size: 18px;
-  border-radius: 50px; /* Rounded button for modern look */
+  border-radius: 50px; 
   background-color: var(--violet-7);
   color: var(--violet-12);
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
@@ -222,22 +269,4 @@ body {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
-}
-
-.DialogOverlay {
-  background-color: rgba(0, 0, 0, 0.5);
-  position: fixed;
-  inset: 0;
-}
-
-.DialogContent {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgb(255, 255, 255);
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px;
 }

@@ -1,10 +1,8 @@
 import { Collection, Card, Heading, Flex, Badge, Divider, Button, Text, Loader } from "@aws-amplify/ui-react";
-import { GetFormsInformation } from "../actions/form";
+import { GetFormsInformation, runForm } from "../actions/form";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
-import RunningForm from '../pages/RunningForm'; 
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 //import { Cross2Icon } from "@radix-ui/react-icons";
 
@@ -77,26 +75,36 @@ const CollectionForms = () => {
         setIsDialogOpen(true);
     };
 
-    const handleStart = () => {
-        if (equipmentName && equipmentTag && selectedForm) {
-            // Log to verify the values before navigation
-            console.log("Navigating with state:", {
-                equipmentName,
-                equipmentTag,
-                form: selectedForm
-            });
-    
-            // Navigate to the running form page, passing the necessary state
-            navigate(`/RunningForm/${selectedForm.projectID}`, {
-                state: {
-                    equipmentName,
-                    equipmentTag,
-                    form: selectedForm
-                }
-            });
-            setIsDialogOpen(false); // Close the dialog after navigating
+    const handleStart = async () => {
+        if (!equipmentName || !equipmentTag || !selectedForm) {
+            console.error("Please fill in all the fields.");
+            return;
+        }
+
+        const { title, projectID } = selectedForm;
+
+        // Trigger runForm function with appropriate arguments
+        if (!title || !projectID) {
+            console.error("Title or Project ID is missing.");
+            return;
+        }
+
+        const formData = {
+            form: selectedForm,
+            equipmentName,
+            equipmentTag,
+        };
+
+        // Wait for runForm to complete and get the result
+        const success = await runForm(title, projectID, equipmentName, equipmentTag);
+
+        if (success) {
+            // If no error occurs in runForm, navigate to RunningForm
+            navigate("/RunningForm", { state: formData });
+            setIsDialogOpen(false); // Close the dialog after starting the form
         } else {
-            alert("Please fill out both fields");
+            // If error occurs in runForm (due to existing equipment tag), do not navigate
+            console.error("Form creation was not successful due to existing equipment tag.");
         }
     };
 
@@ -111,14 +119,20 @@ const CollectionForms = () => {
                     <Loader variation="linear" />
                 </Flex>
             ) : (
+
                 <Collection
                     items={info}
                     type="grid"
-                    templateColumns="1fr 1fr 1fr"
+                    templateColumns={{
+                        base: "1fr",        // 1 column on small screens (phones)
+                        small: "1fr 1fr",      // 2 columns on medium screens (tablets)
+                        medium: "1fr 1fr 1fr",  // 3 columns on larger screens (desktops)
+                    }}
                     gap="15px"
+                    position="relative"  // Fixed position to the top
                     isSearchable
                     isPaginated
-                    itemsPerPage={9}
+                    itemsPerPage={4}
                     searchPlaceholder="Search by Client Name..."
                     searchNoResultsFound={
                         <Flex justifyContent="center">
@@ -133,34 +147,49 @@ const CollectionForms = () => {
                     }}
                 >
                     {(item, index) => (
-                        <Card key={index} borderRadius="medium" width="20rem" variation="outlined" padding="medium">
-                            <Heading level={4} paddingBottom="small">
+                        <Card
+                            key={index}
+                            borderRadius="medium"
+                            width="15rem"
+                            height="9rem"
+                            variation="outlined"
+                            padding="medium"
+                            onClick={() => openDialog(item)}
+                            style={{
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease', // Smooth transition for the border change
+                                overflow: 'hidden', // Prevent text overflow if it doesn't fit
+                            }}
+                            onMouseEnter={(e) => {
+                                // Add outline on hover
+                                e.currentTarget.style.border = '2px solid #000'; // Outline color on hover
+                            }}
+                            onMouseLeave={(e) => {
+                                // Remove outline when mouse leaves
+                                e.currentTarget.style.border = 'none';
+                            }}
+                        >
+                            <Heading level={5} paddingBottom="small" style={{ fontSize: '0.9rem' }}>
                                 {item.title}
                             </Heading>
 
-                            <Text paddingBottom="small" fontWeight="bold" color="gray.60">
+                            <Text paddingBottom="small" fontWeight="bold" color="gray.60" style={{ fontSize: '0.75rem' }}>
                                 Project: {item.projectName}
                             </Text>
 
-                            <Text paddingBottom="small">{item.description}</Text>
+                            <Text paddingBottom="small" style={{ fontSize: '0.75rem' }}>
+                                {item.description}
+                            </Text>
 
                             <Flex gap="small" paddingBottom="small">
                                 {item.badges.map((badge, i) => (
-                                    <Badge key={i} backgroundColor="yellow.40">
+                                    <Badge key={i} backgroundColor="yellow.40" style={{ fontSize: '0.7rem' }}>
                                         {badge}
                                     </Badge>
                                 ))}
                             </Flex>
-
-                            <Divider     />
-                            
-                            <Button variation="primary" marginTop="small" marginLeft="medium" marginRight="medium" onClick={() => openDialog(item)}>
-                                Run Form
-                            </Button>
-                            <Button variation="primary" marginTop="small" backgroundColor="white.40" marginRight="medium" marginLeft="medium">
-                                Edit Form
-                            </Button>
                         </Card>
+
                     )}
                 </Collection>
             )}
@@ -215,24 +244,23 @@ const CollectionForms = () => {
                             />
                         </label>
                     </Flex>
-
-                    <Flex gap="small" style={{ marginTop: '1rem', justifyContent: 'flex-end' }}>
+                    <Flex gap="large" style={{ marginTop: '1rem', justifyContent: 'center', width: '100%' }}>
                         <Dialog.Close asChild>
                             <Button style={{ backgroundColor: 'gray', padding: '10px' }} onClick={handleClose}>
                                 Close
                             </Button>
                         </Dialog.Close>
-                        <Button variation="primary" isFullWidth onClick={handleStart}>
+                        <Button style={{ padding: '10px' }} backgroundColor="white.40">
+                            Edit Form
+                        </Button>
+                        <Button style={{ padding: '10px', width: '100px' }} variation="primary" onClick={handleStart}>
                             Start
                         </Button>
+
                     </Flex>
+
                 </Dialog.Content>
             </Dialog.Root>
-            <Routes>
-          {/*<Route path="/" element={<HomePage />} />*/}
-          <Route path="/RunningForm/:projectID" element={<RunningForm />} />
-          {/*<Route path="/FormsList" element={<CollectionForms />} />*/}
-        </Routes>
         </>
     );
 };

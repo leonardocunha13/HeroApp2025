@@ -1,143 +1,143 @@
-import { Tabs, Text, Button } from '@aws-amplify/ui-react';
-import * as Avatar from '@radix-ui/react-avatar';
+import { Route, Routes, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './pages/Styles/styles.css';
-import { useAuthenticator } from '@aws-amplify/ui-react'; // Assuming you're using the auth hook
-import { useState } from 'react';
-import HomePage from '../src/pages/HomePage'; // Assuming your component imports
-import CreateFormDialog from '../src/components/CreateFormDialog'; // Assuming your component imports
-import CollectionForms from '../src/pages/RunForm'; // Assuming your component imports
-import RunningForm from '../src/pages/RunningForm'; 
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Importing necessary router components
+import { useAuthenticator, Text, Menu, MenuItem, Divider, Button } from '@aws-amplify/ui-react';
+import HomePage from '../src/pages/HomePage';
+import CreateFormDialog from '../src/components/CreateFormDialog';
+import CollectionForms from '../src/pages/RunForm';
+import RunningForm from '../src/pages/RunningForm';
+import DynamicFormBuilder from './pages/BuildForm';
+import { FiSun, FiMoon } from 'react-icons/fi';
 
 const App: React.FC = () => {
-  const { signOut, user } = useAuthenticator(); // Assuming `user` provides the user info
+  const { signOut } = useAuthenticator();
+  const [darkMode, setDarkMode] = useState(false);
 
-  // Track the active tab
-  const [tab, setTab] = useState('1');
-  const [formCreated, setFormCreated] = useState(false);
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [darkMode]);
 
-  
-  // This function will be passed as a prop to CreateFormDialog
-  const handleFormCreated = () => {
-    setFormCreated(true); // Example action after form is created
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
   };
 
   return (
-    
-    <>
-      {/* Top Bar (Fixed at the top of the page) */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '10px 20px',
-        backgroundColor: '#f8f9fa',
-        zIndex: 10  // Ensure it sits on top of other content
-      }}>
+    <div className={darkMode ? 'dark' : ''}>
+      {/* Router Setup */}
 
-    
+      {/* Top Bar */}
+      <div
+        className={`top-bar ${darkMode ? 'dark' : ''}`}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '30px 24px',
+          backdropFilter: 'blur(12px)',
+          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+          borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
+          zIndex: 10,
+          transition: 'background-color 0.3s ease',
+          //backgroundColor: '#ffffff',
+        }}
+      >
         {/* Logo */}
-        <img 
-          src="\logo.png" 
-          alt="App Logo" 
-          style={{ width: '300px', height: '100px' }} 
-        />
+        <img
+          src="\logo.png"
+          alt="App Logo"
+          style={{ width: '300px', height: '100px', position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '10px' }}
 
-        {/* Avatar and Username (Right side) */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {/* Radix UI Avatar */}
-          <Avatar.Root style={{ display: 'inline-block', position: 'relative' }}>
-            <Avatar.Image
-              src=""
-              alt="User Avatar"
+        />
+        {/* Top Bar Content */}
+        <Menu
+          menuAlign="start"
+          style={{
+            backgroundColor: darkMode ? '#fff' : '#fff',
+            color: darkMode ? '#000' : '#000', // <- texto preto no dark
+            border: darkMode ? '1px solid #444' : '1px solid #ccc',
+            borderRadius: '8px',
+            padding: '8px',
+          }}
+        >
+          <MenuItem isDisabled>
+            <Text fontWeight="bold" style={{ color: darkMode ? '#000' : '#000' }}>
+              Hero Audit Form Builder
+            </Text>
+          </MenuItem>
+          <Divider style={{ backgroundColor: '#ccc' }} />
+
+          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
+            <Link to="/" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Home</Link>
+          </MenuItem>
+          <MenuItem style={{  color: darkMode ? '#000' : '#000' }}>
+            <Link to="/forms" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Create New Form</Link>
+          </MenuItem>
+          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
+            <Link to="/forms-list" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Forms List</Link>
+          </MenuItem>
+          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
+            <Link to="/form-builder" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Form Builder</Link>
+          </MenuItem>
+          <Divider style={{ backgroundColor: '#ccc' }} />
+          <MenuItem>
+            <Button
+              onClick={signOut}
               style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: 'transparent',
-                display: 'block',
-                objectFit: 'cover'
-              }}
-            />
-            <Avatar.Fallback
-              delayMs={600}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#999999',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontSize: '18px'
+                backgroundColor: darkMode ? '#e0e0e0' : '#6f6e72',
+                color: darkMode ? '#000' : '#fff',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                fontSize: '16px',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s',
+                width: '100%',
+                textAlign: 'left',
               }}
             >
-              {/* Fallback content (Initials) */}
-              {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
-            </Avatar.Fallback>
-          </Avatar.Root>
+              Sign out
+            </Button>
+          </MenuItem>
+        </Menu>
 
-          {/* Username (next to avatar) */}
-          <Text style={{ marginLeft: '10px', fontSize: '16px', color: '#333' }}>
-            {user?.username || 'User'}
-          </Text>
+
+        <div>
+          <button
+            onClick={toggleDarkMode}
+            style={{
+              backgroundColor: darkMode ? '#333' : '#e0e0e0',
+              color: darkMode ? '#fff' : '#000',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '18px',
+              marginLeft: '12px',
+            }}
+          >
+            {darkMode ? <FiSun /> : <FiMoon />}
+          </button>
         </div>
       </div>
-
-      {/* Main content below the avatar and divider */}
-      <div style={{ position: 'fixed', padding: '20px', marginTop: '-450px', marginLeft:'-500px' }}> {/* Added padding to ensure content is not too close to the top */}
-        <Tabs
-          value={tab}
-          onValueChange={(tab) => setTab(tab)} // Switch tabs
-          items={[
-            {
-              label: 'Home',
-              value: '1',
-              content: (
-                <>
-                  <HomePage />
-                </>
-              ),
-            },
-            {
-              label: 'Create New Form',
-              value: '2',
-              content: (
-                <>
-                  {/* Pass handleFormCreated function as a prop to CreateFormDialog */}
-                  <CreateFormDialog onFormCreated={handleFormCreated} />
-                </>
-              ),
-            },
-            {
-              label: 'Forms List',
-              value: '3',
-              content: (
-                <>
-                  <CollectionForms />
-                </>
-              ),
-            },
-          ]}
-        />
-
-        {/* Optionally, you can add a sign-out button */}
-        <Button onClick={signOut}>Sign out</Button>
-        
-        {/* You can display a message or trigger any logic when a form is created */}
-        {formCreated && <p>Form created successfully!</p>}
-      </div>
-      <Routes>
-          {/*<Route path="/" element={<HomePage />} />*/}
-          {/*<Route path="/RunningForm/:projectID" element={<RunningForm />*/} 
-          {/*<Route path="/FormsList" element={<CollectionForms />} />*/}
+      {/* Main Content */}
+      <div style={{ marginTop: '60px' }}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/forms" element={<CreateFormDialog onFormCreated={function (): void { throw new Error('Function not implemented.'); }} />} />
+          <Route path="/forms-list" element={<CollectionForms />} />
+          <Route path="/form-builder" element={<DynamicFormBuilder />} />
+          <Route path="/RunningForm" element={<RunningForm />} /> {/* Add this route */}
         </Routes>
-    </>
+      </div>
+    </div>
   );
 };
 

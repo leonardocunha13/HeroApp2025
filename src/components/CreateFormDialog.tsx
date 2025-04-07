@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Dialog } from "radix-ui";
 import { Cross2Icon } from "@radix-ui/react-icons";
@@ -58,7 +59,7 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
         onFormCreated(); // Refresh the form list
       }
     } catch (error) {
-      alert("Error creating form: " );
+      alert("Error creating form: ");
     }
   };
 
@@ -79,9 +80,10 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
 
           {/* Client Dropdown */}
           <fieldset className="Fieldset">
-            <label className="Label" htmlFor="client">
+            <label className="Label" htmlFor="Client" style={{ color: 'black' }}>
               Client
             </label>
+
             <select
               className="Input"
               id="client"
@@ -99,9 +101,10 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
 
           {/* Project Dropdown */}
           <fieldset className="Fieldset">
-            <label className="Label" htmlFor="projectId">
+            <label className="Label" htmlFor="ProjectName" style={{ color: 'black' }}>
               Project Name
             </label>
+
             <select
               className="Input"
               id="projectId"
@@ -119,7 +122,7 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
 
           {/* Name and Description fields */}
           <fieldset className="Fieldset">
-            <label className="Label" htmlFor="name">
+            <label className="Label" htmlFor="name" style={{ color: 'black' }}>
               Form Name
             </label>
             <input
@@ -130,9 +133,10 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
             />
           </fieldset>
           <fieldset className="Fieldset">
-            <label className="Label" htmlFor="desc">
+            <label className="Label" htmlFor="desc" style={{ color: 'black' }}>
               Form Description
             </label>
+
             <input
               className="Input"
               id="desc"
