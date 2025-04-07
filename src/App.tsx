@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { Route, Routes, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './pages/Styles/styles.css';
 import { useAuthenticator, Text } from '@aws-amplify/ui-react';
