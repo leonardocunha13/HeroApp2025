@@ -37,6 +37,7 @@ const schema = a.schema({
 
   EquipmentTag: a.model({
     Tag: a.string().required(),
+    EquipmentName: a.string().required(),
     //many to many - equipmenttag has many forms
     forms: a.hasMany('FormTag', 'tagID')
   }).authorization(allow => [allow.publicApiKey()]),

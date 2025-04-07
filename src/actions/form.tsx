@@ -12,7 +12,7 @@ const client = generateClient<Schema>();
 // UserNotFoundErr class for custom error handling
 class UserNotFoundErr extends Error { }
 
-export async function InsertClient(NameClient: string) {
+/*export async function InsertClient(NameClient: string) {
   try {
     const { errors, data } = await client.models.Client.create({
       ClientName: NameClient,
@@ -29,7 +29,60 @@ export async function InsertClient(NameClient: string) {
   }
 }
 
-export async function InsertMultipleClients(names: string[]) {
+// Function to insert a single project (you may already have something like this)
+/*export async function InsertProject(name: string, projNum: string, clientID: string) {
+  try {
+    const { errors, data } = await client.models.Projectt.create({
+      projectID: projNum,
+      projectName: name,
+      ClientID: clientID
+    });
+
+    if (errors) {
+      console.error("Error:", errors);
+      throw new Error("Failed to insert client.");
+    }
+    return data; // Returns the inserted client data
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}*/
+
+// Function to insert multiple projects
+/*export async function InsertMultipleProjects(names: string[], projNum: string[], clientIDs: string[]) {
+  const insertedProjects: any[] = []; // Array to store successfully inserted projects
+  const failedProjects: string[] = []; // Array to store project names that failed to insert
+
+  // Ensure that input arrays have the same length
+  if (names.length !== projNum.length || projNum.length !== clientIDs.length) {
+    throw new Error("Input arrays must have the same length.");
+  }
+
+  // Loop through the arrays and insert projects one by one
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    const projectNumber = projNum[i];
+    const clientID = clientIDs[i];
+
+    try {
+      const projectData = await InsertProject(name, projectNumber, clientID); // Call to insert a single project
+      insertedProjects.push(projectData); // Store the successful insert result
+    } catch (error) {
+      console.error(`Failed to insert project: ${name}`, error);
+      failedProjects.push(name); // Store the failed project name
+    }
+  }
+
+  // Return the results: successful insertions and failed ones
+  return {
+    insertedProjects,
+    failedProjects,
+  };
+}*/
+
+
+/*export async function InsertMultipleClients(names: string[]) {
   const insertedClients: any[] = []; // Array to store successfully inserted clients
   const failedClients: string[] = []; // Array to store client names that failed to insert
 
@@ -48,9 +101,21 @@ export async function InsertMultipleClients(names: string[]) {
     insertedClients,
     failedClients,
   };
-}
+}*/
 
-/*const clientNames = ["Client1", "Client2", "Client3"]; // Example client names
+/*const clients = await GetClients();*/
+
+/*const cID = clients.clientIDs;
+console.log(cID);
+const projects = ["project1", "project2","project3","project4"];
+const  projNumbers = ["projNumber1","projNumber2","projNumber3","projNumber4"];*/
+
+/*InsertProject(projects[0],projNumbers[0],cID[0]);
+InsertProject(projects[1],projNumbers[1],cID[1]);
+InsertProject(projects[2],projNumbers[2],cID[2]);
+InsertProject(projects[3],projNumbers[3],cID[3]);*/
+
+/*const clientNames = ["Client4"]; // Example client names
 
 InsertMultipleClients(clientNames)
   .then((result) => {
@@ -61,23 +126,34 @@ InsertMultipleClients(clientNames)
     console.error("Error inserting clients:", error);
   });*/
 
-export async function GetClients() {
-  try {
-    const { errors, data } = await client.models.Client.list();
-
-    if (errors) {
-      console.error("Error:", errors);
-      throw new Error("Failed to fetch clients.");
+  export async function GetClients() {
+    try {
+      const { errors, data } = await client.models.Client.list();
+  
+      if (errors) {
+        console.error("Error:", errors);
+        throw new Error("Failed to fetch clients.");
+      }
+  
+      // Extract client names and client IDs
+      const clientNames = data.map(client => client.ClientName);
+      const clientIDs = data.map(client => client.id);
+  
+      // Return both client names and IDs in an object or an array
+      return {
+        clientNames,
+        clientIDs
+      };
+  
+      // Alternatively, if you want to return an array:
+      // return [clientNames, clientIDs];
+  
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
     }
-
-    const clientNames = data.map(client => client.ClientName);
-
-    return clientNames;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
   }
-}
+  
 
 export async function GetProjects() {
   try {
@@ -99,7 +175,6 @@ export async function GetProjects() {
     throw error;
   }
 }
-
 
 export async function GetFormStats() {
   try {
@@ -481,8 +556,8 @@ export async function GetFormsInformation() {
   }
 }
 
-/*const formsInfo = await GetFormsInformation()
-console.log('Form Info:', formsInfo);*/
+const formsInfo = await GetFormsInformation()
+console.log('Form Info:', formsInfo);
 
 export async function GetProjectsFromClientName(ClientName: string) {
   try {
@@ -505,9 +580,9 @@ export async function GetProjectsFromClientName(ClientName: string) {
     if (projectErrors) {
       console.error("Error fetching projects:", projectErrors);
     }
-
+    const projectNames = projects.map(project => project.projectName);
     // Return client and associated projects
-    return { ...Clients, projects };
+    return { projectNames };
   } catch (error) {
     console.error("Error:", error);
     throw error;
@@ -515,9 +590,10 @@ export async function GetProjectsFromClientName(ClientName: string) {
 }
 
 
-/*GetProjectsFromClientName("BHP")
+GetProjectsFromClientName("Rio Tinto")
   .then((data) => console.log("Client with Projects:", data))
-  .catch((error) => console.error("Error fetching client with projects:", error));*/
+  .catch((error) => console.error("Error fetching client with projects:", error));
+
   export async function InsertProject(NameProject: string, IDProject: string, ClientID: string) {
     try {
       const { errors, data } = await client.models.Projectt.create({
@@ -538,21 +614,82 @@ export async function GetProjectsFromClientName(ClientName: string) {
       throw error;
     }
   }
-  //InsertProject("Cage Winder Execute Phase" , "HE067P010", "741fa82d-6e1d-463c-a221-6565b2974a1a");
+  //InsertProject("Green Iron - Pilot Plant" , "HE096P001", "1f62526b-d6a5-49ca-9872-f1cbbaf7db9b");
 
-  export async function CreateForm(name: string, description: string, projID: string) {
+ /* export async function AddEquipmentToForm(formId: string, equipmentTag: string) {
+    try {
+      // Create a new EquipmentTag directly without checking for existing tags
+      const { errors: createTagErrors, data: newEquipmentTag } = await client.models.EquipmentTag.create({
+        Tag: equipmentTag, // Creating a new EquipmentTag with the provided name
+      });
+      console.log("New EquipmentTag:", newEquipmentTag);
+      if (createTagErrors) {
+        console.error("Error creating new equipment tag:", createTagErrors);
+        throw new Error("Something went wrong while creating the equipment tag");
+      }
+  
+      // Ensure newEquipmentTag is valid
+      if (!newEquipmentTag) {
+        console.error("Error: New equipment tag is null or undefined");
+        throw new Error("Failed to create new equipment tag.");
+      }
+  
+      // Get the ID of the newly created EquipmentTag
+      const equipmentTagId = newEquipmentTag.id;
+  
+      // Now associate the newly created EquipmentTag with the form
+      const { errors: formTagErrors, data: formTag } = await client.models.FormTag.create({
+        formID: formId,
+        tagID: equipmentTagId, // Link the newly created EquipmentTag to the Form
+      });
+  
+      if (formTagErrors) {
+        console.error("Error associating equipment with form:", formTagErrors);
+        throw new Error("Something went wrong while associating the equipment tag with the form");
+      }
+  
+      console.log("Created FormTag:", formTag);
+      return newEquipmentTag; // Return the created FormTag for further use or confirmation
+    } catch (error) {
+      console.error("Error in AddEquipmentToForm:", error);
+      throw error;
+    }
+  }
+  
+  
+  await AddEquipmentToForm("3cf67384-5113-4be5-9e5e-674712778e13", "Test Tag 1")
+  .then((newEquipmentTag) => console.log("Created FormTag:", newEquipmentTag))
+  .catch((error) => console.error("Error:", error)); // Handle any errors that occur*/
 
+  export async function CreateForm(name: string, description: string, projectName: string) {
     const { userId } = await getCurrentUser();
     if (!userId) {
       throw new UserNotFoundErr();
     }
   
+    // Fetch the project details using projectName
+    const { errors: projectErrors, data: projectsData } = await client.models.Projectt.list({
+      filter: { projectName: { eq: projectName } }
+    });
+  
+    if (projectErrors) {
+      console.error("Error fetching projects:", projectErrors);
+      throw new Error("Failed to fetch projects.");
+    }
+  
+    if (projectsData.length === 0) {
+      throw new Error(`Project with name "${projectName}" not found.`);
+    }
+  
+    // Get the first matching project's ID (assuming project names are unique)
+    const projID = projectsData[0].projectID;
+  
+    // Now create the form using projID
     const { errors, data: form } = await client.models.Form.create({
       userId: userId,
-      projID: projID,
-      name: name, // Use the form name from the state
-      description: description,
-  
+      projID: projID,  // Here, we are using the found projID from the project lookup
+      name: name,      // Use the form name from the state
+      description: description, 
     });
   
     if (errors) {
@@ -563,6 +700,3 @@ export async function GetProjectsFromClientName(ClientName: string) {
     return form?.id;  // Return the created form ID
   };
   
- /* CreateForm("Test name 12", "Test description 12", "HE101P001")
-    .then((formId) => console.log("Created Form ID:", formId)) 
-    .catch((error) => console.error("Error creating form:", error));*/

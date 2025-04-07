@@ -3,7 +3,10 @@ import { GetFormsInformation } from "../actions/form";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon } from "@radix-ui/react-icons";
+import RunningForm from '../pages/RunningForm'; 
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+//import { Cross2Icon } from "@radix-ui/react-icons";
 
 interface Form {
     name: string | null;
@@ -26,18 +29,22 @@ interface FormInfo {
     badges: string[];
 }
 
-export const CollectionForms = () => {
+// CollectionForms component (unchanged from your original, except the addition of triggerRefresh)
+
+const CollectionForms = () => {
     const navigate = useNavigate();
     const [info, setInfo] = useState<FormInfo[]>([]);
     const [loading, setLoading] = useState(true);
-    const [isDialogOpen, setIsDialogOpen] = useState(false); // Dialog open state
-    const [selectedForm, setSelectedForm] = useState<FormInfo | null>(null); // Selected form data
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedForm, setSelectedForm] = useState<FormInfo | null>(null);
+    const [equipmentName, setEquipmentName] = useState("");
+    const [equipmentTag, setEquipmentTag] = useState("");
+    const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const fetchedData: ProjectItem[] = await GetFormsInformation();
-                {/*Filter to return only the projects that contains the forms*/ }
                 const formattedInfo: FormInfo[] = fetchedData
                     .filter(project => project.forms.length > 0)
                     .flatMap(project =>
@@ -59,14 +66,41 @@ export const CollectionForms = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [refresh]); // Ensure the data gets re-fetched when the refresh state changes
 
-    const openDialog = (form: FormInfo) => {
-        setSelectedForm(form); // Set the selected form
-        setIsDialogOpen(true); // Open the dialog
+    const triggerRefresh = () => {
+        setRefresh(prev => !prev); // Toggle the refresh state to trigger useEffect
     };
 
-    const closeDialog = () => {
+    const openDialog = (form: FormInfo) => {
+        setSelectedForm(form);
+        setIsDialogOpen(true);
+    };
+
+    const handleStart = () => {
+        if (equipmentName && equipmentTag && selectedForm) {
+            // Log to verify the values before navigation
+            console.log("Navigating with state:", {
+                equipmentName,
+                equipmentTag,
+                form: selectedForm
+            });
+    
+            // Navigate to the running form page, passing the necessary state
+            navigate(`/RunningForm/${selectedForm.projectID}`, {
+                state: {
+                    equipmentName,
+                    equipmentTag,
+                    form: selectedForm
+                }
+            });
+            setIsDialogOpen(false); // Close the dialog after navigating
+        } else {
+            alert("Please fill out both fields");
+        }
+    };
+
+    const handleClose = () => {
         setIsDialogOpen(false); // Close the dialog
     };
 
@@ -99,13 +133,7 @@ export const CollectionForms = () => {
                     }}
                 >
                     {(item, index) => (
-                        <Card
-                            key={index}
-                            borderRadius="medium"
-                            width="20rem"
-                            variation="outlined"
-                            padding="medium"
-                        >
+                        <Card key={index} borderRadius="medium" width="20rem" variation="outlined" padding="medium">
                             <Heading level={4} paddingBottom="small">
                                 {item.title}
                             </Heading>
@@ -124,52 +152,87 @@ export const CollectionForms = () => {
                                 ))}
                             </Flex>
 
-                            <Divider />
-                            {/*Need to include the function of this button, related to each form*/}
-                            <Button
-                                variation="primary"
-                                isFullWidth
-                                onClick={() => openDialog(item)}
-                            >
+                            <Divider     />
+                            
+                            <Button variation="primary" marginTop="small" marginLeft="medium" marginRight="medium" onClick={() => openDialog(item)}>
                                 Run Form
+                            </Button>
+                            <Button variation="primary" marginTop="small" backgroundColor="white.40" marginRight="medium" marginLeft="medium">
+                                Edit Form
                             </Button>
                         </Card>
                     )}
                 </Collection>
             )}
-            {/* Dialog for viewing form details */}
             <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <Dialog.Portal>
-                    <Dialog.Overlay className="DialogOverlay" />
-                    <Dialog.Content className="DialogContent">
-                        <Dialog.Title  color="black">Form Details</Dialog.Title>
-                        <Dialog.Description className="DialogDescription">
-                            View details for the selected form
-                        </Dialog.Description>
+                <Dialog.Overlay className="DialogOverlay" />
+                <Dialog.Content className="DialogContent">
+                    <Dialog.Title className="text-xl font-bold mb-2">Enter Equipment Details</Dialog.Title>
 
-                        {selectedForm && (
-                            <div>
-                                <p><strong>Form Title:</strong> {selectedForm.title}</p>
-                                <p><strong>Description:</strong> {selectedForm.description}</p>
-                                <p><strong>Client:</strong> {selectedForm.clientName}</p>
-                                <p><strong>Project:</strong> {selectedForm.projectName}</p>
-                            </div>
-                        )}
+                    {selectedForm && (
+                        <div className="mb-4 p-3 bg-gray-100 rounded">
+                            <Text fontSize="1rem" fontWeight="bold">Test Name:</Text>
+                            <Text>{selectedForm.title}</Text>
 
-                        <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
-                            <Dialog.Close asChild>
-                                <Button variation="primary" onClick={closeDialog}>Close</Button>
+                            <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}>Client:</Text>
+                            <Text>{selectedForm.clientName}</Text>
 
-                            </Dialog.Close>
+                            <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}>Project Name:</Text>
+                            <Text>{selectedForm.projectName}</Text>
+
+                            <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}>Project ID:</Text>
+                            <Text>{selectedForm.projectID}</Text>
                         </div>
+                    )}
+
+                    <Dialog.Description className="text-gray-600 mb-4">
+                        Please provide the equipment name and tag before proceeding.
+                    </Dialog.Description>
+
+                    <Flex direction="column" gap="3">
+                        <label>
+                            <Text as="div" fontSize="1rem" marginBottom="1rem" fontWeight="bold">
+                                Equipment Name
+                            </Text>
+                            <input
+                                type="text"
+                                placeholder="Enter Equipment Name"
+                                value={equipmentName}
+                                onChange={(e) => setEquipmentName(e.target.value)}
+                                style={{ backgroundColor: "white", color: "black", border: "1px solid #ccc", padding: "8px", borderRadius: "4px", width: "100%" }}
+                            />
+                        </label>
+                        <label>
+                            <Text as="div" fontSize="1rem" marginBottom="1rem" fontWeight="bold">
+                                Equipment Tag
+                            </Text>
+                            <input
+                                type="text"
+                                placeholder="Enter Equipment Tag"
+                                value={equipmentTag}
+                                onChange={(e) => setEquipmentTag(e.target.value)}
+                                style={{ backgroundColor: "white", color: "black", border: "1px solid #ccc", padding: "8px", borderRadius: "4px", width: "100%" }}
+                            />
+                        </label>
+                    </Flex>
+
+                    <Flex gap="small" style={{ marginTop: '1rem', justifyContent: 'flex-end' }}>
                         <Dialog.Close asChild>
-                            <button className="IconButton" aria-label="Close" onClick={closeDialog}>
-                                <Cross2Icon />
-                            </button>
+                            <Button style={{ backgroundColor: 'gray', padding: '10px' }} onClick={handleClose}>
+                                Close
+                            </Button>
                         </Dialog.Close>
-                    </Dialog.Content>
-                </Dialog.Portal>
+                        <Button variation="primary" isFullWidth onClick={handleStart}>
+                            Start
+                        </Button>
+                    </Flex>
+                </Dialog.Content>
             </Dialog.Root>
+            <Routes>
+          {/*<Route path="/" element={<HomePage />} />*/}
+          <Route path="/RunningForm/:projectID" element={<RunningForm />} />
+          {/*<Route path="/FormsList" element={<CollectionForms />} />*/}
+        </Routes>
         </>
     );
 };

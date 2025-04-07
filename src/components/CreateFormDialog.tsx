@@ -1,33 +1,73 @@
 import { useEffect, useState } from "react";
 import { Dialog } from "radix-ui";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { GetClients, GetProjects } from "../actions/form";
+import { FaSave } from "react-icons/fa";
+import { IoIosCreate } from "react-icons/io";
+import { GetClients, GetProjectsFromClientName, CreateForm } from "../actions/form";
+import { Button } from '@aws-amplify/ui-react';
 
+interface CreateFormDialogProps {
+  onFormCreated: () => void;
+}
 
-const CreateFormDialog = () => {
-  // State for clients (array of strings) and projects (array of strings)
-  const [clients, setClients] = useState<string[]>([]); 
-  const [projectIDs, setProjectIDs] = useState<string[]>([]);
-  const [projectNames, setProjectNames] = useState<string[]>([]);
+const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) => {
+  const [clients, setClients] = useState<string[]>([]);
+  const [projects, setProjects] = useState<string[]>([]);
 
-  // Fetch clients and projects on component mount
+  // Local state to hold form inputs
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedClient, setSelectedClient] = useState("");
+  const [projID, setProjID] = useState("");
+
+  // Fetch clients on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      const clientsData = await GetClients(); // Assuming this returns an array of strings
-      setClients(clientsData); // Set clients state to the fetched data
-      
-      const { projectIDs, projectNames } = await GetProjects(); // Assuming this returns an object
-      setProjectIDs(projectIDs); // Set the project IDs state
-      setProjectNames(projectNames); // Set the project names state
+    const fetchClients = async () => {
+      const clientsData = await GetClients(); // Assuming this returns an array of client names
+      setClients(clientsData.clientNames);
     };
 
-    fetchData(); // Call the function to fetch data
+    fetchClients(); // Fetch the clients when the component is mounted
   }, []);
+
+  // Fetch projects when a client is selected
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (selectedClient) {
+        const { projectNames } = await GetProjectsFromClientName(selectedClient);
+        setProjects(projectNames); // Set the projects for the selected client
+      } else {
+        setProjects([]); // Clear projects if no client is selected
+      }
+    };
+
+    fetchProjects();
+  }, [selectedClient]); // Trigger when the selected client changes
+
+  // Create form function that gets called on button click
+  const handleCreateForm = async () => {
+    try {
+      if (!name || !description || !projID) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const formId = await CreateForm(name, description, projID);
+      if (formId) {
+        alert("Form created successfully with ID: " + formId);
+        onFormCreated(); // Refresh the form list
+      }
+    } catch (error) {
+      alert("Error creating form: " );
+    }
+  };
 
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="Button violet">Create Form</button>
+        <Button size="large" variation="primary" className="Button violet">
+          <IoIosCreate /> Create Form
+        </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />
@@ -36,27 +76,19 @@ const CreateFormDialog = () => {
           <Dialog.Description className="DialogDescription">
             Add details to create your form
           </Dialog.Description>
-          
-          {/* Name and Description fields */}
-          <fieldset className="Fieldset">
-            <label className="Label" htmlFor="name">
-              Name
-            </label>
-            <input className="Input" id="name" defaultValue="" />
-          </fieldset>
-          <fieldset className="Fieldset">
-            <label className="Label" htmlFor="desc">
-              Description
-            </label>
-            <input className="Input" id="desc" defaultValue="" />
-          </fieldset>
 
-          {/* Dropdown populated using the fetched clients data */}
+          {/* Client Dropdown */}
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="client">
               Client
             </label>
-            <select className="Input" id="client" defaultValue="<Select client>">
+            <select
+              className="Input"
+              id="client"
+              value={selectedClient}
+              onChange={(e) => setSelectedClient(e.target.value)}
+            >
+              <option value="">Select Client</option>
               {clients.map((client, index) => (
                 <option key={index} value={client}>
                   {client}
@@ -65,25 +97,58 @@ const CreateFormDialog = () => {
             </select>
           </fieldset>
 
-          {/* Dropdown populated using the fetched projects data */}
+          {/* Project Dropdown */}
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="projectId">
-              Project ID
+              Project Name
             </label>
-            <select className="Input" id="projectId" defaultValue="<Select project Id>">
-              {projectIDs.map((id, index) => (
-                <option key={id} value={id}>
-                  {projectNames[index]} {/* Display the project name */}
+            <select
+              className="Input"
+              id="projectId"
+              value={projID}
+              onChange={(e) => setProjID(e.target.value)}
+            >
+              <option value="">Select Project</option>
+              {projects.map((project, index) => (
+                <option key={index} value={project}>
+                  {project}
                 </option>
               ))}
             </select>
           </fieldset>
 
+          {/* Name and Description fields */}
+          <fieldset className="Fieldset">
+            <label className="Label" htmlFor="name">
+              Form Name
+            </label>
+            <input
+              className="Input"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </fieldset>
+          <fieldset className="Fieldset">
+            <label className="Label" htmlFor="desc">
+              Form Description
+            </label>
+            <input
+              className="Input"
+              id="desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </fieldset>
+
           <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
             <Dialog.Close asChild>
-              <button className="Button green">Save changes</button>
+              <Button className="Button green" onClick={handleCreateForm}>
+                <FaSave /> Save changes
+              </Button>
             </Dialog.Close>
           </div>
+
           <Dialog.Close asChild>
             <button className="IconButton" aria-label="Close">
               <Cross2Icon />
