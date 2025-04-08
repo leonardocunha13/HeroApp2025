@@ -3,7 +3,6 @@ import { Card, Heading, Text, Button, Flex } from "@aws-amplify/ui-react";
 
 const RunningForm = () => {
   const location = useLocation();  // Get the location object
-  const { projectID } = useParams();  // Get the projectID from URL params
   const formData = location.state;  // Get the form data passed via navigation
 
   if (!formData) {

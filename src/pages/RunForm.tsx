@@ -27,6 +27,7 @@ interface FormInfo {
     badges: string[];
 }
 
+
 // CollectionForms component (unchanged from your original, except the addition of triggerRefresh)
 
 const CollectionForms = () => {

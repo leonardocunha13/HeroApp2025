@@ -1,222 +1,94 @@
-import { DndContext, closestCenter, useDraggable, useDroppable } from '@dnd-kit/core';
-import { v4 as uuidv4 } from 'uuid';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import * as XLSX from 'xlsx';
 
-// Define the structure of form components
-interface FormComponent {
-  id: string;
-  type: string;
-  content?: string;
-  options?: string[];
-  columns?: number;
-  rows?: number;
-  tableData?: (string | FormComponent)[][]; // Store components inside cells
-}
+const ExcelFileEditor = () => {
+  const [excelData, setExcelData] = useState<any[][]>([]); // Holds the parsed Excel data
+  const [mergedCells, setMergedCells] = useState<any[]>([]); // Holds merged cells data
 
-// A simple editable component renderer
-const ComponentRenderer = ({
-  component,
-  updateComponent,
-}: {
-  component: FormComponent;
-  updateComponent: (id: string, data: Partial<FormComponent>) => void;
-}) => {
-  switch (component.type) {
-    case 'text':
-      return (
-        <div className="flex flex-col">
-          <input
-            className="p-3 border rounded-md w-full"
-            defaultValue={component.content}
-            onBlur={(e) => updateComponent(component.id, { content: e.target.value })}
-            placeholder="Enter text"
-          />
-          <label className="text-sm mt-2">Text Field</label>
-        </div>
-      );
-    case 'select':
-      return (
-        <div className="flex flex-col">
-          <select
-            className="p-3 border rounded-md w-full"
-            defaultValue={component.options?.[0]}
-            onChange={(e) => {
-              updateComponent(component.id, { options: [e.target.value] });
-            }}
-          >
-            {component.options?.map((opt, index) => (
-              <option key={index} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-          <label className="text-sm mt-2">Select Field</label>
-        </div>
-      );
-    case 'date':
-      return (
-        <div className="flex flex-col">
-          <input
-            type="date"
-            className="p-3 border rounded-md w-full"
-            onBlur={(e) => updateComponent(component.id, { content: e.target.value })}
-          />
-          <label className="text-sm mt-2">Date Picker</label>
-        </div>
-      );
-    case 'checkbox':
-      return (
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            onChange={(e) => updateComponent(component.id, { content: e.target.checked ? 'checked' : 'unchecked' })}
-          />
-          <label className="text-sm ml-2">Checkbox</label>
-        </div>
-      );
-    case 'divider':
-      return <hr className="my-6 border-t border-gray-400" />;
-    case 'table':
-      return (
-        <div className="overflow-auto">
-          <div className="flex gap-4 mb-4">
-            <div>
-              <span className="text-sm">Columns</span>
-              <input
-                type="number"
-                min={1}
-                className="p-2 border rounded w-24"
-                value={component.columns || 1}
-                onChange={(e) => updateComponent(component.id, { columns: parseInt(e.target.value) })}
-              />
-            </div>
-            <div>
-              <span className="text-sm">Rows</span>
-              <input
-                type="number"
-                min={1}
-                className="p-2 border rounded w-24"
-                value={component.rows || 1}
-                onChange={(e) => updateComponent(component.id, { rows: parseInt(e.target.value) })}
-              />
-            </div>
-          </div>
-          <table className="w-full border border-gray-400">
+  // Function to handle file upload and parse Excel template
+  const handleFileUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const abuf = e.target.result;
+      const workbook = XLSX.read(abuf, { type: 'array' });
+      const sheetName = workbook.SheetNames[0]; // Assuming the first sheet
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+      const merges = worksheet['!merges'] || []; // Get merged cells
+
+      setExcelData(jsonData); // Set the Excel data in state
+      setMergedCells(merges); // Set the merged cells in state
+    };
+    reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer
+  };
+
+  // Function to handle cell edits
+  const handleCellEdit = (rowIndex: number, colIndex: number, newValue: string) => {
+    const updatedData = [...excelData];
+    updatedData[rowIndex][colIndex] = newValue; // Update the cell value
+    setExcelData(updatedData); // Update the state with the new data
+  };
+
+  // Function to save the edited Excel file
+  const saveEditedFile = () => {
+    const ws = XLSX.utils.aoa_to_sheet(excelData); // Convert the 2D array back to a sheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, 'modified_template.xlsx'); // Download the modified file
+  };
+
+  return (
+    <div>
+      <h1>Excel Template Editor</h1>
+
+      {/* File input for uploading Excel file */}
+      <input type="file" accept=".xlsx" onChange={(e) => handleFileUpload(e.target.files![0])} />
+
+      {/* Table to display the Excel data */}
+      {excelData.length > 0 && (
+        <div>
+          <button onClick={saveEditedFile}>Save Edited Template</button>
+          <table border={1}>
+            <thead>
+              <tr>
+                {excelData[0].map((header: string, index: number) => (
+                  <th key={index}>{header}</th> // Display the headers (first row)
+                ))}
+              </tr>
+            </thead>
             <tbody>
-              {component.tableData?.map((row, rowIndex) => (
+              {excelData.slice(1).map((row: any[], rowIndex: number) => (
                 <tr key={rowIndex}>
-                  {row.map((cell, colIndex) => (
-                    <td key={colIndex} className="border p-2">
-                      <TableCell
-                        rowIndex={rowIndex}
-                        colIndex={colIndex}
-                        cell={cell}
-                        component={component}
-                        updateComponent={updateComponent}
-                      />
-                    </td>
-                  ))}
+                  {row.map((cell: any, colIndex: number) => {
+                    const merged = mergedCells.find(
+                      (merge) =>
+                        (merge.s.r === rowIndex && merge.s.c === colIndex) ||
+                        (merge.e.r === rowIndex && merge.e.c === colIndex)
+                    );
+
+                    return (
+                      <td
+                        key={colIndex}
+                        rowSpan={merged ? merged.e.r - merged.s.r + 1 : 1}
+                        colSpan={merged ? merged.e.c - merged.s.c + 1 : 1}
+                        style={{ textAlign: 'center' }}
+                      >
+                        <input
+                          type="text"
+                          value={cell}
+                          onChange={(e) => handleCellEdit(rowIndex + 1, colIndex, e.target.value)}
+                        />
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      );
-    default:
-      return null;
-  }
-};
-
-// Table cell component where you can drag/drop components into each cell
-const TableCell = ({
-  rowIndex,
-  colIndex,
-  cell,
-  component,
-  updateComponent,
-}: any) => {
-  const { setNodeRef, isDragging } = useDraggable({
-    id: `${component.id}-${rowIndex}-${colIndex}`,
-  });
-
-  const { setNodeRef: droppableRef } = useDroppable({
-    id: `${component.id}-${rowIndex}-${colIndex}-droppable`,
-  });
-
-  const handleCellDrop = (event: any) => {
-    const { active } = event;
-    const newTableData = [...(component.tableData || [])];
-    newTableData[rowIndex][colIndex] = { id: active.id, type: 'text' };
-    updateComponent(component.id, { tableData: newTableData });
-  };
-
-  return (
-    <div
-      ref={droppableRef}
-      className={`p-2 border-dashed border-2 ${isDragging ? 'bg-gray-200' : ''}`}
-      onDrop={handleCellDrop}
-    >
-      {cell && typeof cell !== 'string' ? (
-        <div ref={setNodeRef}>
-          <ComponentRenderer component={cell} updateComponent={updateComponent} />
-        </div>
-      ) : (
-        <div className="text-center text-gray-500">Drag component here</div>
       )}
     </div>
   );
 };
 
-// Main FormBuilder component to manage form state and logic
-const FormBuilder = () => {
-  const [components, setComponents] = useState<FormComponent[]>([]);
-
-  const addComponent = (type: string) => {
-    const newComponent: FormComponent = {
-      id: uuidv4(),
-      type,
-      ...(type === 'select' && { options: ['Option 1', 'Option 2'] }),
-      ...(type === 'table' && {
-        columns: 2,
-        rows: 2,
-        tableData: Array(2).fill(Array(2).fill('')),
-      }),
-    };
-    setComponents((prev) => [...prev, newComponent]);
-  };
-
-  const updateComponent = (id: string, data: Partial<FormComponent>) => {
-    setComponents((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...data } : c))
-    );
-  };
-
-  return (
-    <div className="p-8 space-y-6 dark:bg-gray-900 min-h-screen text-white">
-      <h1 className="text-3xl font-bold mb-6">🛠️ Dynamic Form Builder</h1>
-      <div className="flex gap-3 flex-wrap mb-6">
-        {['text', 'select', 'date', 'checkbox', 'divider', 'table'].map((type) => (
-          <button
-            key={type}
-            onClick={() => addComponent(type)}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition"
-          >
-            ➕ Add {type.charAt(0).toUpperCase() + type.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      <DndContext collisionDetection={closestCenter}>
-        <div className="space-y-4">
-          {components.map((component) => (
-            <div key={component.id} className="p-4 border border-gray-500 rounded-md">
-              <ComponentRenderer component={component} updateComponent={updateComponent} />
-            </div>
-          ))}
-        </div>
-      </DndContext>
-    </div>
-  );
-};
-
-export default FormBuilder;
+export default ExcelFileEditor;

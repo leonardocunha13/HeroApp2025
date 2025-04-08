@@ -6,8 +6,10 @@ import HomePage from '../src/pages/HomePage';
 import CreateFormDialog from '../src/components/CreateFormDialog';
 import CollectionForms from '../src/pages/RunForm';
 import RunningForm from '../src/pages/RunningForm';
-import DynamicFormBuilder from './pages/BuildForm';
+//import DynamicFormBuilder from './pages/BuildForm';
 import { FiSun, FiMoon } from 'react-icons/fi';
+import ProjectLog from '../src/pages/ProjectLog';
+import ExcelFileEditor from './pages/BuildForm';
 
 const App: React.FC = () => {
   const { signOut } = useAuthenticator();
@@ -77,7 +79,7 @@ const App: React.FC = () => {
           <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
             <Link to="/" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Home</Link>
           </MenuItem>
-          <MenuItem style={{  color: darkMode ? '#000' : '#000' }}>
+          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
             <Link to="/forms" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Create New Form</Link>
           </MenuItem>
           <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
@@ -86,31 +88,32 @@ const App: React.FC = () => {
           <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
             <Link to="/form-builder" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Form Builder</Link>
           </MenuItem>
+          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
+            <Link to="/projectLog" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Project Log</Link>
+          </MenuItem>
           <Divider style={{ backgroundColor: '#ccc' }} />
-          <MenuItem>
-            <Button
-              onClick={signOut}
-              style={{
-                backgroundColor: darkMode ? '#e0e0e0' : '#6f6e72',
-                color: darkMode ? '#000' : '#fff',
-                padding: '10px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                fontSize: '16px',
-                cursor: 'pointer',
-                transition: 'background-color 0.3s',
-                width: '100%',
-                textAlign: 'left',
-              }}
-            >
-              Sign out
-            </Button>
+          <MenuItem
+            onClick={signOut}
+            style={{
+              color: darkMode ? '#000' : '#000',
+              backgroundColor: darkMode ? '#e0e0e0' : '#6f6e72',
+              padding: '10px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontSize: '16px',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s',
+              width: '100%',
+              textAlign: 'left',
+            }}
+          >
+            Sign out
           </MenuItem>
         </Menu>
 
 
         <div>
-          <button
+          <Button
             onClick={toggleDarkMode}
             style={{
               backgroundColor: darkMode ? '#333' : '#e0e0e0',
@@ -124,7 +127,7 @@ const App: React.FC = () => {
             }}
           >
             {darkMode ? <FiSun /> : <FiMoon />}
-          </button>
+          </Button>
         </div>
       </div>
       {/* Main Content */}
@@ -133,8 +136,9 @@ const App: React.FC = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/forms" element={<CreateFormDialog onFormCreated={function (): void { throw new Error('Function not implemented.'); }} />} />
           <Route path="/forms-list" element={<CollectionForms />} />
-          <Route path="/form-builder" element={<DynamicFormBuilder />} />
+          <Route path="/form-builder" element={<ExcelFileEditor />} />
           <Route path="/RunningForm" element={<RunningForm />} /> {/* Add this route */}
+          <Route path="/projectLog" element={<ProjectLog />} />
         </Routes>
       </div>
     </div>
