@@ -1,27 +1,17 @@
 import { useEffect, useState } from "react";
-import { Collection, Card, Heading, Flex, Text, Loader, Badge, SelectField } from "@aws-amplify/ui-react";
+import { Collection, Card, Heading, Flex, Text, Loader, Badge, SelectField, Button } from "@aws-amplify/ui-react";
 import { GetFormsByClientName, GetClients } from "../actions/form"; // Replace with your actual data fetching functions
-import { Cross2Icon } from "@radix-ui/react-icons";
-
-interface EquipmentDetails {
-    equipmentName: string;
-    equipmentTag: string;
-}
-
-interface FormData {
-    clientName: string;
-    projectName: string | undefined;
-    projectID: string;
-    formName: string | undefined;
-    equipmentDetails: EquipmentDetails[];
-    badges: string[]; // Explicitly typed as an array of strings
-}
+import * as Dialog from "@radix-ui/react-dialog";
+import { useNavigate } from "react-router-dom";
 
 const ProjectLog = () => {
+    const navigate = useNavigate();
     const [formsData, setFormsData] = useState<any[]>([]);  // Flattened data
     const [loading, setLoading] = useState(true);
     const [selectedClient, setSelectedClient] = useState<string | null>(null);
     const [clients, setClients] = useState<string[]>([]); // State for holding client list
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedForm, setSelectedForm] = useState<any>(null);
 
     // Fetch list of clients from getClient function
     const fetchClients = async () => {
@@ -50,6 +40,8 @@ const ProjectLog = () => {
                     formName: form.formName || '',
                     equipmentName: equipment.equipmentName,
                     equipmentTag: equipment.equipmentTag,
+                    submission: form.submission,
+                    formID: form.formID,
                     badges: [form.clientName, form.projectID],
                 }))
             );
@@ -62,6 +54,22 @@ const ProjectLog = () => {
         }
     };
 
+    const handleClose = () => {
+        setIsDialogOpen(false); // Close the dialog
+    };
+
+    const openDialog = (form: any) => {
+        setSelectedForm(form);
+        setIsDialogOpen(true);
+    };
+    
+    const handleResumeTest = () => {
+        navigate("/RunningForm", { state: { form: selectedForm, formID: selectedForm.formID } });
+        console.log("Resuming test...");
+        console.log("sELECTED FORM", selectedForm);
+        console.log("id", selectedForm.formID);
+    };
+
     // Use effect to fetch clients and forms data when client changes
     useEffect(() => {
         fetchClients(); // Fetch clients on initial load
@@ -72,13 +80,14 @@ const ProjectLog = () => {
     }, [selectedClient]);
 
     return (
-        <div>
+        <div style={{ width: "100%", padding: "10px" }}>
             {/* Client Dropdown */}
             <SelectField
                 label="Select Client"
                 descriptiveText="Please select a client to view the forms"
                 value={selectedClient || ''}
                 onChange={(e) => setSelectedClient(e.target.value)}
+                style={{ width: "100%", maxWidth: "400px", marginBottom: "20px" }}
             >
                 <option value="">Select Client</option>
                 {clients.map((client) => (
@@ -87,7 +96,6 @@ const ProjectLog = () => {
                     </option>
                 ))}
             </SelectField>
-
 
             {/* Loading state */}
             {loading ? (
@@ -106,24 +114,25 @@ const ProjectLog = () => {
                     }}
                     gap="20px"
                     position="relative"  // Fixed position to the top
-                    //isSearchable
                     isPaginated
                     itemsPerPage={6}
                 >
                     {(item, index) => (
-                        <div key={index}>
-                            {/* Individual Card for Equipment Tag */}
+                        <div key={index} style={{ maxWidth: '100%' }}>
                             <Card
                                 borderRadius="medium"
                                 marginTop="small"
-                                width="15rem"
-                                height="13rem"
+                                width="100%"  // Ensures the card takes full width available
+                                maxWidth="15rem"  // Max width for larger screens
+                                height="auto"  // Auto height for better responsiveness
                                 variation="outlined"
                                 padding="medium"
+                                onClick={() => openDialog(item)}
                                 style={{
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease',
                                     overflow: 'hidden',
+                                    boxSizing: 'border-box',
                                 }}
                             >
                                 {/* Card Content */}
@@ -142,7 +151,6 @@ const ProjectLog = () => {
                                         </Badge>
                                     ))}
                                 </Flex>
-                                
 
                                 {/* Equipment Details */}
                                 <Flex direction="column" gap="small">
@@ -164,6 +172,36 @@ const ProjectLog = () => {
                     )}
                 </Collection>
             )}
+
+            {/* Dialog for displaying detailed info */}
+            <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog.Overlay className="DialogOverlay" />
+                <Dialog.Content className="DialogContent">
+                    <Dialog.Title>Test Details</Dialog.Title>
+                    <Dialog.Description>
+                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Project Name:</strong> {selectedForm?.projectName}</Text>
+                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Form Name:</strong> {selectedForm?.formName}</Text>
+                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Equipment:</strong> {selectedForm?.equipmentName}</Text>
+                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Tag:</strong> {selectedForm?.equipmentTag}</Text>
+                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Status:</strong> {selectedForm?.submission === 1 ? (
+                            <Text color="green" fontWeight="bold">Test Finished</Text>
+                        ) : (
+                            <Text color="red" fontWeight="bold">Test not Finished</Text>
+                        )}</Text>
+                    </Dialog.Description>
+                    <Dialog.Close asChild>
+                        <Button style={{ backgroundColor: 'gray', marginRight: '10px' }} onClick={handleClose}>
+                            Close
+                        </Button>
+                    </Dialog.Close>
+                    <Button
+                        onClick={handleResumeTest}
+                        isDisabled={selectedForm?.submission === 1}
+                    >
+                        Resume Test
+                    </Button>
+                </Dialog.Content>
+            </Dialog.Root>
         </div>
     );
 };

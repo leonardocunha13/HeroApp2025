@@ -46,6 +46,7 @@ const schema = a.schema({
   FormTag2: a.model({
     formID: a.id(),
     tagID: a.id(),
+    contentTest: a.string().default("[]"),
     equipmentTag: a.belongsTo('EquipmentTag2', 'tagID'),
     form: a.belongsTo('Form', 'formID')
   }).authorization(allow => [allow.publicApiKey()]),

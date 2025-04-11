@@ -5,12 +5,14 @@ import { FaSave } from "react-icons/fa";
 import { IoIosCreate } from "react-icons/io";
 import { GetClients, GetProjectsFromClientName, CreateForm } from "../actions/form";
 import { Button } from '@aws-amplify/ui-react';
+import { useNavigate } from "react-router-dom";
 
 interface CreateFormDialogProps {
   onFormCreated: () => void;
 }
 
 const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) => {
+  const navigate = useNavigate();
   const [clients, setClients] = useState<string[]>([]);
   const [projects, setProjects] = useState<string[]>([]);
 
@@ -51,16 +53,27 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
         alert("Please fill in all fields.");
         return;
       }
-
+  
       const formId = await CreateForm(name, description, projID);
-      if (formId) {
-        alert("Form created successfully with ID: " + formId);
-        onFormCreated(); // Refresh the form list
+      if (!formId) {
+        throw new Error("Form ID not returned");
       }
+  
+      alert("Form created successfully with ID: " + formId);
+      onFormCreated?.(); // Refresh the form list
+      console.log("formId", formId);
+      navigate("/form-builder", { state: formId });
+
     } catch (error) {
-      alert("Error creating form: ");
+      console.error("Error creating form:", error);
+      if (error instanceof Error) {
+        alert("Error creating form: " + error.message); // Show error message in alert
+      } else {
+        alert("An unknown error occurred.");
+      }
     }
   };
+  
 
   return (
     <Dialog.Root>
@@ -147,7 +160,7 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
           <div style={{ display: "flex", marginTop: 25, justifyContent: "flex-end" }}>
             <Dialog.Close asChild>
               <Button className="Button green" onClick={handleCreateForm}>
-                <FaSave /> Save changes
+                <FaSave /> Create Form
               </Button>
             </Dialog.Close>
           </div>

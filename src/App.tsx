@@ -9,7 +9,7 @@ import RunningForm from '../src/pages/RunningForm';
 //import DynamicFormBuilder from './pages/BuildForm';
 import { FiSun, FiMoon } from 'react-icons/fi';
 import ProjectLog from '../src/pages/ProjectLog';
-import ExcelFileEditor from './pages/BuildForm';
+import FormBuilder from './pages/BuildForm';
 
 const App: React.FC = () => {
   const { signOut } = useAuthenticator();
@@ -41,6 +41,7 @@ const App: React.FC = () => {
           right: 0,
           display: 'flex',
           justifyContent: 'space-between',
+          backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.22)' : ' rgb(255, 243, 135)',
           alignItems: 'center',
           padding: '30px 24px',
           backdropFilter: 'blur(12px)',
@@ -134,9 +135,9 @@ const App: React.FC = () => {
       <div style={{ marginTop: '60px' }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/forms" element={<CreateFormDialog onFormCreated={function (): void { throw new Error('Function not implemented.'); }} />} />
+          <Route path="/forms" element={<CreateFormDialog onFormCreated={() => { console.log("Form created!"); }} />} />
           <Route path="/forms-list" element={<CollectionForms />} />
-          <Route path="/form-builder" element={<ExcelFileEditor />} />
+          <Route path="/form-builder" element={<FormBuilder />} />
           <Route path="/RunningForm" element={<RunningForm />} /> {/* Add this route */}
           <Route path="/projectLog" element={<ProjectLog />} />
         </Routes>

@@ -320,8 +320,26 @@ export async function UpdateFormContent(id: string, content: string) {
     throw new Error("Failed to update form content.");
   }
 }
+/*const data = [
+  ['Section 1', 'A', 'B', 'C', 'D', 'E', 'F'],
+  ['E', 'F', 'G', 'H', 'I'],
+  ['J', 'K', 'L', 'M', 'N'],
+];
 
-export async function PublishForm(id: string) {
+// Convert the data to a JSON string
+const content = JSON.stringify(data);
+
+
+UpdateFormContent("b5a11d77-fef7-4330-8479-db5d7aea3aff", content)
+  .then(updatedForm => {
+    console.log('Form updated:', updatedForm);
+  })
+  .catch(error => {
+    console.error('Error updating form:', error);
+  });
+*/
+
+export async function PublishForm(id: string, content: string) {
   try {
     const { userId } = await getCurrentUser();
     if (!userId) {
@@ -331,6 +349,7 @@ export async function PublishForm(id: string) {
     const form = {
       id: id,
       userId: userId,
+      content: content,
       published: true,
     };
 
@@ -562,8 +581,11 @@ export async function GetFormsInformation() {
           projectName: projectItem.projectName,
           projectID: projectItem.projectID,
           forms: formsData.map(form => ({
+            id: form.id,
             name: form.name,
             description: form.description,
+            published: form.published,
+            content: form.content,
           })),
         });
       }
@@ -847,13 +869,11 @@ export async function GetFormsByClientName(ClientName: string) {
       ClientName: { eq: ClientName }
     },
   });
-  //console.log("Client Result:", clientResult);
 
   const clientData = clientResult.data?.[0];
   if (!clientData) return [];
 
   const clientID = clientData.id;
-  //console.log("Client ID:", clientID);
 
   // 2. Fetch all Projects with the corresponding ClientID
   const projectsResult = await client.models.Projectt.list({
@@ -864,11 +884,9 @@ export async function GetFormsByClientName(ClientName: string) {
 
   const projects = projectsResult.data;
   if (!projects.length) return [];
-  //console.log("Projects Found:", projects);
 
   // Extract project IDs
   const projectIDs = projects.map(project => project.projectID);
-  //console.log("Project IDs:", projectIDs);
 
   // 3. Fetch all Forms for the found projects
   const allForms = await Promise.all(
@@ -876,11 +894,9 @@ export async function GetFormsByClientName(ClientName: string) {
       const formsResult = await client.models.Form.list({
         filter: { projID: { eq: projectID } },
       });
-      //console.log(`Forms for Project ${projectID}:`, formsResult);
 
       const forms = formsResult.data;
       const formIDs = forms.map(form => form.id);
-      //console.log("Form IDs:", formIDs);
 
       // Fetch tagID related to each FormID and then get equipment and tags
       const formDetailsWithEquipment = await Promise.all(
@@ -897,7 +913,6 @@ export async function GetFormsByClientName(ClientName: string) {
 
           // Extract tagIDs
           const tagIDs = formTags.map(tag => tag.tagID);
-          //console.log("Tag IDs for FormID:", formId, tagIDs);
 
           // Fetch equipment and tags based on tagIDs
           const equipmentAndTags = await Promise.all(
@@ -918,39 +933,44 @@ export async function GetFormsByClientName(ClientName: string) {
             })
           );
 
-          // Combine form data with its equipment and tags
+          // Combine form data with its equipment, tags, and submission status
           const formData = forms.find(form => form.id === formId);
-
+          console.log ("id", formId);
           return {
             clientName: clientData.ClientName, // Adding Client Name
             projectName: projects.find(project => project.projectID === projectID)?.projectName, // Adding Project Name
             projectID, // Adding Project ID
             formName: formData?.name, // Adding Form Name
             equipment: equipmentAndTags.flat(),
+            submission: formData?.submissions || 0, // Adding submission status (0 or 1)
+            description: formData?.description,
+            formId: formId,
           };
         })
       );
-
+      
       return formDetailsWithEquipment.filter(detail => detail !== null);
     })
   );
 
   // Flatten the array of arrays of forms and enrich the data
   const flattenedForms = allForms.flat();
-  //console.log("Flattened Forms with Equipment and Tags:", flattenedForms);
 
   // Flatten and return the result with all the required information
   return flattenedForms.map(formDetail => ({
     clientName: formDetail.clientName,
     projectName: formDetail.projectName,
     projectID: formDetail.projectID,
+    formID: formDetail.formId,
     formName: formDetail.formName,
     equipmentDetails: formDetail.equipment.map(equipment => ({
       equipmentName: equipment?.equipmentName || "Unknown",
       equipmentTag: equipment?.equipmentTag || "Unknown",
     })),
+    submission: formDetail.submission, // Including submission status in the final result
   }));
 }
+
 
 /*await GetFormsByClientName("Rio Tinto")
   .then((flattenedForms) => {
@@ -959,3 +979,43 @@ export async function GetFormsByClientName(ClientName: string) {
   .catch((error) => {
     console.error("❌ Error fetching forms:", error);
   });*/
+
+  //this function was created using content of form submission, but it should be with contentTest in FormTag2.
+  //It shall be updated as soon as the access to the sandbox.
+
+  export async function SaveFormAfterTest(FormID: string, TagID: string, content: string) {
+    try {
+      // 1. Buscar o item existente com formID e tagID
+      const { data: formTags, errors } = await client.models.FormTag2.list({
+        filter: {
+          formID: { eq: FormID },
+          tagID: { eq: TagID },
+        },
+      });
+  
+      if (errors) {
+        console.error("Erro ao buscar FormTag2:", errors);
+        return;
+      }
+  
+      const formTagToUpdate = formTags[0]; // Assume que há apenas um item para esse par (formID, tagID)
+  
+      if (!formTagToUpdate) {
+        console.error("Nenhum registro encontrado com esse formID e tagID");
+        return;
+      }
+  
+      // 2. Atualizar o conteúdo
+      const updated = await client.models.FormTag2.update({
+        id: formTagToUpdate.id,
+        content: content,
+      });
+  
+      console.log("Updated:", updated);
+      return updated;
+  
+    } catch (err) {
+      console.error("Error SaveFormAfterTest:", err);
+    }
+  }
+  

@@ -1,4 +1,4 @@
-import { Collection, Card, Heading, Flex, Badge, Divider, Button, Text, Loader } from "@aws-amplify/ui-react";
+import { Collection, Card, Heading, Flex, Badge, Button, Text, Loader } from "@aws-amplify/ui-react";
 import { GetFormsInformation, runForm } from "../actions/form";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +7,11 @@ import * as Dialog from "@radix-ui/react-dialog";
 //import { Cross2Icon } from "@radix-ui/react-icons";
 
 interface Form {
+    id: string;
     name: string | null;
     description: string | null;
+    published: boolean | null;
+    content: string | null;
 }
 
 interface ProjectItem {
@@ -19,16 +22,16 @@ interface ProjectItem {
 }
 
 interface FormInfo {
+    id: string;
     title: string | null;
     description: string | null;
     projectName: string;
     clientName: string;
     projectID: string;
     badges: string[];
+    published: boolean | null;
+    content: string | null;
 }
-
-
-// CollectionForms component (unchanged from your original, except the addition of triggerRefresh)
 
 const CollectionForms = () => {
     const navigate = useNavigate();
@@ -38,7 +41,7 @@ const CollectionForms = () => {
     const [selectedForm, setSelectedForm] = useState<FormInfo | null>(null);
     const [equipmentName, setEquipmentName] = useState("");
     const [equipmentTag, setEquipmentTag] = useState("");
-    const [refresh, setRefresh] = useState(false);
+    const [refresh] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,12 +51,16 @@ const CollectionForms = () => {
                     .filter(project => project.forms.length > 0)
                     .flatMap(project =>
                         project.forms.map(form => ({
+                            id: form.id,
                             title: form.name,
                             description: form.description,
                             projectName: project.projectName,
                             clientName: project.clientName,
                             projectID: project.projectID,
+                            published: form.published,
+                            content: form.content,
                             badges: [project.clientName, project.projectID],
+
                         }))
                     );
 
@@ -82,6 +89,11 @@ const CollectionForms = () => {
             return;
         }
 
+        if (!selectedForm.published) {
+            alert("This form is not published and cannot be started.");
+            return; // Prevent starting if the form is not published
+        }
+
         const { title, projectID } = selectedForm;
 
         // Trigger runForm function with appropriate arguments
@@ -94,7 +106,10 @@ const CollectionForms = () => {
             form: selectedForm,
             equipmentName,
             equipmentTag,
+            content: selectedForm.content,
+
         };
+        console.log("Selected Form Content:", selectedForm.content);
 
         // Wait for runForm to complete and get the result
         const success = await runForm(title, projectID, equipmentName, equipmentTag);
@@ -109,9 +124,20 @@ const CollectionForms = () => {
         }
     };
 
+
     const handleClose = () => {
         setIsDialogOpen(false); // Close the dialog
     };
+
+    function editForm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+        if (!selectedForm) {
+            console.error("No form selected for editing.");
+            return;
+        }
+
+        // Ensure form ID is included in the state when navigating
+        navigate("/form-builder", { state: { form: selectedForm, formID: selectedForm.id } });
+    }
 
     return (
         <>
@@ -133,7 +159,7 @@ const CollectionForms = () => {
                     position="relative"  // Fixed position to the top
                     isSearchable
                     isPaginated
-                    itemsPerPage={4}
+                    itemsPerPage={6}
                     searchPlaceholder="Search by Client Name..."
                     searchNoResultsFound={
                         <Flex justifyContent="center">
@@ -152,7 +178,7 @@ const CollectionForms = () => {
                             key={index}
                             borderRadius="medium"
                             width="15rem"
-                            height="9rem"
+                            height="11rem"
                             variation="outlined"
                             padding="medium"
                             onClick={() => openDialog(item)}
@@ -178,16 +204,21 @@ const CollectionForms = () => {
                                 Project: {item.projectName}
                             </Text>
 
-                            <Text paddingBottom="small" style={{ fontSize: '0.75rem' }}>
-                                {item.description}
-                            </Text>
-
                             <Flex gap="small" paddingBottom="small">
                                 {item.badges.map((badge, i) => (
                                     <Badge key={i} backgroundColor="yellow.40" style={{ fontSize: '0.7rem' }}>
                                         {badge}
                                     </Badge>
+
                                 ))}
+                            </Flex>
+                            <Flex gap="small" paddingBottom="small">
+                                <Badge
+                                    style={{ fontSize: '0.7rem', color: 'white' }}
+                                    backgroundColor={item.published ? 'green' : 'red'}
+                                >
+                                    {item.published ? 'PUBLISHED' : 'NOT PUBLISHED'}
+                                </Badge>
                             </Flex>
                         </Card>
 
@@ -212,6 +243,10 @@ const CollectionForms = () => {
 
                             <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}>Project ID:</Text>
                             <Text>{selectedForm.projectID}</Text>
+
+                            <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}>Test Description:</Text>
+                            <Text>{selectedForm.description}</Text>
+
                         </div>
                     )}
 
@@ -251,7 +286,7 @@ const CollectionForms = () => {
                                 Close
                             </Button>
                         </Dialog.Close>
-                        <Button style={{ padding: '10px' }} backgroundColor="white.40">
+                        <Button style={{ padding: '10px', backgroundColor: 'white.40' }} onClick={editForm} disabled={selectedForm?.published === true}>
                             Edit Form
                         </Button>
                         <Button style={{ padding: '10px', width: '100px' }} variation="primary" onClick={handleStart}>
