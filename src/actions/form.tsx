@@ -404,37 +404,53 @@ export async function GetFormContentByUrl(formUrl: string) {
     throw new Error("Error fetching form content by URL.");
   }
 }
-
-export async function SubmitForm(formUrl: string, content: string) {
+//The SubmitForm shall receive not form ID, but FormTag ID. FormTag ID is a unique value that relates the equipment Tag with the Form.
+export async function SubmitForm(formId: string, content: string) {
   try {
-    const { data: forms } = await client.models.Form.list({
-      filter: {
-        shareURL: { eq: formUrl },
-        published: { eq: true },
-      },
-    });
+    const { userId } = await getCurrentUser();
+    if (!userId) {
+      throw new UserNotFoundErr();
+    }
 
-    const form = forms[0];
-
-    const newFormSubmission = await client.models.FormSubmissions.create({
-      formId: form.id,
-      content: content,
-    });
-
-    const updatedSubmissions = form.submissions ? form.submissions + 1 : 1;
-
-    const updatedForm = await client.models.Form.update({
-      id: form.id,
-      submissions: updatedSubmissions,
-    });
-
-    return {
-      form: updatedForm,
-      newSubmission: newFormSubmission,
+    const submission = {
+      formId,
+      content,
+      createdAt: new Date().toISOString(),
     };
+
+    const { data, errors } = await client.models.FormSubmissions.create(submission);
+
+    if (errors) {
+      console.error("Error", errors);
+      throw new Error("Error.");
+    }
+
+    const { data: formList, errors: formErrors } = await client.models.Form.list({
+      filter: { id: { eq: formId } },
+    });
+
+    if (formErrors || !formList || formList.length === 0) {
+      console.error(formErrors || "Form not found.");
+      throw new Error("Form not found.");
+    }
+
+    const form = formList[0];
+    const updatedForm = {
+      id: form.id,
+      submissions: (form.submissions || 0) + 1,
+    };
+
+    const { errors: updateErrors } = await client.models.Form.update(updatedForm);
+
+    if (updateErrors) {
+      console.error("Error to update the submission value:", updateErrors);
+      throw new Error("Erro ao atualizar formulário.");
+    }
+
+    return data;
   } catch (error) {
-    console.error("Error submitting form:", error);
-    throw new Error("Failed to submit the form.");
+    console.error("Error to submit the form:", error);
+    throw new Error("Error to submit the form.");
   }
 }
 
@@ -631,78 +647,6 @@ export async function GetProjectsFromClientName(ClientName: string) {
   }
 }
 
-
-/*GetProjectsFromClientName("Rio Tinto")
-  .then((data) => console.log("Client with Projects:", data))
-  .catch((error) => console.error("Error fetching client with projects:", error));*/
-
-/*export async function InsertProject(NameProject: string, IDProject: string, ClientID: string) {
-  try {
-    const { errors, data } = await client.models.Projectt.create({
-      projectName: NameProject,
-      projectID: IDProject,
-      ClientID: ClientID,
-    });
- 
-    if (errors) {
-      console.error("Error inserting project:", errors);
-      throw new Error("Failed to insert project.");
-    }
- 
-    console.log("Project inserted successfully:", data);
-    return data; // Return the inserted project data
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-}
-InsertProject("Cage Winder Execute Phase" , "HE067P010", "b10e95f7-92b6-4358-9ae2-e0a1c639f475");*/
-
-/* export async function AddEquipmentToForm(formId: string, equipmentTag: string) {
-   try {
-     // Create a new EquipmentTag directly without checking for existing tags
-     const { errors: createTagErrors, data: newEquipmentTag } = await client.models.EquipmentTag.create({
-       Tag: equipmentTag, // Creating a new EquipmentTag with the provided name
-     });
-     console.log("New EquipmentTag:", newEquipmentTag);
-     if (createTagErrors) {
-       console.error("Error creating new equipment tag:", createTagErrors);
-       throw new Error("Something went wrong while creating the equipment tag");
-     }
- 
-     // Ensure newEquipmentTag is valid
-     if (!newEquipmentTag) {
-       console.error("Error: New equipment tag is null or undefined");
-       throw new Error("Failed to create new equipment tag.");
-     }
- 
-     // Get the ID of the newly created EquipmentTag
-     const equipmentTagId = newEquipmentTag.id;
- 
-     // Now associate the newly created EquipmentTag with the form
-     const { errors: formTagErrors, data: formTag } = await client.models.FormTag.create({
-       formID: formId,
-       tagID: equipmentTagId, // Link the newly created EquipmentTag to the Form
-     });
- 
-     if (formTagErrors) {
-       console.error("Error associating equipment with form:", formTagErrors);
-       throw new Error("Something went wrong while associating the equipment tag with the form");
-     }
- 
-     console.log("Created FormTag:", formTag);
-     return newEquipmentTag; // Return the created FormTag for further use or confirmation
-   } catch (error) {
-     console.error("Error in AddEquipmentToForm:", error);
-     throw error;
-   }
- }
- 
- 
- await AddEquipmentToForm("3cf67384-5113-4be5-9e5e-674712778e13", "Test Tag 1")
- .then((newEquipmentTag) => console.log("Created FormTag:", newEquipmentTag))
- .catch((error) => console.error("Error:", error)); // Handle any errors that occur*/
-
 export async function CreateForm(name: string, description: string, projectName: string) {
   const { userId } = await getCurrentUser();
   if (!userId) {
@@ -727,112 +671,101 @@ export async function CreateForm(name: string, description: string, projectName:
   const projID = projectsData[0].projectID;
 
   // Now create the form using projID
-  const { errors: formerrors , data: form } = await client.models.Form.create({
+  const { errors: formerrors, data: form } = await client.models.Form.create({
     userId: userId,
     projID: projID,  // Here, we are using the found projID from the project lookup
     name: name,      // Use the form name from the state
     description: description,
   });
 
+
   if (formerrors) {
     console.error("Error creating form:", formerrors);
     throw new Error("Something went wrong while creating the form");
   }
 
-  return form?.id;  // Return the created form ID
+  return {
+    formId: form?.id,
+    projID: projID
+  };  // Return the created form ID
 };
 
-export const runForm = async (TestName: string, ProjectID: string, EquipName: string, EquipTag: string): Promise<boolean> => {
+export const runForm = async (
+  TestName: string,
+  ProjectID: string,
+  EquipName: string,
+  EquipTag: string
+): Promise<{ success: boolean; createdTagID?: string; tagCreatedAt?: string }> => {
   try {
-    // Fetch the form based on TestName and ProjectID
-    //console.log("Fetching form with TestName:", TestName, "and ProjectID:", ProjectID);
     const formResp = await fetchFormByNameAndProject(TestName, ProjectID);
 
     if (!formResp) {
       console.error("Form not found with the provided TestName and ProjectID");
-      return false; // Return false if the form is not found
+      return { success: false };
     }
 
-    //console.log("Form fetched successfully:", formResp);
     const form = formResp;
-
-    // Verifies if the EquipmentTag with this Tag + EquipmentName already exists for the same form and project
-    //console.log("Checking if EquipmentTag exists for Tag:", EquipTag, "and EquipmentName:", EquipName, "in the same form and project");
 
     const existingTagResp = await client.models.EquipmentTag2.list({
       filter: {
-        Tag: { eq: EquipTag },  // Case-sensitive check for EquipTag
-        EquipmentName: { eq: EquipName },  // Case-sensitive check for EquipmentName
+        Tag: { eq: EquipTag },
+        EquipmentName: { eq: EquipName },
       },
     });
 
-    //console.log("Existing EquipmentTag response:", existingTagResp);
-
-    // If any EquipmentTag exists for this EquipTag and EquipmentName, check if it's linked to the same form
     const existingTag = existingTagResp.data?.[0];
 
     if (existingTag) {
-      // Check if the EquipmentTag is already linked to the same form and project
       const linkedFormResp = await client.models.FormTag2.list({
         filter: {
           tagID: { eq: existingTag.id },
-          formID: { eq: form.id },  // Check if it's the same form
+          formID: { eq: form.id },
         },
       });
 
-      // If the EquipmentTag is already linked to the same form, block form start
       if (linkedFormResp.data?.length > 0) {
-        console.error("Error: This equipment and tag are already associated with this form and project.");
+        console.error("This equipment and tag are already associated with this form and project.");
         alert("Error: This equipment and tag are already associated with this form and project.");
-        return false;  // Prevent proceeding with the form creation
+        return { success: false };
       }
-
-      // Otherwise, allow form to proceed for a different form
-      //console.log("Allowing form to proceed as EquipmentTag is linked to a different form.");
     }
 
-    // If the EquipmentTag does not exist, create it
-    let createResp = null; // Declare createResp outside the block
+    let createResp = null;
+    let createdTagID: string | undefined = undefined;
+    let tagCreatedAt: string | undefined = undefined;
+
     if (!existingTag) {
-      //console.log('Creating new EquipmentTag with Tag:', EquipTag, 'and EquipmentName:', EquipName);
       createResp = await client.models.EquipmentTag2.create({
         Tag: EquipTag,
         EquipmentName: EquipName,
       });
 
       if (!createResp.data) {
-        console.error('Failed to create EquipmentTag');
-        //console.log("Create Response:", createResp);  // Log the full response to check for details
-        return false; // Return false if creating the equipment tag fails
+        console.error("Failed to create EquipmentTag");
+        return { success: false };
       }
 
-      //console.log('New EquipmentTag created:', createResp.data);
+      createdTagID = createResp.data.id;
+      tagCreatedAt = new Date(createResp.data.createdAt).toISOString().split("T")[0];
     }
 
-    // Create the link between the Form and EquipmentTag (FormTag)
-    //console.log('Creating FormTag to link form with EquipmentTag');
     const formTagResp = await client.models.FormTag2.create({
       formID: form.id,
-      tagID: existingTag ? existingTag.id : createResp?.data?.id, // Use existing or newly created tagID
+      tagID: existingTag ? existingTag.id : createdTagID,
     });
 
     if (!formTagResp.data) {
-      console.error('Failed to create FormTag');
-      return false; // Return false if the form tag creation fails
+      console.error("Failed to create FormTag");
+      return { success: false };
     }
 
-    //console.log('FormTag created successfully:', formTagResp.data);
-    //console.log('Form executed successfully and linked to the EquipmentTag.');
-
-    return true; // Return true if everything succeeds
+    return { success: true, createdTagID, tagCreatedAt };
 
   } catch (error) {
-    console.error('Error executing runForm:', error);
-    return false; // Return false if any error occurs
+    console.error("Error executing runForm:", error);
+    return { success: false };
   }
 };
-
-
 
 // Fetch formId by TestName and ProjectID
 const fetchFormByNameAndProject = async (TestName: string, ProjectID: string) => {
@@ -859,15 +792,10 @@ const fetchFormByNameAndProject = async (TestName: string, ProjectID: string) =>
 .then((newEquipmentTag) => console.log("Created FormTag:", newEquipmentTag))
 .catch((error) => console.error("Error:", error)); // Handle any errors */
 
-
-// form.tsx
-
 export async function GetFormsByClientName(ClientName: string) {
   // 1. Fetch the Client ID
   const clientResult = await client.models.Client.list({
-    filter: {
-      ClientName: { eq: ClientName }
-    },
+    filter: { ClientName: { eq: ClientName } },
   });
 
   const clientData = clientResult.data?.[0];
@@ -877,15 +805,12 @@ export async function GetFormsByClientName(ClientName: string) {
 
   // 2. Fetch all Projects with the corresponding ClientID
   const projectsResult = await client.models.Projectt.list({
-    filter: {
-      ClientID: { eq: clientID }
-    }
+    filter: { ClientID: { eq: clientID } },
   });
 
   const projects = projectsResult.data;
   if (!projects.length) return [];
 
-  // Extract project IDs
   const projectIDs = projects.map(project => project.projectID);
 
   // 3. Fetch all Forms for the found projects
@@ -898,10 +823,8 @@ export async function GetFormsByClientName(ClientName: string) {
       const forms = formsResult.data;
       const formIDs = forms.map(form => form.id);
 
-      // Fetch tagID related to each FormID and then get equipment and tags
       const formDetailsWithEquipment = await Promise.all(
         formIDs.map(async (formId) => {
-          // Fetch the tagID for the current FormID from FormTag2
           const { data: formTags, errors: formTagsErrors } = await client.models.FormTag2.list({
             filter: { formID: { eq: formId } },
           });
@@ -911,10 +834,8 @@ export async function GetFormsByClientName(ClientName: string) {
             return null;
           }
 
-          // Extract tagIDs
           const tagIDs = formTags.map(tag => tag.tagID);
 
-          // Fetch equipment and tags based on tagIDs
           const equipmentAndTags = await Promise.all(
             tagIDs.map(async (tagID) => {
               const { data: equipmentData, errors: equipmentErrors } = await client.models.EquipmentTag2.list({
@@ -929,48 +850,46 @@ export async function GetFormsByClientName(ClientName: string) {
               return equipmentData.map(equipment => ({
                 equipmentName: equipment.EquipmentName,
                 equipmentTag: equipment.Tag,
+                tagCreatedAt: new Date(equipment.createdAt).toISOString().split("T")[0], // <-- Adicionado aqui
               }));
             })
           );
 
-          // Combine form data with its equipment, tags, and submission status
           const formData = forms.find(form => form.id === formId);
-          console.log ("id", formId);
           return {
-            clientName: clientData.ClientName, // Adding Client Name
-            projectName: projects.find(project => project.projectID === projectID)?.projectName, // Adding Project Name
-            projectID, // Adding Project ID
-            formName: formData?.name, // Adding Form Name
+            clientName: clientData.ClientName,
+            projectName: projects.find(project => project.projectID === projectID)?.projectName,
+            projectID,
+            formName: formData?.name,
             equipment: equipmentAndTags.flat(),
-            submission: formData?.submissions || 0, // Adding submission status (0 or 1)
+            submission: formData?.submissions || 0,
             description: formData?.description,
             formId: formId,
           };
         })
       );
-      
+
       return formDetailsWithEquipment.filter(detail => detail !== null);
     })
   );
 
-  // Flatten the array of arrays of forms and enrich the data
   const flattenedForms = allForms.flat();
 
-  // Flatten and return the result with all the required information
   return flattenedForms.map(formDetail => ({
     clientName: formDetail.clientName,
     projectName: formDetail.projectName,
     projectID: formDetail.projectID,
     formID: formDetail.formId,
     formName: formDetail.formName,
+    description: formDetail.description,
     equipmentDetails: formDetail.equipment.map(equipment => ({
       equipmentName: equipment?.equipmentName || "Unknown",
       equipmentTag: equipment?.equipmentTag || "Unknown",
+      tagCreatedAt: equipment?.tagCreatedAt || "Unknown", // <-- Adicionado aqui também
     })),
-    submission: formDetail.submission, // Including submission status in the final result
+    submission: formDetail.submission,
   }));
 }
-
 
 /*await GetFormsByClientName("Rio Tinto")
   .then((flattenedForms) => {
@@ -980,42 +899,122 @@ export async function GetFormsByClientName(ClientName: string) {
     console.error("❌ Error fetching forms:", error);
   });*/
 
-  //this function was created using content of form submission, but it should be with contentTest in FormTag2.
-  //It shall be updated as soon as the access to the sandbox.
+export async function SaveFormAfterTest(FormID: string, TagID: string, content: string) {
+  try {
 
-  export async function SaveFormAfterTest(FormID: string, TagID: string, content: string) {
-    try {
-      // 1. Buscar o item existente com formID e tagID
-      const { data: formTags, errors } = await client.models.FormTag2.list({
-        filter: {
-          formID: { eq: FormID },
-          tagID: { eq: TagID },
-        },
-      });
-  
-      if (errors) {
-        console.error("Erro ao buscar FormTag2:", errors);
-        return;
-      }
-  
-      const formTagToUpdate = formTags[0]; // Assume que há apenas um item para esse par (formID, tagID)
-  
-      if (!formTagToUpdate) {
-        console.error("Nenhum registro encontrado com esse formID e tagID");
-        return;
-      }
-  
-      // 2. Atualizar o conteúdo
-      const updated = await client.models.FormTag2.update({
-        id: formTagToUpdate.id,
-        content: content,
-      });
-  
-      console.log("Updated:", updated);
-      return updated;
-  
-    } catch (err) {
-      console.error("Error SaveFormAfterTest:", err);
+    const { data: formTags, errors } = await client.models.FormTag2.list({
+      filter: {
+        formID: { eq: FormID },
+        tagID: { eq: TagID },
+      },
+    });
+
+    if (errors) {
+      console.error("Error:", errors);
+      return;
     }
+
+    const formTagToUpdate = formTags[0];
+
+    if (!formTagToUpdate) {
+      console.error("Nothing found for this formID and tagID");
+      return;
+    }
+
+    const updated = await client.models.FormTag2.update({
+      id: formTagToUpdate.id,
+      contentTest: content,
+    });
+
+    console.log("Updated:", updated);
+    return updated;
+
+  } catch (err) {
+    console.error("Error SaveFormAfterTest:", err);
   }
-  
+}
+
+/*  SaveFormAfterTest("96a34ca0-03a2-4f79-8853-495e7ea3d060", "40df5981-e8d0-45e1-b8f4-9922f5ccce52", "Test content")
+.then((updatedForm) => {
+  console.log("Form updated successfully:", updatedForm);
+})
+.catch((error) => {
+  console.error("Error updating form:", error);
+});*/
+
+export async function getContentByFormIDandTagID(FormID: string, TagID: string) {
+  try {
+    const { data: formTags, errors } = await client.models.FormTag2.list({
+      filter: {
+        formID: { eq: FormID },
+        tagID: { eq: TagID },
+      },
+    });
+
+    if (errors) {
+      console.error("Error:", errors);
+      return;
+    }
+
+    const formTag = formTags[0];
+
+    if (!formTag) {
+      console.error("Nothing found for this formID and tagID");
+      return;
+    }
+
+    const content = formTag.contentTest; 
+
+    //console.log("Fetched content:", content);
+    return content;
+
+  } catch (err) {
+    console.error("Error getContentByFormIDandTagID:", err);
+  }
+}
+
+/*getContentByFormIDandTagID("2e069dfa-3e6d-42d2-be06-544b5aa99b40", "9399935a-59ea-413f-8303-41b8fc4f97b7")
+.then((updatedForm) => {
+  console.log("Form updated successfully:", updatedForm);
+})
+.catch((error) => {
+  console.error("Error updating form:", error);
+});*/
+
+export async function getEquipmentTagID(equipmentName: string, equipmentTag: string) {
+  try {
+    // Query to fetch equipment by its name and tag
+    const { data, errors } = await client.models.EquipmentTag2.list({
+      filter: {
+        EquipmentName: { eq: equipmentName },
+        Tag: { eq: equipmentTag },
+      },
+    });
+
+    // Check for errors
+    if (errors) {
+      console.error("Error fetching equipment tag:", errors);
+      return;
+    }
+
+    // Check if data exists
+    const equipmentTagData = data[0]; // Assuming the first entry matches the search
+    if (!equipmentTagData) {
+      console.error("No matching equipment found for given name and tag.");
+      return;
+    }
+
+    // Return the equipmentTagID
+    return equipmentTagData.id; // Assuming `id` is the equipmentTagID
+  } catch (err) {
+    console.error("Error in getEquipmentTagID:", err);
+  }
+}
+
+/*getEquipmentTagID("Equip1", "Tag1")
+.then((updatedForm) => {
+  console.log("Equip TAG ID:", updatedForm);
+})
+.catch((error) => {
+  console.error("Error updating form:", error);
+});*/

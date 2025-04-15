@@ -4,7 +4,7 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import { FaSave } from "react-icons/fa";
 import { IoIosCreate } from "react-icons/io";
 import { GetClients, GetProjectsFromClientName, CreateForm } from "../actions/form";
-import { Button } from '@aws-amplify/ui-react';
+import { Button, Alert } from '@aws-amplify/ui-react';
 import { useNavigate } from "react-router-dom";
 
 interface CreateFormDialogProps {
@@ -53,27 +53,29 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
         alert("Please fill in all fields.");
         return;
       }
-  
+
       const formId = await CreateForm(name, description, projID);
       if (!formId) {
         throw new Error("Form ID not returned");
       }
-  
-      alert("Form created successfully with ID: " + formId);
+      const projectID = formId.projID;
+      <Alert variation="success">Form created successfully!</Alert>;
       onFormCreated?.(); // Refresh the form list
-      console.log("formId", formId);
-      navigate("/form-builder", { state: formId });
-
+      //console.log("formId", formId.projID);
+      navigate(`/form-builder/${formId.formId}`, {
+        state: { idform: formId.formId, name, description, projID, projectID, client: selectedClient }
+      });
+      
     } catch (error) {
       console.error("Error creating form:", error);
       if (error instanceof Error) {
-        alert("Error creating form: " + error.message); // Show error message in alert
+        alert("Error creating form: " + error.message);
       } else {
         alert("An unknown error occurred.");
       }
     }
   };
-  
+
 
   return (
     <Dialog.Root>
@@ -148,10 +150,10 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
             <label className="Label" htmlFor="desc" style={{ color: 'black' }}>
               Form Description
             </label>
-
-            <input
+            <textarea
               className="Input"
               id="desc"
+              style={{ resize: "vertical", overflow: "auto", height: "150px" }}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />

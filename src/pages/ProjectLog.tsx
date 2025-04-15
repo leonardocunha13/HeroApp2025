@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Collection, Card, Heading, Flex, Text, Loader, Badge, SelectField, Button } from "@aws-amplify/ui-react";
-import { GetFormsByClientName, GetClients } from "../actions/form"; // Replace with your actual data fetching functions
+import { GetFormsByClientName, GetClients, getContentByFormIDandTagID, getEquipmentTagID } from "../actions/form"; // Replace with your actual data fetching functions
 import * as Dialog from "@radix-ui/react-dialog";
 import { useNavigate } from "react-router-dom";
 
@@ -32,27 +32,53 @@ const ProjectLog = () => {
             const data = await GetFormsByClientName(selectedClient); // Fetch forms data for selected client
 
             // Flatten the equipment details to create separate cards
-            const flattenedData = data.flatMap((form) =>
-                form.equipmentDetails.map((equipment) => ({
-                    clientName: form.clientName,
-                    projectName: form.projectName || '',
-                    projectID: form.projectID,
-                    formName: form.formName || '',
-                    equipmentName: equipment.equipmentName,
-                    equipmentTag: equipment.equipmentTag,
-                    submission: form.submission,
-                    formID: form.formID,
-                    badges: [form.clientName, form.projectID],
-                }))
+            const flattenedData = await Promise.all(
+                data.flatMap(async (form) => {
+                    const equipmentData = await Promise.all(
+                        form.equipmentDetails.map(async (equipment) => {
+                            // Get the tagID using the equipment's name and tag
+                            const equipmentTagID = await getEquipmentTagID(equipment.equipmentName, equipment.equipmentTag);
+
+                            // If the tagID is not found, skip this equipment
+                            if (!equipmentTagID) {
+                                console.error("No tagID found for equipment:", equipment);
+                                return;
+                            }
+
+                            // Fetch the content using formID and equipmentTagID
+                            const content = await getContentByFormIDandTagID(form.formID, equipmentTagID);
+
+                            return {
+                                clientName: form.clientName,
+                                projectName: form.projectName || '',
+                                projectID: form.projectID,
+                                formName: form.formName || '',
+                                description: form.description || '',
+                                TagCreatedAt: equipment.tagCreatedAt,
+                                equipmentName: equipment.equipmentName,
+                                equipmentTag: equipment.equipmentTag,
+                                submission: form.submission,
+                                formID: form.formID,
+                                badges: [form.clientName, form.projectID],
+                                content: content || '',
+                            };
+                        })
+                    );
+
+                    return equipmentData;
+                })
             );
 
-            setFormsData(flattenedData);
+            // Flatten the results (in case nested arrays are returned from Promise.all)
+            setFormsData(flattenedData.flat());
         } catch (error) {
             console.error("Error fetching forms data:", error);
         } finally {
             setLoading(false);
         }
     };
+
+
 
     const handleClose = () => {
         setIsDialogOpen(false); // Close the dialog
@@ -62,14 +88,33 @@ const ProjectLog = () => {
         setSelectedForm(form);
         setIsDialogOpen(true);
     };
-    
-    const handleResumeTest = () => {
-        navigate("/RunningForm", { state: { form: selectedForm, formID: selectedForm.formID } });
-        console.log("Resuming test...");
-        console.log("sELECTED FORM", selectedForm);
-        console.log("id", selectedForm.formID);
-    };
 
+    const handleResumeTest = async () => {
+        if (!selectedForm) return;
+
+        try {
+            // Assuming the selected equipment tag is part of the selectedForm
+            const equipmentTagID = await getEquipmentTagID(selectedForm.equipmentName, selectedForm.equipmentTag);
+
+            // If the tagID is not found, log an error and exit
+            if (!equipmentTagID) {
+                console.error("No tagID found for the selected form's equipment.");
+                return;
+            }
+            const content = await getContentByFormIDandTagID(selectedForm.formID, equipmentTagID);
+            navigate(`/RunningForm/${equipmentTagID}`, {
+                state: {
+                    form: selectedForm,
+                    equipmentTagID: equipmentTagID,
+                    formID: selectedForm.formID,
+                    tagCreatedAt: selectedForm.TagCreatedAt,
+                    content: content || '' // Send the fetched content along
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching content:", error);
+        }
+    };
     // Use effect to fetch clients and forms data when client changes
     useEffect(() => {
         fetchClients(); // Fetch clients on initial load
@@ -78,6 +123,49 @@ const ProjectLog = () => {
     useEffect(() => {
         fetchData(); // Fetch forms data when selected client changes
     }, [selectedClient]);
+
+    async function GenerateReport(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {
+        if (!selectedForm) {
+            console.error("No form selected for generating the report.");
+            return;
+        }
+
+        try {
+            // Assuming the selected equipment tag is part of the selectedForm
+            const equipmentTagID = await getEquipmentTagID(selectedForm.equipmentName, selectedForm.equipmentTag);
+
+            if (!equipmentTagID) {
+                console.error("No tagID found for the selected form's equipment.");
+                return;
+            }
+
+            // Fetch the content using formID and equipmentTagID
+            const content = await getContentByFormIDandTagID(selectedForm.formID, equipmentTagID);
+
+            // Generate the report (this could involve creating a downloadable file, sending data to a server, etc.)
+            const reportData = {
+                projectName: selectedForm.projectName,
+                formName: selectedForm.formName,
+                equipmentName: selectedForm.equipmentName,
+                equipmentTag: selectedForm.equipmentTag,
+                content: content || "No content available",
+            };
+
+            // Example: Log the report data or send it to a server
+            console.log("Generated Report:", reportData);
+
+            // Optionally, trigger a download of the report as a JSON file
+            const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${selectedForm.projectName || "report"}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error generating report:", error);
+        }
+    }
 
     return (
         <div style={{ width: "100%", padding: "10px" }}>
@@ -108,9 +196,9 @@ const ProjectLog = () => {
                     items={formsData}
                     type="grid"
                     templateColumns={{
-                        base: "1fr",        // 1 column on small screens (phones)
-                        small: "1fr 1fr",    // 2 columns on medium screens (tablets)
-                        medium: "1fr 1fr 1fr", // 3 columns on larger screens (desktops)
+                        base: "1fr",
+                        small: "1fr 1fr",
+                        medium: "1fr 1fr 1fr",
                     }}
                     gap="20px"
                     position="relative"  // Fixed position to the top
@@ -122,9 +210,9 @@ const ProjectLog = () => {
                             <Card
                                 borderRadius="medium"
                                 marginTop="small"
-                                width="100%"  // Ensures the card takes full width available
-                                maxWidth="15rem"  // Max width for larger screens
-                                height="auto"  // Auto height for better responsiveness
+                                width="100%"
+                                maxWidth="15rem"
+                                height="auto"
                                 variation="outlined"
                                 padding="medium"
                                 onClick={() => openDialog(item)}
@@ -142,6 +230,12 @@ const ProjectLog = () => {
 
                                 <Text paddingBottom="small" fontWeight="bold" color="gray.60" style={{ fontSize: '0.75rem' }}>
                                     Project: {item.projectName || 'N/A'}
+                                </Text>
+                                <Text>
+                                    <strong>Status:</strong>{" "}
+                                    <span style={{ color: selectedForm?.submission === 1 ? 'green' : 'red' }}>
+                                        {selectedForm?.submission === 1 ? "Test Finished" : "Test not Finished"}
+                                    </span>
                                 </Text>
 
                                 <Flex gap="small" paddingBottom="small">
@@ -178,27 +272,30 @@ const ProjectLog = () => {
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content className="DialogContent">
                     <Dialog.Title>Test Details</Dialog.Title>
-                    <Dialog.Description>
-                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Project Name:</strong> {selectedForm?.projectName}</Text>
-                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Form Name:</strong> {selectedForm?.formName}</Text>
-                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Equipment:</strong> {selectedForm?.equipmentName}</Text>
-                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Tag:</strong> {selectedForm?.equipmentTag}</Text>
-                        <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}><strong>Status:</strong> {selectedForm?.submission === 1 ? (
-                            <Text color="green" fontWeight="bold">Test Finished</Text>
-                        ) : (
-                            <Text color="red" fontWeight="bold">Test not Finished</Text>
-                        )}</Text>
+                    <Dialog.Description asChild>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <Text><strong>Project Name:</strong> {selectedForm?.projectName}</Text>
+                            <Text><strong>Form Name:</strong> {selectedForm?.formName}</Text>
+                            <Text><strong>Equipment:</strong> {selectedForm?.equipmentName}</Text>
+                            <Text><strong>Tag:</strong> {selectedForm?.equipmentTag}</Text>
+                        </div>
                     </Dialog.Description>
                     <Dialog.Close asChild>
                         <Button style={{ backgroundColor: 'gray', marginRight: '10px' }} onClick={handleClose}>
                             Close
                         </Button>
                     </Dialog.Close>
-                    <Button
+                    <Button style={{  marginRight: '10px' }}
                         onClick={handleResumeTest}
                         isDisabled={selectedForm?.submission === 1}
                     >
                         Resume Test
+                    </Button>
+                    <Button
+                        onClick={GenerateReport}
+                        isDisabled={selectedForm?.submission === 0}
+                    >
+                        Generate Report
                     </Button>
                 </Dialog.Content>
             </Dialog.Root>

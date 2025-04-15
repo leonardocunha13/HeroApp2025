@@ -88,55 +88,56 @@ const CollectionForms = () => {
             console.error("Please fill in all the fields.");
             return;
         }
-
+    
         if (!selectedForm.published) {
             alert("This form is not published and cannot be started.");
-            return; // Prevent starting if the form is not published
+            return;
         }
-
+    
         const { title, projectID } = selectedForm;
-
-        // Trigger runForm function with appropriate arguments
+    
         if (!title || !projectID) {
             console.error("Title or Project ID is missing.");
             return;
         }
-
-        const formData = {
-            form: selectedForm,
-            equipmentName,
-            equipmentTag,
-            content: selectedForm.content,
-
-        };
-        console.log("Selected Form Content:", selectedForm.content);
-
-        // Wait for runForm to complete and get the result
-        const success = await runForm(title, projectID, equipmentName, equipmentTag);
-
+    
+        // Call runForm and capture both success and createdTagID
+        const { success, createdTagID, tagCreatedAt } = await runForm(title, projectID, equipmentName, equipmentTag);
+    
         if (success) {
-            // If no error occurs in runForm, navigate to RunningForm
-            navigate("/RunningForm", { state: formData });
-            setIsDialogOpen(false); // Close the dialog after starting the form
+            const formData = {
+                form: selectedForm,
+                equipmentName,
+                equipmentTag,
+                content: selectedForm.content,
+                createdTagID, // Include the createdTagID if needed in the next screen
+                tagCreatedAt,
+            };
+    
+            navigate(`/RunningForm/${createdTagID}`, { state: formData });
+            setIsDialogOpen(false);
         } else {
-            // If error occurs in runForm (due to existing equipment tag), do not navigate
             console.error("Form creation was not successful due to existing equipment tag.");
         }
     };
+    
 
 
     const handleClose = () => {
         setIsDialogOpen(false); // Close the dialog
     };
 
-    function editForm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    function editForm(): void {
         if (!selectedForm) {
             console.error("No form selected for editing.");
             return;
         }
 
         // Ensure form ID is included in the state when navigating
-        navigate("/form-builder", { state: { form: selectedForm, formID: selectedForm.id } });
+        navigate(`/form-builder/${selectedForm.id}`, {
+            state: { form: selectedForm, formID: selectedForm.id }
+          });
+          
     }
 
     return (
@@ -244,8 +245,8 @@ const CollectionForms = () => {
                             <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}>Project ID:</Text>
                             <Text>{selectedForm.projectID}</Text>
 
-                            <Text fontSize="1rem" fontWeight="bold" style={{ marginTop: "8px" }}>Test Description:</Text>
-                            <Text>{selectedForm.description}</Text>
+                            <Text fontSize="1rem" fontWeight="bold"  style={{ marginTop: "8px",  }}>Test Description:</Text>
+                            <Text   style={{maxHeight: "200px", overflowY: "auto", wordWrap: "break-word", whiteSpace: "pre-wrap"}}>{selectedForm.description}</Text>
 
                         </div>
                     )}

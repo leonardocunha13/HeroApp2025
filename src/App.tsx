@@ -33,7 +33,7 @@ const App: React.FC = () => {
 
       {/* Top Bar */}
       <div
-        className={`top-bar ${darkMode ? 'dark' : ''}`}
+        className="{`top-bar ${darkMode ? 'dark' : ''}`}"
         style={{
           position: 'fixed',
           top: 0,
@@ -41,12 +41,13 @@ const App: React.FC = () => {
           right: 0,
           display: 'flex',
           justifyContent: 'space-between',
-          backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.22)' : ' rgb(255, 243, 135)',
+          backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.22)' : ' rgb(255, 255, 255)',
           alignItems: 'center',
           padding: '30px 24px',
           backdropFilter: 'blur(12px)',
           boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
           borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
+          borderColor: 'rgba(255, 255, 255, 0.48)',
           zIndex: 10,
           transition: 'background-color 0.3s ease',
           //backgroundColor: '#ffffff',
@@ -56,20 +57,21 @@ const App: React.FC = () => {
         <img
           src="\logo.png"
           alt="App Logo"
-          style={{ width: '300px', height: '100px', position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '10px' }}
+          style={{ width: '150px', height: '50px', position: 'absolute', left: '4%' }}
 
         />
         {/* Top Bar Content */}
         <Menu
-          menuAlign="start"
+          menuAlign="end"
           style={{
             backgroundColor: darkMode ? '#fff' : '#fff',
-            color: darkMode ? '#000' : '#000', // <- texto preto no dark
+            color: darkMode ? '#000' : '#000', 
             border: darkMode ? '1px solid #444' : '1px solid #ccc',
             borderRadius: '8px',
             padding: '8px',
           }}
         >
+          
           <MenuItem isDisabled>
             <Text fontWeight="bold" style={{ color: darkMode ? '#000' : '#000' }}>
               Hero Audit Form Builder
@@ -86,9 +88,9 @@ const App: React.FC = () => {
           <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
             <Link to="/forms-list" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Forms List</Link>
           </MenuItem>
-          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
+          {/*<MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
             <Link to="/form-builder" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Form Builder</Link>
-          </MenuItem>
+          </MenuItem>*/}
           <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
             <Link to="/projectLog" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Project Log</Link>
           </MenuItem>
@@ -135,10 +137,10 @@ const App: React.FC = () => {
       <div style={{ marginTop: '60px' }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/forms" element={<CreateFormDialog onFormCreated={() => { console.log("Form created!"); }} />} />
+          <Route path="/forms" element={<CreateFormDialog onFormCreated={() => {  }} />} />
           <Route path="/forms-list" element={<CollectionForms />} />
-          <Route path="/form-builder" element={<FormBuilder />} />
-          <Route path="/RunningForm" element={<RunningForm />} /> {/* Add this route */}
+          <Route path="/form-builder/:formId" element={<FormBuilder />} />
+          <Route path="/RunningForm/:tagId" element={<RunningForm />} /> {/* Add this route */}
           <Route path="/projectLog" element={<ProjectLog />} />
         </Routes>
       </div>

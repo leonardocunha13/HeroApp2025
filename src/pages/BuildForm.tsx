@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table } from "@radix-ui/themes";
-import { ThemeProvider, Theme, Button, Input, CheckboxField } from '@aws-amplify/ui-react';
+import { ThemeProvider, Theme, Button, Input, CheckboxField, Flex, Text, Card, Heading } from '@aws-amplify/ui-react';
 import { useLocation } from "react-router-dom";
 import { UpdateFormContent, PublishForm } from "../actions/form";
+import * as XLSX from 'xlsx';
 
 const theme: Theme = {
   name: 'table-theme',
@@ -52,7 +53,12 @@ const columnLetterToIndex = (letter: string): number => {
 const FormBuilder: React.FC = () => {
   const location = useLocation();
   const formData = location.state?.form || {};
-  const formID = location.state?.formID || location.state?.form?.ID || location.state;
+  const formID = location.state?.idform || location.state?.form?.id;
+  const formName = location.state?.name || location.state?.form?.title;
+  //const formDescription = location.state?.description || location.state?.form?.description;
+  const formClient = location.state?.client || location.state?.form?.clientName;
+  const formProject = location.state?.projID || location.state?.form?.projectName;
+  const formProjectID = location.state?.projectID || location.state?.form?.projectID;
 
   if (!formData) {
     return <div>No form data found.</div>;
@@ -62,22 +68,31 @@ const FormBuilder: React.FC = () => {
     if (formData?.content) {
       try {
         const parsed = JSON.parse(formData.content);
-        return Array.isArray(parsed) ? parsed : [['']];
+        return Array.isArray(parsed.table) ? parsed.table : [['']];
       } catch (e) {
-        console.error("Erro ao fazer parse do formData.content:", e);
+        console.error("Error to parse:", e);
         return [['']];
       }
     } else {
-      // Se formData for undefined ou não contiver conteúdo, inicie com uma estrutura padrão
-      return [['']];
+      return Array.from({ length: 5 }, () => Array(5).fill(''));
     }
   });
 
+  useEffect(() => {
+    if (formData?.content) {
+      try {
+        const parsed = JSON.parse(formData.content);
+        setReadOnlyColumns(parsed.readOnlyColumns || []);
+        setReadOnlyRows(parsed.readOnlyRows || []);
+      } catch (e) {
+        console.error("Erro to parse:", e);
+      }
+    }
+  }, []);
+
+
   const [rowInput, setRowInput] = useState('');
   const [colInput, setColInput] = useState('');
-  const [sectionTitle, setSectionTitle] = useState('');
-  const [dividers, setDividers] = useState<number[]>([]); // Track divider rows
-  const [sections, setSections] = useState<string[]>([]); // Track section names
   const [readOnlyColumns, setReadOnlyColumns] = useState<string[]>([]);
   const [readOnlyRows, setReadOnlyRows] = useState<string[]>([]);
 
@@ -116,37 +131,19 @@ const FormBuilder: React.FC = () => {
     }
   };
 
-  const addDivider = () => {
-    const newDividers = [...dividers, tableData.length];
-    setDividers(newDividers);
-
-    // Add a new section with an optional name.
-    const newSections = [...sections, sectionTitle || 'Untitled Section'];
-    setSections(newSections);
-
-    // Remove all the cells in the specific row and insert a title.
-    const newTableData = [...tableData];
-    const dividerRowIndex = newTableData.length - 1; // The last row
-    newTableData[dividerRowIndex] = Array(newTableData[dividerRowIndex].length).fill(''); // Empty the row
-    newTableData[dividerRowIndex][0] = sectionTitle || 'Untitled Section'; // Add section title in the first cell
-
-    setTableData(newTableData);
-  };
-
-  const handleSectionTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSectionTitle(e.target.value);
-  };
   // Gather the form data and structure it properly
   const gatherFormData = () => {
     const formData = tableData.map((row) => {
-      return row.map((cell) => cell.trim());
+      return row.map((cell) => {
+        // Ensure the cell is a string before trimming
+        return typeof cell === 'string' ? cell.trim() : String(cell).trim();
+      });
     });
 
     return {
       table: formData,
       readOnlyColumns: readOnlyColumns,
       readOnlyRows: readOnlyRows,
-      
     };
   };
 
@@ -204,7 +201,7 @@ const FormBuilder: React.FC = () => {
         : [...prev, col]
     );
   };
-  console.log("Rows:", readOnlyRows);
+  //console.log("Rows:", readOnlyRows);
   const toggleReadOnlyRows = (rowKey: string) => {
     setReadOnlyRows((prev) =>
       prev.includes(rowKey)
@@ -212,255 +209,274 @@ const FormBuilder: React.FC = () => {
         : [...prev, rowKey]
     );
   };
-  
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target) {
+          const binaryStr = event.target.result as string;
+          const wb = XLSX.read(binaryStr, { type: 'binary' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const data = XLSX.utils.sheet_to_json(ws, { header: 1 }); // 2D array
+
+          // Normalize data to ensure all rows have the same number of columns
+          const maxCols = Math.max(...data.map((row) => (row as string[]).length));
+          const normalizedData = (data as string[][]).map((row) => {
+            const newRow = [...row];
+            while (newRow.length < maxCols) {
+              newRow.push("");
+            }
+            return newRow;
+          });
+
+          setTableData(normalizedData as TableData);
+
+          // Adjust dimensions of input cells
+          setTimeout(() => {
+            const inputs = document.querySelectorAll("input[type='text']") as NodeListOf<HTMLInputElement>;
+            inputs.forEach((input) => {
+              adjustCellDimensions(input); // Adjust dimensions after table is populated
+            });
+          }, 0); // Ensure DOM is updated first
+        }
+      };
+      reader.readAsBinaryString(file);
+    }
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx, .xls';
+    input.onchange = (event) =>
+      handleFileUpload(event as unknown as React.ChangeEvent<HTMLInputElement>);
+    input.click();
+  };
+
+  const adjustCellDimensions = (input: HTMLInputElement) => {
+    // Reset the width and height to auto for recalculation
+    input.style.width = 'auto';
+    input.style.height = 'auto';
+
+    // Create a temporary span to calculate the width of the content
+    const span = document.createElement('span');
+    span.style.position = 'absolute';
+    span.style.visibility = 'hidden';
+    span.style.whiteSpace = 'pre-wrap';
+    span.style.wordWrap = 'break-word';
+    span.style.fontFamily = 'Arial'; // Match the font
+    span.style.fontSize = '14px'; // Match the font size
+
+    // Set the span's content to the value of the input
+    span.textContent = input.value;
+
+    // Append the span to the document temporarily to get the content width
+    document.body.appendChild(span);
+
+    // Set the width of the input to the span's scroll width (content width)
+    const newWidth = Math.min(span.scrollWidth, 500); // Max width 500px
+    input.style.width = `${newWidth}px`;
+
+    // Remove the span after measurement
+    document.body.removeChild(span);
+
+    // Adjust the height based on scrollHeight (height of the content)
+    input.style.height = `${input.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    const inputs = document.querySelectorAll("input[type='text']") as NodeListOf<HTMLInputElement>;
+    inputs.forEach((input) => {
+      adjustCellDimensions(input); // Adjust each cell's dimensions
+    });
+  }, [tableData]); // Trigger when tableData changes
 
   return (
     <ThemeProvider theme={theme} colorMode="light">
-      <div className="form-builder">
-        <div className="sidebar" style={{ padding: '10px', borderRight: '2px solid #ddd' }}>
-          <div style={{ marginBottom: '10px' }}>
-            <Button
-              ariaLabel="Add Row"
-              backgroundColor="#ffd811"
-              borderRadius="1rem"
-              color="black"
-              fontWeight="normal"
-              onClick={addRow}
-              size="small"
-              width="9rem"
-            >
-              Add Row
-            </Button>
+      <Flex direction="column" alignItems="center">
+        {/* Sticky Card Header */}
+        <div className="sticky top-0 bg-white z-10 w-full">
+          <Card variation="outlined" width="100%" padding="large" style={{ backgroundColor: "white" }}>
 
-            <Button
-              ariaLabel="Remove Row"
-              backgroundColor="#ffd811"
-              borderRadius="1rem"
-              color="black"
-              fontWeight="normal"
-              onClick={handleRemoveRow}
-              size="small"
-              width="9rem"
-            >
-              Remove Row
-            </Button>
-            <Input
-              size="small"
-              width="9rem"
-              type="number"
-              borderColor={'black'}
-              value={rowInput}
-              onChange={(e) => setRowInput(e.target.value)}
-              placeholder="Row number"
-              style={inputStyle}
-            />
-          </div>
+            {/* Header Section */}
+            <Flex direction="row" justifyContent="space-between" alignItems="flex-start" marginBottom="1rem">
+              <Flex direction="column" gap="0.5rem" alignItems="center">
+                <Heading level={3}>Audit Form Builder</Heading>
+              </Flex>
 
-          <div style={{ marginTop: '10px' }}>
-            <Button
-              ariaLabel="Add Column"
-              backgroundColor="#ffd811"
-              borderRadius="1rem"
-              color="black"
-              fontWeight="normal"
-              onClick={addColumn}
-              size="small"
-              width="9rem"
-            >
-              Add Column
-            </Button>
-            <Button
-              ariaLabel="Remove Column"
-              backgroundColor="#ffd811"
-              borderRadius="1rem"
-              color="black"
-              fontWeight="normal"
-              onClick={handleRemoveColumn}
-              size="small"
-              width="9rem"
-            >
-              Remove Column
-            </Button>
-            <Input
-              size="small"
-              width="9rem"
-              borderColor={'black'}
-              type="text"
-              value={colInput}
-              onChange={(e) => setColInput(e.target.value)}
-              placeholder="Column letter"
-              style={inputStyle}
-            />
-          </div>
+              <Flex direction="column" alignItems="flex-end">
+                <img src="/logo.png" alt="Logo" style={{ height: "100px", marginBottom: "0.5rem" }} />
+              </Flex>
+            </Flex>
+            <Flex direction="column" border="1px solid #000" marginBottom="1rem" gap="0">
+              <Flex backgroundColor="#e0e0e0" padding="0.5rem" justifyContent="center">
+                <Text fontWeight="bold" fontSize={24}>Audit Form Information</Text>
+              </Flex>
 
-          <div style={{ marginBottom: '10px' }}>
-            <Button
-              ariaLabel="Add Divider"
-              backgroundColor="#ffd811"
-              borderRadius="1rem"
-              color="black"
-              fontWeight="normal"
-              onClick={addDivider}
-              size="small"
-              width="9rem"
-            >
-              Add Divider
-            </Button>
+              <Flex style={{ borderTop: "1px solid #000" }} alignItems="stretch" gap="0">
+                <Flex width="20%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                  <Text fontWeight="bold">Client:</Text>
+                </Flex>
+                <Flex width="80%" padding="0.5rem">
+                  <Text style={{ wordWrap: 'break-word', maxWidth: "1600px" }}>{formClient}</Text>
+                </Flex>
+              </Flex>
 
-            <Input
-              size="small"
-              width="9rem"
-              borderColor={'black'}
-              type="text"
-              value={sectionTitle}
-              onChange={handleSectionTitleChange}
-              placeholder="Section Title"
-              style={inputStyle}
-            />
-          </div>
+              <Flex style={{ borderTop: "1px solid #000" }} alignItems="stretch" gap="0">
+                <Flex width="20%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                  <Text fontWeight="bold">Project:</Text>
+                </Flex>
+                <Flex width="28.5%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                  <Text style={{ wordWrap: 'break-word', maxWidth: "800px" }}>{formProject}</Text>
+                </Flex>
+                <Flex width="20%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                  <Text fontWeight="bold">Project ID:</Text>
+                </Flex>
+                <Flex width="30%" padding="0.5rem">
+                  <Text style={{ wordWrap: 'break-word', maxWidth: "800px" }}>{formProjectID}</Text>
+                </Flex>
+              </Flex>
 
-          <Button
-            ariaLabel="Publish"
-            backgroundColor="#ffd811"
-            borderRadius="1rem"
-            color="black"
-            fontWeight="normal"
-            onClick={() => handlePublish()}
-            size="small"
-            width="9rem"
-          >
-            Publish
-          </Button>
-          <Button
-            ariaLabel="Publish"
-            backgroundColor="#ffd811"
-            borderRadius="1rem"
-            color="black"
-            fontWeight="normal"
-            onClick={() => handleSave()}
-            size="small"
-            width="9rem"
-          >
-            Save Form
-          </Button>
+              <Flex style={{ borderTop: "1px solid #000" }} alignItems="stretch" gap="0">
+                <Flex width="20%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                  <Text fontWeight="bold">Equipment Name:</Text>
+                </Flex>
+                <Flex width="28.5%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                  <Text style={{ wordWrap: 'break-word', maxWidth: "800px" }}>N/A</Text>
+                </Flex>
+                <Flex width="20%" style={{ borderRight: "1px solid #000", height: "100%" }} padding="0.5rem">
+                  <Text fontWeight="bold">Equipment Tag:</Text>
+                </Flex>
+                <Flex width="30%" padding="0.5rem">
+                  <Text style={{ wordWrap: 'break-word', maxWidth: "800px" }}>N/A</Text>
+                </Flex>
+              </Flex>
+
+              <Flex style={{ borderTop: "1px solid #000" }} alignItems="stretch" gap="0">
+                <Flex width="20%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                  <Text fontWeight="bold">Document Name:</Text>
+                </Flex>
+                <Flex width="80%" padding="0.5rem" alignItems="stretch">
+                  <Text style={{ wordWrap: 'break-word', maxWidth: "1600px" }}>{formName}</Text>
+                </Flex>
+              </Flex>
+
+              {/*<Flex style={{ borderTop: "1px solid #000" }} alignItems="stretch" gap="0">
+              <Flex width="20%" style={{ borderRight: "1px solid #000" }} padding="0.5rem">
+                <Text fontWeight="bold">Description:</Text>
+              </Flex>
+              <Flex width="80%" padding="0.5rem">
+                <Text style={{ wordWrap: 'break-word', maxWidth: "1600px" }}>{formDescription}</Text>
+              </Flex>
+            </Flex>*/}
+            </Flex>
+            <Flex direction="column" gap="0.5rem" alignItems="center" marginBottom={"1rem"}>
+              <Heading level={4}>Form Control</Heading>
+            </Flex>
+            {/*Control Buttons*/}
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button ariaLabel="Import Excel" backgroundColor="blue.20" borderRadius="1rem" color="black" fontWeight="normal" onClick={handleImport} size="small" width="9rem" marginBottom="5px">Import Excel</Button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button ariaLabel="Add Row" backgroundColor="#ffd811" borderRadius="1rem" color="black" fontWeight="normal" onClick={addRow} size="small" width="9rem" marginBottom="5px">Add Row</Button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button ariaLabel="Remove Row" backgroundColor="#ffd811" borderRadius="1rem" color="black" fontWeight="normal" onClick={handleRemoveRow} size="small" width="9rem">Remove Row</Button>
+                <Input size="small" width="9rem" type="number" borderColor="black" value={rowInput} onChange={(e) => setRowInput(e.target.value)} placeholder="Row number" />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button ariaLabel="Add Column" backgroundColor="#ffd811" borderRadius="1rem" color="black" fontWeight="normal" onClick={addColumn} size="small" width="9rem" marginBottom="5px">Add Column</Button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button ariaLabel="Remove Column" backgroundColor="#ffd811" borderRadius="1rem" color="black" fontWeight="normal" onClick={handleRemoveColumn} size="small" width="9rem">Remove Column</Button>
+                <Input size="small" style={{ width: '9rem', minWidth: '9rem' }} type="text" borderColor="black" value={colInput} onChange={(e) => setColInput(e.target.value)} placeholder="Column letter" />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button ariaLabel="Publish" variation="primary" borderRadius="1rem" color="black" fontWeight="normal" onClick={handlePublish} size="small" width="9rem">Publish</Button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Button ariaLabel="Save Form" backgroundColor="grey" borderRadius="1rem" color="black" fontWeight="normal" onClick={handleSave} size="small" width="9rem">Save Form</Button>
+              </div>
+            </div>
+          </Card>
         </div>
-
-        <div className="table-container">
-          <Table.Root aria-label="Form Table">
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
-                {Array.from({ length: tableData[0].length }, (_, index) => {
-                  const colLetter = generateColumnLetter(index);
-                  return (
-                    <Table.ColumnHeaderCell key={`checkbox-${index}`}>
-                      <CheckboxField
-                        label={`Column ${colLetter}`}
-                        name={`column-${colLetter}`}
-                        checked={readOnlyColumns.includes(colLetter)}
-                        onChange={() => {
-                          toggleReadOnly(colLetter);
-                          console.log("Read-only column indexes:", colLetter);
-                        }}
-                        title={`Toggle read-only for column ${colLetter}`}
-                        style={{ marginBottom: '4px' }}
-                      />
-                    </Table.ColumnHeaderCell>
-                  );
-                })}
-
-              </Table.Row>
-              <Table.Row>
-                <Table.ColumnHeaderCell>#</Table.ColumnHeaderCell>
-                {Array.from({ length: tableData[0].length }, (_, index) => (
-                  <Table.ColumnHeaderCell key={`label-${index}`}>
-                    {generateColumnLetter(index)}
-                  </Table.ColumnHeaderCell>
-                ))}
-              </Table.Row>
-            </Table.Header>
-
-            <Table.Body>
-              {tableData.map((row, rowIndex) => (
-                <Table.Row key={rowIndex}>
-                  <Table.RowHeaderCell>
-                    <CheckboxField
-                      label={`Row ${rowIndex + 1}`}
-                      name={`row-${rowIndex +1 }`}
-                      checked={readOnlyRows.includes(rowIndex.toString())}
-                      onChange={() => {
-                        toggleReadOnlyRows(rowIndex.toString())
-                        console.log("Read-only column indexes:", rowIndex);
-                      }}
-                      title={`Toggle read-only for row ${rowIndex + 1}`}
-                      style={{ marginRight: '4px' }}
-                    />
-
-                  </Table.RowHeaderCell>
-                  {row.map((cell, colIndex) => (
-                    <Table.Cell key={colIndex}>
-                      <input
-                        type="text"
-                        value={cell}
-                        style={inputCellStyle}
-                        onChange={(e) => {
-                          const updatedTableData = [...tableData];
-                          const updatedRow = [...updatedTableData[rowIndex]]; // Copy the specific row
-                          updatedRow[colIndex] = e.target.value; // Update the specific cell
-                          updatedTableData[rowIndex] = updatedRow; // Assign updated row back
-                          setTableData(updatedTableData); // Update state
-                        }}
-                      />
-                    </Table.Cell>
-                  ))}
+        {/* Table Section */}
+        <div style={{ width: '100%', maxHeight: '35vh', overflowY: 'auto', border: '1px solid #ccc', padding: '10px', backgroundColor: 'white' }}>
+          <Flex direction="column" alignItems="center">
+            <Table.Root aria-label="Form Table">
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeaderCell>#</Table.ColumnHeaderCell>
+                  {Array.from({ length: tableData[0].length }, (_, index) => {
+                    const colLetter = generateColumnLetter(index);
+                    return (
+                      <Table.ColumnHeaderCell key={`header-${index}`}>
+                        <div className="flex flex-col items-center justify-center">
+                          <span className="text-sm font-semibold">{colLetter}</span>
+                          <CheckboxField
+                            label={``}
+                            name={`column-${colLetter}`}
+                            checked={readOnlyColumns.includes(colLetter)}
+                            onChange={() => toggleReadOnly(colLetter)}
+                            title={`Toggle read-only for column ${colLetter}`}
+                            style={{ marginTop: '4px' }}
+                          />
+                        </div>
+                      </Table.ColumnHeaderCell>
+                    );
+                  })}
                 </Table.Row>
-              ))}
-            </Table.Body>
-          </Table.Root>
+              </Table.Header>
+              <Table.Body>
+                {tableData.map((row, rowIndex) => (
+                  <Table.Row key={rowIndex}>
+                    <Table.RowHeaderCell>
+                      <CheckboxField
+                        label={`${rowIndex + 1}`}
+                        name={`row-${rowIndex + 1}`}
+                        checked={readOnlyRows.includes(rowIndex.toString())}
+                        onChange={() => {
+                          toggleReadOnlyRows(rowIndex.toString())
+                          //console.log("Read-only column indexes:", rowIndex);
+                        }}
+                        title={`Toggle read-only for row ${rowIndex + 1}`}
+                        style={{ marginRight: '4px' }}
+                      />
+                    </Table.RowHeaderCell>
+                    {row.map((cell, colIndex) => (
+                      <Table.Cell key={colIndex}>
+                        <div style={{ display: 'inline-block', minWidth: '100px', maxWidth: '500px', position: 'relative' }}>
+                          <textarea
+                            value={cell}
+                            onChange={(e) => {
+                              const updatedTableData = [...tableData];
+                              const updatedRow = [...updatedTableData[rowIndex]];
+                              updatedRow[colIndex] = e.target.value;
+                              updatedTableData[rowIndex] = updatedRow;
+                              setTableData(updatedTableData);
+                            }}
+                            onInput={(e) => {
+                              const target = e.target as HTMLInputElement; // Corrected to HTMLInputElement
+                              adjustCellDimensions(target); // Pass the correct element type to the function
+                            }}
+                            style={{ padding: '5px', border: '1px solid #ddd', outline: 'none', backgroundColor: '#fff', fontSize: '14px', color: 'black', resize: 'both', overflow: 'hidden', textAlign: 'center', width: '100%', minHeight: '50px', minWidth: '100px', maxWidth: '400px', maxHeight: '150px' }}
+                            rows={1} // Start with 1 row
+                          />
+                        </div>
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </Flex>
         </div>
-      </div>
+      </Flex>
     </ThemeProvider>
   );
-};
-
-// Styling
-const buttonStyle = {
-  padding: '8px 12px',
-  backgroundColor: '#007bff',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  marginRight: '5px',
-  fontSize: '14px',
-};
-
-const inputStyle = {
-  padding: '5px',
-  margin: '0 5px',
-  border: '1px solid #ccc',
-  borderRadius: '4px',
-  fontSize: '14px',
-};
-
-const inputCellStyle = {
-  width: '100%',
-  padding: '5px',
-  border: '1px solid #ddd',
-  outline: 'none',
-  textAlign: 'center' as React.CSSProperties['textAlign'],
-  backgroundColor: '#fff',
-  fontSize: '14px',
-  color: 'black',
-};
-
-// Styling for divider rows
-const dividerStyle: React.CSSProperties = {
-  textAlign: 'center',
-  fontWeight: 'bold',
-  backgroundColor: '#f0f0f0',
-  border: '1px solid #ddd',
-  padding: '10px',
 };
 
 export default FormBuilder;
