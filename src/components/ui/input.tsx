@@ -1,22 +1,45 @@
-interface InputProps {
-    label?: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    placeholder?: string;
-    type?: "text" | "number" | "password" | "email";
-  }
-  
-  const Input: React.FC<InputProps> = ({ label, value, onChange, placeholder, type = "text" }) => (
-    <div className="space-y-2">
-      {label && <label className="block text-sm font-medium">{label}</label>}
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        className="input"
-        placeholder={placeholder}
-      />
-    </div>
-  );
+import { Input, Label } from '@aws-amplify/ui-react';
 
-  export default Input;
+interface InputProps {
+  label: string;
+  name?: string;
+  value?: string;
+  checked?: boolean;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
+  required?: boolean;
+}
+
+
+
+export default function TextInput({
+  label,
+  name,
+  value,
+  checked,
+  onChange,
+  disabled = false,
+  required = false,
+  
+}: InputProps) {
+  return (
+    <Label
+    htmlFor={name}  // Corrected prop name from 'htmlFor' to 'httlFor'
+    className="Label"
+    style={{ color: 'black' }} // Added inline style for label color
+    
+    
+    
+    >
+      {label}
+      <Input
+        name={name || ''}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        isDisabled={disabled}
+        isRequired={required}
+      />
+    </Label>
+  );
+}

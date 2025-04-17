@@ -23,7 +23,7 @@ const schema = a.schema({
     projects: a.hasMany('Projectt', 'ClientID')
   }).authorization(allow => [allow.publicApiKey()]),
 
-  Projectt: a.model({
+  Project: a.model({
     projectID: a.string().required(),
     projectName: a.string().required(),
     //one to many - project belongs to one client
@@ -35,7 +35,7 @@ const schema = a.schema({
    // equipmentTAGs: a.hasMany('EquipmentTag', 'ProjectID')
   }).authorization(allow => [allow.publicApiKey()]),
 
-  EquipmentTag2: a.model({
+  EquipmentTag: a.model({
     Tag: a.string().required(),
     EquipmentName: a.string().required(),
     //many to many - equipmenttag has many forms
@@ -43,7 +43,7 @@ const schema = a.schema({
   }).authorization(allow => [allow.publicApiKey()]),
 
   //many to many - equipmenttag and forms
-  FormTag2: a.model({
+  FormTag: a.model({
     formID: a.id(),
     tagID: a.id(),
     contentTest: a.string().default("[]"),

@@ -1,35 +1,62 @@
-// src/components/ui/card.tsx
-
-import React from 'react';
+import { View, Text } from '@aws-amplify/ui-react';
 
 interface CardProps {
-  children: React.ReactNode;
+  title: string;
+  description: string;
+  footer?: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
-  onClick?: () => void;  // Add onClick to handle clicks
+  style?: React.CSSProperties;
 }
 
-const Card: React.FC<CardProps> = ({ children, className, onClick }) => {
+const Card: React.FC<CardProps> = ({ 
+  title, 
+  description, 
+  footer, 
+  children, 
+  className, 
+  style 
+}) => {
   return (
-    <div
-      className={`border rounded-md shadow-sm bg-white p-4 ${className}`}
-      onClick={onClick}  // Attach onClick here
+    <View 
+      className={`card ${className || ''}`} 
+      style={{
+        padding: '1rem',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        ...style,
+      }}
     >
-      {children}
-    </div>
+      <Text 
+        as="h3" 
+        style={{ marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '1.25rem' }}
+      >
+        {title}
+      </Text>
+      <Text 
+        as="p" 
+        style={{ marginBottom: '1rem', color: '#555' }}
+      >
+        {description}
+      </Text>
+      <View style={{ marginBottom: '1rem' }}>
+        {children}
+      </View>
+      {footer && (
+        <View 
+          style={{
+            borderTop: '1px solid #eee',
+            paddingTop: '0.5rem',
+            marginTop: '1rem',
+            color: '#777',
+          }}
+        >
+          {footer}
+        </View>
+      )}
+    </View>
   );
 };
 
-interface CardContentProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const CardContent: React.FC<CardContentProps> = ({ children, className }) => {
-  return (
-    <div className={`p-4 ${className}`}>
-      {children}
-    </div>
-  );
-};
-
-export { Card, CardContent };
+export default Card;

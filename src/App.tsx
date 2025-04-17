@@ -5,7 +5,8 @@ import {
   useAuthenticator,
   Button,
   Breadcrumbs,
-  SelectField
+  SelectField,
+  Avatar,
 } from '@aws-amplify/ui-react';
 
 import { FiSun, FiMoon } from 'react-icons/fi';
@@ -16,8 +17,9 @@ import CollectionForms from '../src/pages/RunForm';
 import RunningForm from '../src/pages/RunningForm';
 import ProjectLog from '../src/pages/ProjectLog';
 import FormBuilder from './pages/BuildForm';
+import DesignerSideBar from './components/DesignerSideBar';
 
-const breadcrumbOptions = ['Forms', 'Create Form', 'Form List', 'Project Log'];
+const breadcrumbOptions = ['Home', 'Create Form', 'Form List', 'Project Log'];
 
 const App: React.FC = () => {
   const { signOut } = useAuthenticator();
@@ -33,7 +35,7 @@ const App: React.FC = () => {
   }, [darkMode]);
 
   const routeMap: Record<string, string> = {
-    'Forms': '/forms',
+    'Home': '/',
     'Create Form': '/form-builder',
     'Form List': '/forms-list',
     'Project Log': '/project-log', // Make sure this route is defined
@@ -73,18 +75,15 @@ const App: React.FC = () => {
           <img
             src="/logo.png"
             alt="App Logo"
-            style={{ width: '150px', height: '50px' }}
+            style={{ width: '100px', height: '30px' }}
           />
 
 
           {/* Breadcrumb Navigation */}
           <Breadcrumbs.Container>
             <Breadcrumbs.Item>
-              <Breadcrumbs.Link href="/">Home</Breadcrumbs.Link>
-              <Breadcrumbs.Separator />
-            </Breadcrumbs.Item>
-            <Breadcrumbs.Item>
               <SelectField
+                className="select"
                 label="Navigation"
                 labelHidden
                 variation="quiet"
@@ -101,32 +100,34 @@ const App: React.FC = () => {
             onClick={toggleDarkMode}
             variation="link"
             size="small"
+            display={"inline-flex"}
             style={{
               backgroundColor: darkMode ? '#333' : '#e0e0e0',
               color: darkMode ? '#fff' : '#000',
               padding: '8px 12px',
               borderRadius: '8px',
               cursor: 'pointer',
-              fontSize: '18px',
+              fontSize: '14px',
               marginLeft: '12px',
             }}
           >
             {darkMode ? <FiSun /> : <FiMoon />}
           </Button>
+          <Avatar style={{ padding: "8px 12px", marginLeft: "12px" }}>HE</Avatar>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div style={{ marginTop: '70px' }}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/forms" element={<CreateFormDialog onFormCreated={() => { }} />} />
-          <Route path="/forms-list" element={<CollectionForms />} />
-          <Route path="/form-builder" element={<FormBuilder />} />
-          {/* Optional route if you use "Project Log" */}
-          <Route path="/project-log" element={<div>Project Log Page</div>} />
-        </Routes>
-      </div>
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/forms" element={<CreateFormDialog onFormCreated={() => { }} />} />
+        <Route path="/forms-list" element={<CollectionForms />} />
+        <Route path="/form-builder" element={<DesignerSideBar />} />
+        <Route path="/form/:formId" element={<RunningForm />} />        
+        <Route path="/project-log" element={<div>Project Log Page</div>} />
+      </Routes>
+
 
       {/* Sign Out Button */}
       <div style={{ textAlign: 'center', marginTop: '20px' }}>

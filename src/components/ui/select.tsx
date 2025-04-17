@@ -1,20 +1,34 @@
-interface SelectProps {
-    label?: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    options: string[];
-  }
-  
-  const Select: React.FC<SelectProps> = ({ label, value, onChange, options }) => (
-    <div className="space-y-2">
-      {label && <label className="block text-sm font-medium">{label}</label>}
-      <select value={value} onChange={onChange} className="select">
-        {options.map((option, idx) => (
-          <option key={idx} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </div>
+import React from 'react';
+import { SelectField } from '@aws-amplify/ui-react';
+
+interface CustomSelectProps {
+  label: string;
+  placeholder?: string;
+  descriptiveText?: string;
+  isDisabled?: boolean;
+  errorMessage?: string;
+  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: { value: string; label: string }[];
+  [key: string]: any; // Allow additional props to be passed
+}
+
+const CustomSelect: React.FC<CustomSelectProps> = ({ label, placeholder, descriptiveText, options, ...props }) => {
+  return (
+    <SelectField 
+      descriptiveText={descriptiveText}
+      label={label}
+      isDisabled={props.isDisabled}
+      placeholder={placeholder}
+      errorMessage={props.errorMessage}
+      onChange={props.onChange} 
+      {...props}>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </SelectField>
   );
-export default Select;  
+};
+
+export default CustomSelect;
