@@ -13,7 +13,7 @@ import { cn } from "../../lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { BsFillCalendarDateFill } from "react-icons/bs";
-import { Button } from "../ui/button";
+import { Button } from "@aws-amplify/ui-react";
 import { Calendar } from "../ui/calendar";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";

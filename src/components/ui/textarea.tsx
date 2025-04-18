@@ -1,44 +1,21 @@
-import React from 'react';
-import { TextAreaField, TextAreaFieldProps } from '@aws-amplify/ui-react';
+import * as React from "react";
 
-interface TextFieldProps extends TextAreaFieldProps {
-  label: string;
-  placeholder?: string;
-  isRequired?: boolean;
-  descriptiveText?: string;
-  errorMessage?: string;
-  isDisabled?: boolean;
-  onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
-  onBlur?: () => void;
-  [key: string]: any; // Allow additional props to be passed  
-  
-}
+import { cn } from "../../lib/utils";
 
-const TextField: React.FC<TextFieldProps> = ({
-  label,
-  placeholder = '',
-  isRequired = false,
-  descriptiveText = '',
-  errorMessage = '',
-  isDisabled = false,
-  onChange,
-  onBlur,
-  ...props
-}) => {
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => {
   return (
-    <TextAreaField
-      label={label}
-      placeholder={placeholder}
-      isRequired={isRequired}
-      descriptiveText={descriptiveText}
-      errorMessage={errorMessage}
-      isDisabled={isDisabled}
-      onChange={onChange}
-      onBlur={onBlur}
-
+    <textarea
+      className={cn(
+        "flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        className,
+      )}
+      ref={ref}
       {...props}
     />
   );
-};
+});
+Textarea.displayName = "Textarea";
 
-export default TextField;
+export { Textarea };

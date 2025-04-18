@@ -1,7 +1,7 @@
 "use client";
 
 import { ElementsType, FormElement, FormElementInstance } from "../FormElements";
-import { Label } from "../ui/label";
+import { Label } from "../ui/label"; // Ensure the file exists and matches the correct case-sensitive path
 import { Input } from "../ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -101,13 +101,13 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         <FormField
           control={form.control}
           name="title"
-          render={({ field }) => (
+          render={({ field }: { field: import("react-hook-form").ControllerRenderProps<propertiesFormSchemaType, "title"> }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  onKeyDown={(e) => {
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                     if (e.key === "Enter") e.currentTarget.blur();
                   }}
                 />

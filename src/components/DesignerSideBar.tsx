@@ -1,12 +1,15 @@
-import React from 'react';
-import CreateFormDialog from './CreateFormDialog';
+import useDesigner from "./hooks/useDesigner";
+import FormElementsSidebar from "./FormElementsSideBar"; 
 
-const DesignerSideBar: React.FC = () => {
+
+function DesignerSidebar() {
+  const { selectedElement } = useDesigner();
   return (
+    <aside className="w-[400px] max-w-[400px] flex flex-col flex-grow gap-2 border-l-2 border-muted p-4 bg-background overflow-y-auto h-full">
+      {!selectedElement && <FormElementsSidebar />}
     
-      <CreateFormDialog onFormCreated={() => console.log('Form created')} />
-    
+    </aside>
   );
-};
+}
 
-export default DesignerSideBar;
+export default DesignerSidebar;
