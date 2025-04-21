@@ -4,14 +4,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "../FormElements";
+import {
+  ElementsType,
+  FormElement,
+  FormElementInstance,
+  SubmitFunction,
+} from "../FormElements";
 import useDesigner from "../hooks/useDesigner";
 import { Input } from "../ui/input";
 import { Label } from "../../components/ui/label";
 
 import { cn } from "../../lib/utils";
 import { Bs123 } from "react-icons/bs";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../components/ui/form";
 import { Switch } from "../ui/switch";
 
 const type: ElementsType = "NumberField";
@@ -45,7 +58,10 @@ export const NumberFieldFormElement: FormElement = {
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
 
-  validate: (formElement: FormElementInstance, currentValue: string): boolean => {
+  validate: (
+    formElement: FormElementInstance,
+    currentValue: string,
+  ): boolean => {
     const element = formElement as CustomInstance;
     if (element.extraAttributes.required) {
       return currentValue.length > 0;
@@ -59,7 +75,11 @@ type CustomInstance = FormElementInstance & {
   extraAttributes: typeof extraAttributes;
 };
 
-function DesignerComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
+function DesignerComponent({
+  elementInstance,
+}: {
+  elementInstance: FormElementInstance;
+}) {
   const element = elementInstance as CustomInstance;
   const { label, required, placeHolder, helperText } = element.extraAttributes;
   return (
@@ -69,7 +89,9 @@ function DesignerComponent({ elementInstance }: { elementInstance: FormElementIn
         {required && "*"}
       </Label>
       <Input readOnly disabled type="number" placeholder={placeHolder} />
-      {helperText && <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>}
+      {helperText && (
+        <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>
+      )}
     </div>
   );
 }
@@ -108,20 +130,36 @@ function FormComponent({
         onChange={(e) => setValue(e.target.value)}
         onBlur={(e) => {
           if (!submitValue) return;
-          const valid = NumberFieldFormElement.validate(element, e.target.value);
+          const valid = NumberFieldFormElement.validate(
+            element,
+            e.target.value,
+          );
           setError(!valid);
           if (!valid) return;
           submitValue(element.id, e.target.value);
         }}
         value={value}
       />
-      {helperText && <p className={cn("text-muted-foreground text-[0.8rem]", error && "text-red-500")}>{helperText}</p>}
+      {helperText && (
+        <p
+          className={cn(
+            "text-muted-foreground text-[0.8rem]",
+            error && "text-red-500",
+          )}
+        >
+          {helperText}
+        </p>
+      )}
     </div>
   );
 }
 
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
-function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
+function PropertiesComponent({
+  elementInstance,
+}: {
+  elementInstance: FormElementInstance;
+}) {
   const element = elementInstance as CustomInstance;
   const { updateElement } = useDesigner();
   const form = useForm<propertiesFormSchemaType>({
@@ -176,7 +214,8 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                 />
               </FormControl>
               <FormDescription>
-                The label of the field. <br /> It will be displayed above the field
+                The label of the field. <br /> It will be displayed above the
+                field
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -236,7 +275,10 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

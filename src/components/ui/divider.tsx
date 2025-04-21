@@ -1,4 +1,4 @@
-import { Divider } from '@aws-amplify/ui-react';
+import { Divider } from "@aws-amplify/ui-react";
 
 export const Separator: React.FC = () => {
   return (

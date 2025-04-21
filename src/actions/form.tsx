@@ -1,8 +1,8 @@
-import { Amplify } from 'aws-amplify';
-import outputs from '../../amplify_outputs.json';
+import { Amplify } from "aws-amplify";
+import outputs from "../../amplify_outputs.json";
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getCurrentUser } from 'aws-amplify/auth'; // Ensure getCurrentUser is imported correctly
+import { getCurrentUser } from "aws-amplify/auth"; // Ensure getCurrentUser is imported correctly
 //import { string } from 'zod';
 //import { formSchemaType } from "../schemas/form";
 
@@ -11,7 +11,7 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 // UserNotFoundErr class for custom error handling
-class UserNotFoundErr extends Error { }
+class UserNotFoundErr extends Error {}
 
 /*export async function InsertClient(NameClient: string) {
   try {
@@ -53,7 +53,6 @@ class UserNotFoundErr extends Error { }
   }
 }*/
 
-
 // Function to insert multiple projects
 /*export async function InsertMultipleProjects(names: string[], projNum: string[], clientIDs: string[]) {
   const insertedProjects: any[] = []; // Array to store successfully inserted projects
@@ -85,7 +84,6 @@ class UserNotFoundErr extends Error { }
     failedProjects,
   };
 }*/
-
 
 /*export async function InsertMultipleClients(names: string[]) {
   const insertedClients: any[] = []; // Array to store successfully inserted clients
@@ -141,18 +139,17 @@ export async function GetClients() {
     }
 
     // Extract client names and client IDs
-    const clientNames = data.map(client => client.ClientName);
-    const clientIDs = data.map(client => client.id);
+    const clientNames = data.map((client) => client.ClientName);
+    const clientIDs = data.map((client) => client.id);
 
     // Return both client names and IDs in an object or an array
     return {
       clientNames,
-      clientIDs
+      clientIDs,
     };
 
     // Alternatively, if you want to return an array:
     // return [clientNames, clientIDs];
-
   } catch (error) {
     console.error("Error:", error);
     throw error;
@@ -174,8 +171,6 @@ export async function GetClients() {
 
 //fetchData().catch(console.error);
 
-
-
 export async function GetProjects() {
   try {
     const { errors, data } = await client.models.Projectt.list();
@@ -186,8 +181,8 @@ export async function GetProjects() {
     }
 
     // Separate projectIDs and projectNames
-    const projectIDs = data.map(project => project.projectID); // List of all projectIDs
-    const projectNames = data.map(project => project.projectName); // List of all projectNames
+    const projectIDs = data.map((project) => project.projectID); // List of all projectIDs
+    const projectNames = data.map((project) => project.projectName); // List of all projectNames
 
     // Return both separately
     return { projectIDs, projectNames };
@@ -219,7 +214,7 @@ export async function GetFormStats() {
     const visits = userForms.reduce((sum, form) => sum + (form.visits || 0), 0);
     const submissions = userForms.reduce(
       (sum, form) => sum + (form.submissions || 0),
-      0
+      0,
     );
 
     let submissionRate = 0;
@@ -241,7 +236,6 @@ export async function GetFormStats() {
     return { visits: 0, submissions: 0, submissionRate: 0, bounceRate: 0 };
   }
 }
-
 
 export async function GetForms() {
   try {
@@ -391,7 +385,8 @@ export async function GetFormContentByUrl(formUrl: string) {
       visits: updatedVisits,
     };
 
-    const { errors: updateErrors } = await client.models.Form.update(updatedForm);
+    const { errors: updateErrors } =
+      await client.models.Form.update(updatedForm);
 
     if (updateErrors) {
       console.error(updateErrors);
@@ -418,16 +413,18 @@ export async function SubmitForm(formId: string, content: string) {
       createdAt: new Date().toISOString(),
     };
 
-    const { data, errors } = await client.models.FormSubmissions.create(submission);
+    const { data, errors } =
+      await client.models.FormSubmissions.create(submission);
 
     if (errors) {
       console.error("Error", errors);
       throw new Error("Error.");
     }
 
-    const { data: formList, errors: formErrors } = await client.models.Form.list({
-      filter: { id: { eq: formId } },
-    });
+    const { data: formList, errors: formErrors } =
+      await client.models.Form.list({
+        filter: { id: { eq: formId } },
+      });
 
     if (formErrors || !formList || formList.length === 0) {
       console.error(formErrors || "Form not found.");
@@ -440,7 +437,8 @@ export async function SubmitForm(formId: string, content: string) {
       submissions: (form.submissions || 0) + 1,
     };
 
-    const { errors: updateErrors } = await client.models.Form.update(updatedForm);
+    const { errors: updateErrors } =
+      await client.models.Form.update(updatedForm);
 
     if (updateErrors) {
       console.error("Error to update the submission value:", updateErrors);
@@ -469,9 +467,10 @@ export async function GetFormWithSubmissions(id: string) {
     }
 
     if (form && form.userId === userId) {
-      const { data: submissions, errors: submissionErrors } = await client.models.FormSubmissions.list({
-        filter: { formId: { eq: form.id } },
-      });
+      const { data: submissions, errors: submissionErrors } =
+        await client.models.FormSubmissions.list({
+          filter: { formId: { eq: form.id } },
+        });
 
       if (submissionErrors) {
         console.error(submissionErrors);
@@ -496,9 +495,10 @@ export async function GetClientWithProjects(ClientID: string) {
     }
 
     // Fetch all projects related to this client
-    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
-      filter: { ClientID: { eq: ClientID } },
-    });
+    const { data: projects, errors: projectErrors } =
+      await client.models.Projectt.list({
+        filter: { ClientID: { eq: ClientID } },
+      });
 
     if (projectErrors) {
       console.error("Error fetching projects:", projectErrors);
@@ -523,9 +523,10 @@ export async function GetFormsWithClient(ClientID: string) {
 
   try {
     // Fetch projects linked to the ClientID
-    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
-      filter: { ClientID: { eq: ClientID } }
-    });
+    const { data: projects, errors: projectErrors } =
+      await client.models.Projectt.list({
+        filter: { ClientID: { eq: ClientID } },
+      });
     console.log("Projects Found:", projects);
     if (projectErrors || !projects || projects.length === 0) {
       console.error(projectErrors || "No projects found for this client.");
@@ -536,16 +537,16 @@ export async function GetFormsWithClient(ClientID: string) {
     const forms = await Promise.all(
       projects.map(async (project) => {
         const { data: projectForms } = await client.models.Form.list({
-          filter: { projID: { eq: project.projectID } }
+          filter: { projID: { eq: project.projectID } },
         });
-        console.log('Project ID:', project.projectID);
+        console.log("Project ID:", project.projectID);
         console.log(`Forms for Project ${project.projectName}:`, projectForms);
 
-        return projectForms.map(form => ({
+        return projectForms.map((form) => ({
           ...form,
-          projectName: project.projectName
+          projectName: project.projectName,
         }));
-      })
+      }),
     );
 
     return forms.flat();
@@ -561,7 +562,8 @@ export async function GetFormsWithClient(ClientID: string) {
 
 export async function GetFormsInformation() {
   try {
-    const { errors: clientErrors, data: clientsData } = await client.models.Client.list();
+    const { errors: clientErrors, data: clientsData } =
+      await client.models.Client.list();
 
     if (clientErrors) {
       console.error("Error:", clientErrors);
@@ -571,9 +573,10 @@ export async function GetFormsInformation() {
     let results = [];
 
     for (const clientItem of clientsData) {
-      const { errors: projectErrors, data: projectsData } = await client.models.Projectt.list({
-        filter: { ClientID: { eq: clientItem.id } },
-      });
+      const { errors: projectErrors, data: projectsData } =
+        await client.models.Projectt.list({
+          filter: { ClientID: { eq: clientItem.id } },
+        });
 
       if (projectErrors) {
         console.error("Error:", projectErrors);
@@ -583,9 +586,10 @@ export async function GetFormsInformation() {
       for (const projectItem of projectsData) {
         //console.log(`Fetching forms for project: ${projectItem.projectName}, ID: ${projectItem.projectID}`);
 
-        const { errors: formErrors, data: formsData } = await client.models.Form.list({
-          filter: { projID: { eq: projectItem.projectID } }, // Ensure the correct key is used
-        });
+        const { errors: formErrors, data: formsData } =
+          await client.models.Form.list({
+            filter: { projID: { eq: projectItem.projectID } }, // Ensure the correct key is used
+          });
 
         if (formErrors) {
           console.error("Error:", formErrors);
@@ -596,7 +600,7 @@ export async function GetFormsInformation() {
           clientName: clientItem.ClientName,
           projectName: projectItem.projectName,
           projectID: projectItem.projectID,
-          forms: formsData.map(form => ({
+          forms: formsData.map((form) => ({
             id: form.id,
             name: form.name,
             description: form.description,
@@ -621,7 +625,7 @@ export async function GetProjectsFromClientName(ClientName: string) {
   try {
     // Fetch Client based on ClientName
     const { errors, data: clientData } = await client.models.Client.list({
-      filter: { ClientName: { eq: ClientName } }
+      filter: { ClientName: { eq: ClientName } },
     });
 
     if (errors || clientData.length === 0) {
@@ -631,14 +635,15 @@ export async function GetProjectsFromClientName(ClientName: string) {
 
     // Assuming each client has an array of projects
     const Clients = clientData[0]; // Assuming the first client in the list is the one we're interested in
-    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
-      filter: { ClientID: { eq: Clients.id } },
-    });
+    const { data: projects, errors: projectErrors } =
+      await client.models.Projectt.list({
+        filter: { ClientID: { eq: Clients.id } },
+      });
 
     if (projectErrors) {
       console.error("Error fetching projects:", projectErrors);
     }
-    const projectNames = projects.map(project => project.projectName);
+    const projectNames = projects.map((project) => project.projectName);
     // Return client and associated projects
     return { projectNames };
   } catch (error) {
@@ -647,16 +652,21 @@ export async function GetProjectsFromClientName(ClientName: string) {
   }
 }
 
-export async function CreateForm(name: string, description: string, projectName: string) {
+export async function CreateForm(
+  name: string,
+  description: string,
+  projectName: string,
+) {
   const { userId } = await getCurrentUser();
   if (!userId) {
     throw new UserNotFoundErr();
   }
 
   // Fetch the project details using projectName
-  const { errors: projectErrors, data: projectsData } = await client.models.Projectt.list({
-    filter: { projectName: { eq: projectName } }
-  });
+  const { errors: projectErrors, data: projectsData } =
+    await client.models.Projectt.list({
+      filter: { projectName: { eq: projectName } },
+    });
 
   if (projectErrors) {
     console.error("Error fetching projects:", projectErrors);
@@ -673,11 +683,10 @@ export async function CreateForm(name: string, description: string, projectName:
   // Now create the form using projID
   const { errors: formerrors, data: form } = await client.models.Form.create({
     userId: userId,
-    projID: projID,  // Here, we are using the found projID from the project lookup
-    name: name,      // Use the form name from the state
+    projID: projID, // Here, we are using the found projID from the project lookup
+    name: name, // Use the form name from the state
     description: description,
   });
-
 
   if (formerrors) {
     console.error("Error creating form:", formerrors);
@@ -686,16 +695,20 @@ export async function CreateForm(name: string, description: string, projectName:
 
   return {
     formId: form?.id,
-    projID: projID
-  };  // Return the created form ID
-};
+    projID: projID,
+  }; // Return the created form ID
+}
 
 export const runForm = async (
   TestName: string,
   ProjectID: string,
   EquipName: string,
-  EquipTag: string
-): Promise<{ success: boolean; createdTagID?: string; tagCreatedAt?: string }> => {
+  EquipTag: string,
+): Promise<{
+  success: boolean;
+  createdTagID?: string;
+  tagCreatedAt?: string;
+}> => {
   try {
     const formResp = await fetchFormByNameAndProject(TestName, ProjectID);
 
@@ -724,8 +737,12 @@ export const runForm = async (
       });
 
       if (linkedFormResp.data?.length > 0) {
-        console.error("This equipment and tag are already associated with this form and project.");
-        alert("Error: This equipment and tag are already associated with this form and project.");
+        console.error(
+          "This equipment and tag are already associated with this form and project.",
+        );
+        alert(
+          "Error: This equipment and tag are already associated with this form and project.",
+        );
         return { success: false };
       }
     }
@@ -746,7 +763,9 @@ export const runForm = async (
       }
 
       createdTagID = createResp.data.id;
-      tagCreatedAt = new Date(createResp.data.createdAt).toISOString().split("T")[0];
+      tagCreatedAt = new Date(createResp.data.createdAt)
+        .toISOString()
+        .split("T")[0];
     }
 
     const formTagResp = await client.models.FormTag2.create({
@@ -760,7 +779,6 @@ export const runForm = async (
     }
 
     return { success: true, createdTagID, tagCreatedAt };
-
   } catch (error) {
     console.error("Error executing runForm:", error);
     return { success: false };
@@ -768,7 +786,10 @@ export const runForm = async (
 };
 
 // Fetch formId by TestName and ProjectID
-const fetchFormByNameAndProject = async (TestName: string, ProjectID: string) => {
+const fetchFormByNameAndProject = async (
+  TestName: string,
+  ProjectID: string,
+) => {
   try {
     //console.log("Fetching form with TestName:", TestName, "and ProjectID:", ProjectID);
     const formResp = await client.models.Form.list({
@@ -811,7 +832,7 @@ export async function GetFormsByClientName(ClientName: string) {
   const projects = projectsResult.data;
   if (!projects.length) return [];
 
-  const projectIDs = projects.map(project => project.projectID);
+  const projectIDs = projects.map((project) => project.projectID);
 
   // 3. Fetch all Forms for the found projects
   const allForms = await Promise.all(
@@ -821,44 +842,56 @@ export async function GetFormsByClientName(ClientName: string) {
       });
 
       const forms = formsResult.data;
-      const formIDs = forms.map(form => form.id);
+      const formIDs = forms.map((form) => form.id);
 
       const formDetailsWithEquipment = await Promise.all(
         formIDs.map(async (formId) => {
-          const { data: formTags, errors: formTagsErrors } = await client.models.FormTag2.list({
-            filter: { formID: { eq: formId } },
-          });
+          const { data: formTags, errors: formTagsErrors } =
+            await client.models.FormTag2.list({
+              filter: { formID: { eq: formId } },
+            });
 
           if (formTagsErrors) {
-            console.error(`Error fetching form tags for form ID ${formId}:`, formTagsErrors);
+            console.error(
+              `Error fetching form tags for form ID ${formId}:`,
+              formTagsErrors,
+            );
             return null;
           }
 
-          const tagIDs = formTags.map(tag => tag.tagID);
+          const tagIDs = formTags.map((tag) => tag.tagID);
 
           const equipmentAndTags = await Promise.all(
             tagIDs.map(async (tagID) => {
-              const { data: equipmentData, errors: equipmentErrors } = await client.models.EquipmentTag2.list({
-                filter: tagID ? { id: { eq: tagID } } : undefined,
-              });
+              const { data: equipmentData, errors: equipmentErrors } =
+                await client.models.EquipmentTag2.list({
+                  filter: tagID ? { id: { eq: tagID } } : undefined,
+                });
 
               if (equipmentErrors) {
-                console.error(`Error fetching equipment for tagID ${tagID}:`, equipmentErrors);
+                console.error(
+                  `Error fetching equipment for tagID ${tagID}:`,
+                  equipmentErrors,
+                );
                 return null;
               }
 
-              return equipmentData.map(equipment => ({
+              return equipmentData.map((equipment) => ({
                 equipmentName: equipment.EquipmentName,
                 equipmentTag: equipment.Tag,
-                tagCreatedAt: new Date(equipment.createdAt).toISOString().split("T")[0], // <-- Adicionado aqui
+                tagCreatedAt: new Date(equipment.createdAt)
+                  .toISOString()
+                  .split("T")[0], // <-- Adicionado aqui
               }));
-            })
+            }),
           );
 
-          const formData = forms.find(form => form.id === formId);
+          const formData = forms.find((form) => form.id === formId);
           return {
             clientName: clientData.ClientName,
-            projectName: projects.find(project => project.projectID === projectID)?.projectName,
+            projectName: projects.find(
+              (project) => project.projectID === projectID,
+            )?.projectName,
             projectID,
             formName: formData?.name,
             equipment: equipmentAndTags.flat(),
@@ -866,23 +899,23 @@ export async function GetFormsByClientName(ClientName: string) {
             description: formData?.description,
             formId: formId,
           };
-        })
+        }),
       );
 
-      return formDetailsWithEquipment.filter(detail => detail !== null);
-    })
+      return formDetailsWithEquipment.filter((detail) => detail !== null);
+    }),
   );
 
   const flattenedForms = allForms.flat();
 
-  return flattenedForms.map(formDetail => ({
+  return flattenedForms.map((formDetail) => ({
     clientName: formDetail.clientName,
     projectName: formDetail.projectName,
     projectID: formDetail.projectID,
     formID: formDetail.formId,
     formName: formDetail.formName,
     description: formDetail.description,
-    equipmentDetails: formDetail.equipment.map(equipment => ({
+    equipmentDetails: formDetail.equipment.map((equipment) => ({
       equipmentName: equipment?.equipmentName || "Unknown",
       equipmentTag: equipment?.equipmentTag || "Unknown",
       tagCreatedAt: equipment?.tagCreatedAt || "Unknown", // <-- Adicionado aqui também
@@ -899,9 +932,12 @@ export async function GetFormsByClientName(ClientName: string) {
     console.error("❌ Error fetching forms:", error);
   });*/
 
-export async function SaveFormAfterTest(FormID: string, TagID: string, content: string) {
+export async function SaveFormAfterTest(
+  FormID: string,
+  TagID: string,
+  content: string,
+) {
   try {
-
     const { data: formTags, errors } = await client.models.FormTag2.list({
       filter: {
         formID: { eq: FormID },
@@ -928,7 +964,6 @@ export async function SaveFormAfterTest(FormID: string, TagID: string, content: 
 
     console.log("Updated:", updated);
     return updated;
-
   } catch (err) {
     console.error("Error SaveFormAfterTest:", err);
   }
@@ -942,7 +977,10 @@ export async function SaveFormAfterTest(FormID: string, TagID: string, content: 
   console.error("Error updating form:", error);
 });*/
 
-export async function getContentByFormIDandTagID(FormID: string, TagID: string) {
+export async function getContentByFormIDandTagID(
+  FormID: string,
+  TagID: string,
+) {
   try {
     const { data: formTags, errors } = await client.models.FormTag2.list({
       filter: {
@@ -963,11 +1001,10 @@ export async function getContentByFormIDandTagID(FormID: string, TagID: string) 
       return;
     }
 
-    const content = formTag.contentTest; 
+    const content = formTag.contentTest;
 
     //console.log("Fetched content:", content);
     return content;
-
   } catch (err) {
     console.error("Error getContentByFormIDandTagID:", err);
   }
@@ -981,7 +1018,10 @@ export async function getContentByFormIDandTagID(FormID: string, TagID: string) 
   console.error("Error updating form:", error);
 });*/
 
-export async function getEquipmentTagID(equipmentName: string, equipmentTag: string) {
+export async function getEquipmentTagID(
+  equipmentName: string,
+  equipmentTag: string,
+) {
   try {
     // Query to fetch equipment by its name and tag
     const { data, errors } = await client.models.EquipmentTag2.list({

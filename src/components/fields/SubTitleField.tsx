@@ -1,5 +1,5 @@
-import React from 'react';
-import { TextFieldProps, TextField } from '@aws-amplify/ui-react';
+import React from "react";
+import { TextFieldProps, TextField } from "@aws-amplify/ui-react";
 
 interface SubTitleFieldProps extends TextFieldProps {
   label: string;
@@ -12,10 +12,10 @@ interface SubTitleFieldProps extends TextFieldProps {
 }
 
 const SubTitleField: React.FC<SubTitleFieldProps> = ({
-  label = 'Subtitle',
-  placeholder = 'Enter subtitle',
-  descriptiveText = 'Subtitle for the section',
-  errorMessage = 'Invalid subtitle',
+  label = "Subtitle",
+  placeholder = "Enter subtitle",
+  descriptiveText = "Subtitle for the section",
+  errorMessage = "Invalid subtitle",
   isDisabled = false,
   onChange,
   onBlur,

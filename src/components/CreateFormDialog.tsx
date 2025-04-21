@@ -13,13 +13,19 @@ import {
 } from "@aws-amplify/ui-react";
 import { IoIosCreate } from "react-icons/io";
 import { FaSave } from "react-icons/fa";
-import { GetClients, GetProjectsFromClientName, CreateForm } from "../actions/form";
+import {
+  GetClients,
+  GetProjectsFromClientName,
+  CreateForm,
+} from "../actions/form";
 
 interface CreateFormDialogProps {
   onFormCreated: () => void;
 }
 
-const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) => {
+const CreateFormDialog: React.FC<CreateFormDialogProps> = ({
+  onFormCreated,
+}) => {
   const navigate = useNavigate();
   const [clients, setClients] = useState<string[]>([]);
   const [projects, setProjects] = useState<string[]>([]);
@@ -44,7 +50,8 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
   useEffect(() => {
     const fetchProjects = async () => {
       if (selectedClient) {
-        const { projectNames } = await GetProjectsFromClientName(selectedClient);
+        const { projectNames } =
+          await GetProjectsFromClientName(selectedClient);
         setProjects(projectNames);
       } else {
         setProjects([]);
@@ -99,14 +106,21 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
       });
     } catch (err) {
       console.error("Error creating form:", err);
-      setError(err instanceof Error ? err.message : "An unknown error occurred.");
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred.",
+      );
     }
   };
 
   return (
     <View>
       <Flex justifyContent="center">
-        <Button style={{ alignItems: 'center', height : '120px', width: '300px'}} variation="primary" size="large" onClick={() => setIsOpen(true)}>
+        <Button
+          style={{ alignItems: "center", height: "120px", width: "300px" }}
+          variation="primary"
+          size="large"
+          onClick={() => setIsOpen(true)}
+        >
           <IoIosCreate /> Create Form
         </Button>
       </Flex>
@@ -131,7 +145,12 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({ onFormCreated }) =>
             maxWidth="600px"
             boxShadow="0 4px 12px rgba(0,0,0,0.2)"
           >
-            <Flex direction="row" justifyContent="space-between" alignItems="center" marginBottom="1rem">
+            <Flex
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              marginBottom="1rem"
+            >
               <Heading level={3}>Create New Form</Heading>
               <Button variation="link" onClick={() => setIsOpen(false)}>
                 ✕

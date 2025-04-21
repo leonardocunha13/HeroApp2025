@@ -1,5 +1,5 @@
-import React from 'react';
-import { RadioGroupField, Radio } from '@aws-amplify/ui-react';
+import React from "react";
+import { RadioGroupField, Radio } from "@aws-amplify/ui-react";
 
 interface RadioOption {
   value: string;
@@ -13,7 +13,12 @@ interface ReusableRadioGroupProps {
   onChange?: (value: string) => void;
 }
 
-const ReusableRadioGroup: React.FC<ReusableRadioGroupProps> = ({ legend, name, options, onChange }) => {
+const ReusableRadioGroup: React.FC<ReusableRadioGroupProps> = ({
+  legend,
+  name,
+  options,
+  onChange,
+}) => {
   return (
     <RadioGroupField
       legend={legend}

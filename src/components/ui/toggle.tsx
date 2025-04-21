@@ -1,7 +1,7 @@
-import React from 'react';
-import { ToggleButton, ToggleButtonProps } from '@aws-amplify/ui-react';
+import React from "react";
+import { ToggleButton, ToggleButtonProps } from "@aws-amplify/ui-react";
 
-interface ToggleProps extends Omit<ToggleButtonProps, 'onChange'> {
+interface ToggleProps extends Omit<ToggleButtonProps, "onChange"> {
   label?: string;
   onChange?: (value: string | undefined) => void;
 }
@@ -15,8 +15,8 @@ const Toggle: React.FC<ToggleProps> = ({
   isLoading,
   loadingText,
   onClick,
-  size = 'small',
-  variation = 'primary',
+  size = "small",
+  variation = "primary",
   value,
   ...props
 }) => {
@@ -27,7 +27,7 @@ const Toggle: React.FC<ToggleProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       {label && <span>{label}</span>}
       <ToggleButton
         {...props}

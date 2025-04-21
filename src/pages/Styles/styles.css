@@ -1,4 +1,9 @@
-/* Define custom color palette */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind screens;
+@tailwind typography;
+
 :root {
   --black-alpha-9: rgba(0, 0, 0, 0.3);
   --green-4: #4caf50;
@@ -20,15 +25,14 @@
 }
 
 body {
-  background: linear-gradient(to right, #faf098, #FFFACD);
+  background: linear-gradient(to right, #faf098, #fffacd);
   color: var(--amplify-colors-font-secondary);
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
 }
-
 
 .app-container {
   padding: 40px;
@@ -115,234 +119,135 @@ body {
 
 /* === Top Bar Layout === */
 .top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 12px 24px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  transition: background-color 0.3s ease;
-  gap: 12px;
+  @apply flex justify-between items-center flex-wrap px-6 py-3 fixed top-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-md shadow-md z-10 transition-colors duration-300 gap-3;
 }
 
 .nav-left,
 .nav-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  @apply flex items-center gap-4 flex-wrap;
 }
 
 .app-logo {
-  width: clamp(80px, 10vw, 100px);
-  height: auto;
-  flex-shrink: 0;
+  @apply w-[clamp(80px,10vw,100px)] h-auto flex-shrink-0;
 }
 
 .theme-toggle {
-  background-color: #e0e0e0;
-  color: #000;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 11px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
+  @apply bg-gray-300 text-black px-3 py-2 rounded-lg text-xs cursor-pointer inline-flex items-center;
 }
 
 .dark .theme-toggle {
-  background-color: #333;
-  color: #fff;
+  @apply bg-gray-800 text-white;
 }
 
 .select {
-  min-width: auto;
-  display: flex;
-  align-items: center;  
-  max-width: 200px;
-  color: var(--mauve-12);
+  @apply min-w-auto flex items-center max-w-[200px] text-gray-300;
 }
 
 .amplify-select-wraapper {
-  width: 100%;
-  background-color: var(--violet-12);
-  border-radius: 8px;
-  border: 1px solid var(--violet-7);
-  padding: 8px;
-  color: var(--mauve-12);
+  @apply w-full bg-white rounded-lg border border-violet-700 px-2 py-2 text-gray-300;
 }
 
 .amplify-select--small {
-  font-size: 20px;
-  padding: 6px;
+  @apply text-xl py-1;
 }
 
 /* Dialog Overlay */
 .DialogOverlay {
-  background-color: var(--black-alpha-9);
-  position: fixed;
-  inset: 0;
-  animation: overlayShow 300ms ease-out;
+  @apply bg-black bg-opacity-30 fixed inset-0 animate-overlayShow;
 }
 
 /* Dialog Content */
 .DialogContent {
-  background-color: var(--gray-1);
-  border-radius: 16px;
-  border: 1px solid var(--violet-7);
-  box-shadow: var(--shadow-6);
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95vw;
-  max-width: 500px;
-  max-height: 90vh;
-  padding: 20px;
+  @apply bg-gray-100 rounded-lg border border-violet-700 shadow-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-[500px] max-h-[90vh] p-5 transition-all ease-in-out;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-  transition: all 0.3s ease;
 }
 
 /* Dialog Title */
 .DialogTitle {
-  margin: 0;
-  font-weight: 600;
-  color: var(--violet-7);
-  font-size: 20px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  @apply m-0 font-semibold text-violet-700 text-xl uppercase tracking-wider;
 }
 
 .DialogDescription {
-  margin: 15px 0;
-  color: var(--violet-7);
-  font-size: 14px;
-  line-height: 1.6;
+  @apply my-4 text-violet-700 text-sm leading-6;
 }
 
 /* Icon Button */
 .IconButton {
-  all: unset;
-  font-family: inherit;
-  border-radius: 50%;
-  height: 30px;
-  width: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--violet-12);
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background-color: var(--violet-6);
-  transition: background-color 0.3s ease;
+  @apply all-reset rounded-full h-8 w-8 inline-flex items-center justify-center text-white absolute top-4 right-4 bg-violet-600 transition-colors ease-in-out;
 }
 
 .IconButton:hover {
-  background-color: var(--violet-4);
+  @apply bg-violet-400;
 }
 
 .IconButton:focus {
-  box-shadow: 0 0 0 3px var(--violet-7);
+  @apply outline-none ring-4 ring-violet-700;
 }
 
 /* Input Field Styles */
 .Fieldset {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-bottom: 20px;
-  width: 100%;
+  @apply flex flex-col gap-4 mb-5 w-full;
 }
 
 .Label {
-  font-size: 14px;
-  color: var(--gray-1);
-  font-weight: 600;
+  @apply text-sm text-gray-100 font-semibold;
 }
 
 .Input {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--violet-7);
-  background-color: var(--violet-12);
-  color: var(--mauve-12);
-  transition: all 0.3s ease;
+  @apply w-full py-3 text-lg rounded-lg border border-violet-700 bg-violet-900 text-gray-100 transition-all ease-in-out;
 }
 
 .Input:focus {
-  border-color: var(--violet-6);
-  box-shadow: 0 0 0 3px var(--violet-7);
+  @apply border-violet-600 ring-4 ring-violet-700;
 }
 
 /* Tabs & Buttons */
 .amplify-tabs__item {
-  font-size: var(--amplify-font-sizes-xl);
-  color: var(--amplify-colors-font-secondary);
-  transition: color 0.3s ease;
+  @apply text-xl text-gray-500 transition-colors duration-300;
 }
 
 .amplify-tabs__item:hover {
-  color: var(--violet-6);
+  @apply text-violet-600;
 }
 
 .amplify-button {
-  width: 100%;
-  padding: 10px 0;
-  font-size: 16px;
-  border-radius: 50px;
-  background-color: var(--violet-7);
-  color: var(--violet-12);
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
+  @apply w-full py-2 text-lg rounded-full bg-violet-700 text-white shadow-md transition-colors duration-300;
 }
 
 .amplify-button:hover {
-  background-color: var(--violet-6);
+  @apply bg-violet-600;
 }
 
 /* Form Builder */
 .form-builder {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  @apply flex flex-col gap-4;
 }
 
 .sidebar {
-  width: 200px;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  overflow-x: auto;
+  @apply w-48 flex flex-row gap-3 overflow-x-auto;
 }
 
 table {
-  border-collapse: collapse;
+  @apply border-collapse;
 }
 
-table th, table td {
-  border: 1px solid #ccc;
-  padding: 8px;
+table th,
+table td {
+  @apply border border-gray-400 px-2 py-2;
 }
 
 input {
-  width: 100%;
-  padding: 5px;
+  @apply w-full py-1;
 }
 
 /* Animations */
 @keyframes overlayShow {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes contentShow {
@@ -359,70 +264,63 @@ input {
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
   .top-bar {
-    flex-wrap: wrap;
-    justify-content: space-between;
-    padding: 12px 16px;
+    @apply flex-wrap justify-between p-3;
   }
 
-  .nav-left, .nav-right {
-    flex-wrap: wrap;
-    justify-content: flex-start;
+  .nav-left,
+  .nav-right {
+    @apply flex-wrap justify-start;
   }
 
   .select {
-    max-width: 100%;
+    @apply max-w-full;
   }
 }
 
 @media (max-width: 768px) {
   .app-container {
-    padding: 20px;
-    border-radius: 8px;
+    @apply p-5 rounded-lg;
   }
 
   .top-bar {
-    gap: 8px;
-    padding: 10px 12px;
+    @apply gap-2 p-2;
   }
 
   .theme-toggle {
-    font-size: 10px;
-    padding: 6px 10px;
+    @apply text-xs px-2 py-2;
   }
 
   .app-logo {
-    width: 80px;
+    @apply w-20;
   }
 }
 
 @media (max-width: 480px) {
   .app-container {
-    padding: 16px;
+    @apply p-4;
   }
 
   .sidebar {
-    flex-wrap: wrap;
-    gap: 6px;
+    @apply flex-wrap gap-2;
   }
 
   .amplify-button {
-    font-size: 14px;
+    @apply text-sm;
   }
 
   .Input {
-    font-size: 14px;
-    padding: 10px;
+    @apply text-sm py-2;
   }
 
   .DialogTitle {
-    font-size: 18px;
+    @apply text-lg;
   }
 
   .DialogDescription {
-    font-size: 13px;
+    @apply text-sm;
   }
 
   .Fieldset {
-    gap: 10px;
+    @apply gap-3;
   }
 }

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Accordion } from '@aws-amplify/ui-react';
+import * as React from "react";
+import { Accordion } from "@aws-amplify/ui-react";
 
 interface AccordionItem {
   value: string;
@@ -35,4 +35,3 @@ export const ReusableAccordion: React.FC<AccordionProps> = ({
     </Accordion.Container>
   );
 };
-
