@@ -1,6 +1,6 @@
 import { Amplify } from "aws-amplify";
-import outputs from "../../amplify_outputs.json";
-import type { Schema } from "../../amplify/data/resource";
+import outputs from "../amplify_outputs.json";
+import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from "aws-amplify/auth"; // Ensure getCurrentUser is imported correctly
 //import { string } from 'zod';
@@ -361,6 +361,8 @@ export async function PublishForm(id: string, content: string) {
   }
 }
 
+
+
 export async function GetFormContentByUrl(formUrl: string) {
   try {
     const { userId } = await getCurrentUser();
@@ -476,7 +478,7 @@ export async function GetFormWithSubmissions(id: string) {
         console.error(submissionErrors);
       }
 
-      return { ...form, submissions };
+      return { form, submissions };
     }
 
     throw new Error("Form not found or doesn't belong to the current user.");

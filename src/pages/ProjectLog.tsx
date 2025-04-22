@@ -15,7 +15,7 @@ import {
   GetClients,
   getContentByFormIDandTagID,
   getEquipmentTagID,
-} from "../actions/form"; // Replace with your actual data fetching functions
+} from "../../actions/form"; // Replace with your actual data fetching functions
 import * as Dialog from "@radix-ui/react-dialog";
 import { useNavigate } from "react-router-dom";
 

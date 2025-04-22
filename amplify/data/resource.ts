@@ -12,10 +12,10 @@ const schema = a.schema({
       visits: a.integer().default(0),
       submissions: a.integer().default(0),
       shareURL: a.string(),
-      //FormSubmissions: a.hasMany('FormSubmissions', 'formId'), // One-to-many relationship
+      FormSubmissions: a.hasMany('FormSubmissions', 'formId'), // One-to-many relationship
       projID: a.id(),
-      //projects: a.belongsTo('Projectt', 'projID'),
-      //equipmentTAGs: a.hasMany('FormTag2', 'formID')
+      projects: a.belongsTo('Projectt', 'projID'),
+      equipmentTAGs: a.hasMany('FormTag2', 'formID')
     })
     .authorization((allow) => [allow.publicApiKey()]),
 

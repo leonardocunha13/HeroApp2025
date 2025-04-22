@@ -9,11 +9,11 @@ import {
 } from "@aws-amplify/ui-react";
 import { FiSun, FiMoon } from "react-icons/fi";
 import HomePage from "../src/pages/HomePage";
-import CreateFormDialog from "../src/components/CreateFormDialog";
+import CreateFormDialog from "../components/CreateFormDialog";
 import CollectionForms from "../src/pages/RunForm";
 import ProjectLog from "../src/pages/ProjectLog";
 import FormBuilder from "./pages/FormBuilder";
-import DesignerContextProvider from "./components/context/DesignerContext";
+import DesignerContextProvider from "../components/context/DesignerContext";
 import '../src/pages/Styles/styles.css'
 
 const breadcrumbOptions = ["Home", "Create Form", "Form List", "Project Log"];

@@ -8,7 +8,7 @@ import {
   Text,
   Loader,
 } from "@aws-amplify/ui-react";
-import { GetFormsInformation, runForm } from "../actions/form";
+import { GetFormsInformation, runForm } from "../../actions/form";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";

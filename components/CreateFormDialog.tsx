@@ -96,7 +96,7 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({
 
       navigate(`/form-builder/${formId.formId}`, {
         state: {
-          idform: formId.formId,
+          formId: formId.formId,
           name,
           description,
           projID,

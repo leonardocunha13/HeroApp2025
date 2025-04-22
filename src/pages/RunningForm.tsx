@@ -9,7 +9,7 @@ import {
   Flex,
   Alert,
 } from "@aws-amplify/ui-react";
-import { SaveFormAfterTest, SubmitForm } from "../actions/form";
+import { SaveFormAfterTest, SubmitForm } from "../../actions/form";
 
 const RunningForm = () => {
   const location = useLocation(); // Get the location object

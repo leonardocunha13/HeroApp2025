@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import PreviewDialogBtn from "../components/PreviewDialogBtn";
-import Designer from "../components/Designer";
+import PreviewDialogBtn from "../../components/PreviewDialogBtn";
+import Designer from "../../components/Designer";
 import {
   DndContext,
   MouseSensor,
@@ -9,14 +9,14 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import DragOverlayWrapper from "../components/DragOverlayWrapper";
-import useDesigner from "../components/hooks/useDesigner";
+import DragOverlayWrapper from "../../components/DragOverlayWrapper";
+import useDesigner from "../../components/hooks/useDesigner";
 import { ImSpinner2 } from "react-icons/im";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
-import { toast } from "../components/ui/use-toast";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { toast } from "../../components/ui/use-toast";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
-import { GetFormById } from "../actions/form";
+import { GetFormById } from "../../actions/form";
 import type { Schema } from "../../amplify/data/resource";
 import { Flex, Text } from '@aws-amplify/ui-react';
 
@@ -30,10 +30,11 @@ function FormBuilder() {
   const [form, setForm] = useState<FormType | null>(null);
   const [isReady, setIsReady] = useState(false);
 
-  const formID =
-    location.state?.idform ||
-    location.state?.form?.id ||
-    location.state?.formID;
+  const formID = location.state?.formId
+  const formName = location.state?.name || location.state?.form?.title;
+  const formClient = location.state?.client || location.state?.form?.clientName;
+  const formProject = location.state?.projID || location.state?.form?.projectName;
+  const formProjectID = location.state?.projectID || location.state?.form?.projectID;
 
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: { distance: 10 },
@@ -138,31 +139,98 @@ function FormBuilder() {
 
   return (
     <DndContext sensors={sensors}>
-      <main className="w-full flex flex-col">
-        <nav className="flex justify-between border-b-2 p-4 gap-3 items-center">
-          <Text as="h2" className="truncate font-medium">
-            <span className="text-muted-foreground mr-2">Form:</span>
-            {form.name}
-          </Text>
-          <div className="flex items-center gap-2">
+      {/* Action Buttons */}
+        <Flex justifyContent="space-between" alignItems="center" marginTop="1rem">
+          <Flex gap="0.75rem" alignItems="center">
             <PreviewDialogBtn />
-            {/* Add additional buttons or elements here if needed */}
             {!form.published && <Button>Publish</Button>}
-          </div>
-        </nav>
-        <div className="relative w-full overflow-y-auto h-[200px]">
-          <Flex
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-            className="flex-grow bg-accent bg-[url(/paper.svg)] dark:bg-[url(/paper-dark.svg)]"
-          >
-            <Designer />
           </Flex>
-        </div>
-      </main>
+        </Flex>
+      {/* Form Info Section */}
+      <Flex direction="column" padding="1.5rem" gap="0.5rem" width="100%">
+        <Flex
+          direction="column"
+          width="100%"
+          border="1px solid #ccc"
+          borderRadius="8px"
+          overflow="auto"
+          fontSize={"0.875rem"}
+        >
+          {[
+            {
+              label: "Client",
+              value: formClient,
+            },
+            {
+              label: "Project",
+              value: formProject,
+              extraLabel: "Project ID",
+              extraValue: formProjectID,
+            },
+            {
+              label: "Equipment Name",
+              value: "N/A",
+              extraLabel: "Equipment Tag",
+              extraValue: "N/A",
+            },
+            {
+              label: "Document Name",
+              value: formName,
+            },
+          ].map((item, index) => (
+            <Flex
+              key={index}
+              direction="row"
+              style={{ borderTop: index !== 0 ? "1px solid #ccc" : "none", borderBottom: "1px solid #ccc" }}
+              wrap ="wrap"
+            >
+              <Flex
+                width="10%"
+                padding="0.75rem"
+                backgroundColor="#f7f7f7"
+                style = {{borderRight: "1px solid #ccc"}}
+              >
+                <Text fontWeight="bold">{item.label}</Text>
+              </Flex>
+              <Flex
+                width={item.extraLabel ? "30%" : "80%"}
+                padding="0.75rem"
+                style={{
+                  borderRight: item.extraLabel ? "1px solid #ccc" : "none", // Use 'none' instead of 'undefined'
+                }}
+              >
+                <Text style={{ wordWrap: "break-word" }}>{item.value}</Text>
+              </Flex>
+              {item.extraLabel && (
+                <>
+                  <Flex
+                    width="20%"
+                    padding="0.75rem"
+                    backgroundColor="#f7f7f7"
+                    style = {{borderRight:"1px solid #ccc"}}
+                  >
+                    <Text fontWeight="bold">{item.extraLabel}</Text>
+                  </Flex>
+                  <Flex width="10%" padding="0.75rem">
+                    <Text style={{ wordWrap: "break-word" }}>
+                      {item.extraValue}
+                    </Text>
+                  </Flex>
+                </>
+              )}
+            </Flex>
+          ))}
+        </Flex>
+
+        
+
+        {/* Designer Canvas */}
+        <Designer />
+      </Flex>
+
       <DragOverlayWrapper />
     </DndContext>
+
   );
 }
 
