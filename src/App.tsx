@@ -33,7 +33,7 @@ const App: React.FC = () => {
 
       {/* Top Bar */}
       <div
-        className="{`top-bar ${darkMode ? 'dark' : ''}`}"
+        className={`top-bar ${darkMode ? 'dark' : ''}`}
         style={{
           position: 'fixed',
           top: 0,

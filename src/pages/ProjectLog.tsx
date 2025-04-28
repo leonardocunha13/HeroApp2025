@@ -212,7 +212,7 @@ const ProjectLog = () => {
                                 marginTop="small"
                                 width="100%"
                                 maxWidth="15rem"
-                                height="auto"
+                                height="16Rem"
                                 variation="outlined"
                                 padding="medium"
                                 onClick={() => openDialog(item)}
