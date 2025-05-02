@@ -1,148 +1,152 @@
-import { Route, Routes, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import './pages/Styles/styles.css';
-import { useAuthenticator, Text, Menu, MenuItem, Divider, Button } from '@aws-amplify/ui-react';
-import HomePage from '../src/pages/HomePage';
-import CreateFormDialog from '../src/components/CreateFormDialog';
-import CollectionForms from '../src/pages/RunForm';
-import RunningForm from '../src/pages/RunningForm';
-//import DynamicFormBuilder from './pages/BuildForm';
-import { FiSun, FiMoon } from 'react-icons/fi';
-import ProjectLog from '../src/pages/ProjectLog';
-import FormBuilder from './pages/BuildForm';
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import {
+  useAuthenticator,
+  Button,
+  Breadcrumbs,
+  SelectField,
+  Avatar,
+} from "@aws-amplify/ui-react";
+import { FiSun, FiMoon } from "react-icons/fi";
+import HomePage from "../src/pages/HomePage";
+import CreateFormDialog from "../components/CreateFormDialog";
+import CollectionForms from "../src/pages/RunForm";
+import ProjectLog from "../src/pages/ProjectLog";
+import FormBuilder from "./pages/FormBuilder";
+import DesignerContextProvider from "../components/context/DesignerContext";
+import '../src/pages/Styles/styles.css'
+
+const breadcrumbOptions = ["Home", "Create Form", "Form List", "Project Log"];
 
 const App: React.FC = () => {
   const { signOut } = useAuthenticator();
   const [darkMode, setDarkMode] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
+    document.body.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+  const routeMap: Record<string, string> = {
+    Home: "/",
+    "Create Form": "/create-form",
+    "Form List": "/forms-list",
+    "Project Log": "/project-log",
   };
 
-  return (
-    <div className={darkMode ? 'dark' : ''}>
-      {/* Router Setup */}
+  const handleBreadcrumbSelect = (value: string) => {
+    const path = routeMap[value];
+    if (path) navigate(path);
+  };
 
+  function toggleDarkMode(): void {
+    setDarkMode((prevMode) => !prevMode);
+  }
+
+  return (
+    <div
+      className={darkMode ? "dark" : ""}
+      style={{
+        minHeight: "100vh",
+        backgroundColor: darkMode ? "#121212" : "#ffffff",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
       {/* Top Bar */}
       <div
-        className={`top-bar ${darkMode ? 'dark' : ''}`}
+        className={`top-bar ${darkMode ? "dark" : ""}`}
         style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.22)' : ' rgb(255, 255, 255)',
-          alignItems: 'center',
-          padding: '30px 24px',
-          backdropFilter: 'blur(12px)',
-          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-          borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
-          borderColor: 'rgba(255, 255, 255, 0.48)',
+          position: "relative",
           zIndex: 10,
-          transition: 'background-color 0.3s ease',
-          //backgroundColor: '#ffffff',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "12px 24px",
+          backdropFilter: "blur(12px)",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          borderBottom: darkMode
+            ? "1px solid rgba(255, 255, 255, 0.2)"
+            : "1px solid rgba(0, 0, 0, 0.1)",
+          backgroundColor: darkMode ? "#1e1e1e" : "#fff",
         }}
       >
-        {/* Logo */}
-        <img
-          src="\logo.png"
-          alt="App Logo"
-          style={{ width: '150px', height: '50px', position: 'absolute', left: '4%' }}
-
-        />
-        {/* Top Bar Content */}
-        <Menu
-          menuAlign="end"
-          style={{
-            backgroundColor: darkMode ? '#fff' : '#fff',
-            color: darkMode ? '#000' : '#000', 
-            border: darkMode ? '1px solid #444' : '1px solid #ccc',
-            borderRadius: '8px',
-            padding: '8px',
-          }}
-        >
-          
-          <MenuItem isDisabled>
-            <Text fontWeight="bold" style={{ color: darkMode ? '#000' : '#000' }}>
-              Hero Audit Form Builder
-            </Text>
-          </MenuItem>
-          <Divider style={{ backgroundColor: '#ccc' }} />
-
-          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
-            <Link to="/" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Home</Link>
-          </MenuItem>
-          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
-            <Link to="/forms" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Create New Form</Link>
-          </MenuItem>
-          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
-            <Link to="/forms-list" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Forms List</Link>
-          </MenuItem>
-          {/*<MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
-            <Link to="/form-builder" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Form Builder</Link>
-          </MenuItem>*/}
-          <MenuItem style={{ color: darkMode ? '#000' : '#000' }}>
-            <Link to="/projectLog" style={{ textDecoration: 'none', color: darkMode ? '#000' : '#000' }}>Project Log</Link>
-          </MenuItem>
-          <Divider style={{ backgroundColor: '#ccc' }} />
-          <MenuItem
-            onClick={signOut}
-            style={{
-              color: darkMode ? '#000' : '#000',
-              backgroundColor: darkMode ? '#e0e0e0' : '#6f6e72',
-              padding: '10px 16px',
-              borderRadius: '8px',
-              border: 'none',
-              fontSize: '16px',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s',
-              width: '100%',
-              textAlign: 'left',
-            }}
-          >
-            Sign out
-          </MenuItem>
-        </Menu>
-
-
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <img
+            src="/logo.png"
+            alt="App Logo"
+            style={{ width: "100px", height: "30px" }}
+          />
+          <Breadcrumbs.Container>
+            <Breadcrumbs.Item>
+              <SelectField
+                className="select"
+                label="Navigation"
+                labelHidden
+                variation="quiet"
+                size="small"
+                onChange={(e) => handleBreadcrumbSelect(e.target.value)}
+                options={breadcrumbOptions}
+              />
+            </Breadcrumbs.Item>
+          </Breadcrumbs.Container>
+        </div>
         <div>
           <Button
             onClick={toggleDarkMode}
+            variation="link"
+            size="small"
             style={{
-              backgroundColor: darkMode ? '#333' : '#e0e0e0',
-              color: darkMode ? '#fff' : '#000',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '18px',
-              marginLeft: '12px',
+              backgroundColor: darkMode ? "#333" : "#e0e0e0",
+              color: darkMode ? "#fff" : "#000",
+              padding: "8px 12px",
+              borderRadius: "8px",
+              fontSize: "14px",
+              marginLeft: "12px",
             }}
           >
             {darkMode ? <FiSun /> : <FiMoon />}
           </Button>
+          <Avatar style={{ padding: "8px 12px", marginLeft: "12px" }}>
+            HE
+          </Avatar>
         </div>
       </div>
+
       {/* Main Content */}
-      <div style={{ marginTop: '60px' }}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/forms" element={<CreateFormDialog onFormCreated={() => {  }} />} />
-          <Route path="/forms-list" element={<CollectionForms />} />
-          <Route path="/form-builder/:formId" element={<FormBuilder />} />
-          <Route path="/RunningForm/:tagId" element={<RunningForm />} /> {/* Add this route */}
-          <Route path="/projectLog" element={<ProjectLog />} />
-        </Routes>
+      <div style={{ paddingTop: "80px", padding: "24px", width: "100%" }}>
+        <DesignerContextProvider>
+
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/forms-list" element={<CollectionForms />} />
+            <Route
+              path="/create-form"
+              element={<CreateFormDialog onFormCreated={() => { }} />}
+            />
+            <Route path="/form-builder/:formId" element={<FormBuilder />} />
+            <Route path="/project-log" element={<ProjectLog />} />
+          </Routes>
+
+        </DesignerContextProvider>
+
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
+          <button
+            onClick={signOut}
+            style={{
+              backgroundColor: darkMode ? "#444" : "#6f6e72",
+              color: darkMode ? "#fff" : "#000",
+              padding: "10px 16px",
+              borderRadius: "8px",
+              border: "none",
+              fontSize: "16px",
+              cursor: "pointer",
+              width: "100%",
+            }}
+          >
+            Sign out
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind screens;
+@tailwind typography;
 
-/* Define custom color palette */
 :root {
   --black-alpha-9: rgba(0, 0, 0, 0.3);
   --green-4: #4caf50;
@@ -21,15 +25,13 @@
 }
 
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(to right, #faf098, #FFFACD); 
-  color: var(--amplify-colors-font-secondary); 
-  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(to right, #faf098, #fffacd);
+  color: var(--amplify-colors-font-secondary);
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
 }
 
 .app-container {
@@ -37,81 +39,75 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: var(--violet-12); 
-  color: var(--amplify-font-primary); 
-  border-radius: 16px; 
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); 
+  background-color: var(--violet-12);
+  color: var(--amplify-font-primary);
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  padding-top: 80px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
 }
 
 /* Dark Mode Styles */
 .dark {
-  background: var(--mauve-12); 
+  background: var(--mauve-12);
   color: var(--violet-12);
 }
 
-
-
-/* Top Bar Styles */
 .dark .top-bar {
-  background-color: rgba(0, 0, 0, 0.7); /* Dark background for top bar */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Light border for top bar */
+  background-color: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .dark .top-bar .Text {
-  color: #fdd835; /* Dark mode text color */
+  color: #fdd835;
 }
 
 .dark .top-bar button {
-  color: #fdd835; /* Dark mode button color */
+  color: #fdd835;
 }
 
-/* Dark mode for Dialog */
 .dark .DialogContent {
-  background-color: var(--mauve-12); 
+  background-color: var(--mauve-12);
   color: var(--violet-12);
 }
 
-/* Dark mode for Input fields */
 .dark .Input {
-  background-color: var(--violet-12); 
+  background-color: var(--violet-12);
   color: var(--mauve-12);
 }
 
-/* Dark mode for buttons */
 .dark .Button {
-  background-color: var(--yellow-1); 
+  background-color: var(--yellow-1);
   color: var(--yellow-1);
 }
 
 .dark .Button:hover {
-  background-color: var(--violet-6); 
+  background-color: var(--violet-6);
 }
 
-/* Tab Styles */
 .dark .amplify-tabs__header {
-  background-color: var(--mauve-12); /* Dark background for tabs header */
+  background-color: var(--mauve-12);
 }
 
 .dark .amplify-tabs__item {
-  color: var(--violet-12); /* Light color for text on tabs */
+  color: var(--violet-12);
 }
 
 .dark .amplify-tabs__item.selected {
-  background-color: var(--violet-7); /* Active tab color */
+  background-color: var(--violet-7);
 }
 
 .dark .amplify-tabs__content {
-  background-color: var(--mauve-12); /* Dark background for tab content */
-  color: var(--violet-12); /* Light color for tab content text */
+  background-color: var(--mauve-12);
+  color: var(--violet-12);
 }
 
-/* Hover effect for Tab items */
 .dark .amplify-tabs__item:hover {
-  color: var(--violet-6); /* Hover effect for tab items */
+  color: var(--violet-6);
 }
 
-/* Dark mode button styles */
 .dark .amplify-button {
   background-color: var(--yellow-1);
   color: var(--violet-12);
@@ -121,132 +117,127 @@ body {
   background-color: var(--violet-7);
 }
 
+/* === Top Bar Layout === */
+.top-bar {
+  @apply flex justify-between items-center flex-wrap px-6 py-3 fixed top-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-md shadow-md z-10 transition-colors duration-300 gap-3;
+}
+
+.nav-left,
+.nav-right {
+  @apply flex items-center gap-4 flex-wrap;
+}
+
+.app-logo {
+  @apply w-[clamp(80px,10vw,100px)] h-auto flex-shrink-0;
+}
+
+.theme-toggle {
+  @apply bg-gray-300 text-black px-3 py-2 rounded-lg text-xs cursor-pointer inline-flex items-center;
+}
+
+.dark .theme-toggle {
+  @apply bg-gray-800 text-white;
+}
+
+.select {
+  @apply min-w-auto flex items-center max-w-[200px] text-gray-300;
+}
+
+.amplify-select-wraapper {
+  @apply w-full bg-white rounded-lg border border-violet-700 px-2 py-2 text-gray-300;
+}
+
+.amplify-select--small {
+  @apply text-xl py-1;
+}
+
 /* Dialog Overlay */
 .DialogOverlay {
-  background-color: var(--black-alpha-9);
-  position: fixed;
-  inset: 0;
-  animation: overlayShow 300ms ease-out;
+  @apply bg-black bg-opacity-30 fixed inset-0 animate-overlayShow;
 }
 
 /* Dialog Content */
 .DialogContent {
-  background-color: var(--gray-1);
-  border-radius: 8px;
-  border: 1px solid var(--violet-7);
-  box-shadow: var(--shadow-6);
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90vw;
-  max-width: 500px;
-  max-height: 85vh;
-  padding: 30px;
+  @apply bg-gray-100 rounded-lg border border-violet-700 shadow-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-[500px] max-h-[90vh] p-5 transition-all ease-in-out;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-  border-radius: 16px;
-  transition: all 0.3s ease;
 }
 
 /* Dialog Title */
 .DialogTitle {
-  margin: 0;
-  font-weight: 600;
-  color: var(--violet-7);
-  font-size: 24px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  @apply m-0 font-semibold text-violet-700 text-xl uppercase tracking-wider;
 }
 
-/* Dialog Description */
 .DialogDescription {
-  margin: 15px 0;
-  color: var(--violet-7);
-  font-size: 16px;
-  line-height: 1.6;
+  @apply my-4 text-violet-700 text-sm leading-6;
 }
 
 /* Icon Button */
 .IconButton {
-  all: unset;
-  font-family: inherit;
-  border-radius: 50%;
-  height: 30px;
-  width: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--violet-12);
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background-color: var(--violet-6);
-  transition: background-color 0.3s ease;
+  @apply all-reset rounded-full h-8 w-8 inline-flex items-center justify-center text-white absolute top-4 right-4 bg-violet-600 transition-colors ease-in-out;
 }
 
 .IconButton:hover {
-  background-color: var(--violet-4);
+  @apply bg-violet-400;
 }
 
 .IconButton:focus {
-  box-shadow: 0 0 0 3px var(--violet-7);
+  @apply outline-none ring-4 ring-violet-700;
 }
 
 /* Input Field Styles */
 .Fieldset {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-bottom: 20px;
-  width: 100%;
+  @apply flex flex-col gap-4 mb-5 w-full;
 }
 
 .Label {
-  font-size: 14px;
-  color: var(--gray-1);
-  font-weight: 600;
+  @apply text-sm text-gray-100 font-semibold;
 }
 
 .Input {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--violet-7);
-  background-color: var(--violet-12);
-  color: var(--mauve-12);
-  transition: all 0.3s ease;
+  @apply w-full py-3 text-lg rounded-lg border border-violet-700 bg-violet-900 text-gray-100 transition-all ease-in-out;
 }
 
 .Input:focus {
-  border-color: var(--violet-6);
-  box-shadow: 0 0 0 3px var(--violet-7);
+  @apply border-violet-600 ring-4 ring-violet-700;
 }
 
-/* Custom Tab Styles */
+/* Tabs & Buttons */
 .amplify-tabs__item {
-  font-size: var(--amplify-font-sizes-xl);
-  color: var(--amplify-colors-font-secondary);
-  transition: color 0.3s ease;
+  @apply text-xl text-gray-500 transition-colors duration-300;
 }
 
 .amplify-tabs__item:hover {
-  color: var(--violet-6);
+  @apply text-violet-600;
 }
 
 .amplify-button {
-  width: 100%;
-  padding: 12px 0;
-  font-size: 18px;
-  border-radius: 50px; 
-  background-color: var(--violet-7);
-  color: var(--violet-12);
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
+  @apply w-full py-2 text-lg rounded-full bg-violet-700 text-white shadow-md transition-colors duration-300;
 }
 
 .amplify-button:hover {
-  background-color: var(--violet-6);
+  @apply bg-violet-600;
+}
+
+/* Form Builder */
+.form-builder {
+  @apply flex flex-col gap-4;
+}
+
+.sidebar {
+  @apply w-48 flex flex-row gap-3 overflow-x-auto;
+}
+
+table {
+  @apply border-collapse;
+}
+
+table th,
+table td {
+  @apply border border-gray-400 px-2 py-2;
+}
+
+input {
+  @apply w-full py-1;
 }
 
 /* Animations */
@@ -270,29 +261,66 @@ body {
   }
 }
 
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .top-bar {
+    @apply flex-wrap justify-between p-3;
+  }
 
-.form-builder {
-  display: flex;
-  gap: 20px;
+  .nav-left,
+  .nav-right {
+    @apply flex-wrap justify-start;
+  }
+
+  .select {
+    @apply max-w-full;
+  }
 }
 
-.sidebar {
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+@media (max-width: 768px) {
+  .app-container {
+    @apply p-5 rounded-lg;
+  }
+
+  .top-bar {
+    @apply gap-2 p-2;
+  }
+
+  .theme-toggle {
+    @apply text-xs px-2 py-2;
+  }
+
+  .app-logo {
+    @apply w-20;
+  }
 }
 
-table {
-  border-collapse: collapse;
-}
+@media (max-width: 480px) {
+  .app-container {
+    @apply p-4;
+  }
 
-table th, table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
+  .sidebar {
+    @apply flex-wrap gap-2;
+  }
 
-input {
-  width: 100%;
-  padding: 5px;
+  .amplify-button {
+    @apply text-sm;
+  }
+
+  .Input {
+    @apply text-sm py-2;
+  }
+
+  .DialogTitle {
+    @apply text-lg;
+  }
+
+  .DialogDescription {
+    @apply text-sm;
+  }
+
+  .Fieldset {
+    @apply gap-3;
+  }
 }
