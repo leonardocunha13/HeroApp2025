@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { HiCursorClick } from "react-icons/hi";
 import { toast } from "./ui/use-toast";
 import { ImSpinner2 } from "react-icons/im";
-import { submitFormAction } from "../actions/form";
+import { submitFormAction, SaveFormAfterTestAction } from "../actions/form";
 
 function FormSubmitComponent({ formUrl, content }: { content: FormElementInstance[]; formUrl: string }) {
   const formValues = useRef<{ [key: string]: string }>({});
@@ -63,7 +63,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
       formData.append("formId", formUrl);
       formData.append("responses", JSON.stringify(cleanData)); // valores preenchidos
       formData.append("formContent", JSON.stringify(content)); // estrutura do formulário
-      
+
       if (tagId) {
         formData.append("tagId", tagId);
       }
@@ -78,7 +78,37 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
       });
     }
   };
+  const saveProgress = async () => {
+    try {
+      const cleanData = JSON.parse(JSON.stringify(formValues.current));
+      if (!tagId) {
+        toast({
+          title: "Missing tag ID",
+          description: "Unable to save progress without tagId",
+          variant: "destructive",
+        });
+        return;
+      }
 
+      const formData = new FormData();
+      formData.append("formId", formUrl);
+      formData.append("tagId", tagId);
+      formData.append("responses", JSON.stringify(cleanData));
+      formData.append("formContent", JSON.stringify(content));
+
+      await SaveFormAfterTestAction(formData);
+      toast({
+        title: "Progress saved",
+        description: "Your progress has been saved successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Save failed",
+        description: "Could not save your progress.",
+        variant: "destructive",
+      });
+    }
+  };
 
 
   if (submitted) {
@@ -110,37 +140,37 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
             />
           );
         })}
-        <Button
-          className="mt-8"
-          onClick={() => {
-            startTransition(submitForm);
-          }}
-          disabled={pending}
-        >
-          {!pending && (
-            <>
-              <HiCursorClick className="mr-2" />
-              Save
-            </>
-          )}
-          {pending && <ImSpinner2 className="animate-spin" />}
-        </Button>
-        <Button
-          className="mt-8"
-          onClick={() => {
-            startTransition(submitForm);
-          }}
-          disabled={pending}
-        >
-          {!pending && (
-            <>
-              <HiCursorClick className="mr-2" />
-              Submit
-            </>
-          )}
-          {pending && <ImSpinner2 className="animate-spin" />}
-        </Button>
+        <div className="flex justify-center gap-4 mt-8">
+          <Button
+            onClick={() => {
+              startTransition(submitForm);
+            }}
+            disabled={pending}
+          >
+            {!pending ? (
+              <>
+                <HiCursorClick className="mr-2" />
+                Submit
+              </>
+            ) : (
+              <ImSpinner2 className="animate-spin" />
+            )}
+          </Button>
 
+          <Button
+            onClick={saveProgress}
+            disabled={pending}
+          >
+            {!pending ? (
+              <>
+                <HiCursorClick className="mr-2" />
+                Save
+              </>
+            ) : (
+              <ImSpinner2 className="animate-spin" />
+            )}
+          </Button>
+        </div>
 
       </div>
     </div>
