@@ -15,123 +15,7 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 // UserNotFoundErr class for custom error handling
-class UserNotFoundErr extends Error {}
-
-/*export async function InsertClient(NameClient: string) {
-  try {
-    const { errors, data } = await client.models.Client.create({
-      ClientName: NameClient,
-    });
-
-    if (errors) {
-      console.error("Error:", errors);
-      throw new Error("Failed to insert client.");
-    }
-    return data; // Returns the inserted client data
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-}*/
-/*InsertClient("Fortescue")
-  .then((data) => console.log("Client:", data))
-  .catch((error) => console.error("Error fetching client with projects:", error));*/
-
-// Function to insert a single project (you may already have something like this)
-/*export async function InsertProject(name: string, projNum: string, clientID: string) {
-  try {
-    const { errors, data } = await client.models.Projectt.create({
-      projectID: projNum,
-      projectName: name,
-      ClientID: clientID
-    });
-
-    if (errors) {
-      console.error("Error:", errors);
-      throw new Error("Failed to insert client.");
-    }
-    return data; // Returns the inserted client data
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-}*/
-
-// Function to insert multiple projects
-/*export async function InsertMultipleProjects(names: string[], projNum: string[], clientIDs: string[]) {
-  const insertedProjects: any[] = []; // Array to store successfully inserted projects
-  const failedProjects: string[] = []; // Array to store project names that failed to insert
-
-  // Ensure that input arrays have the same length
-  if (names.length !== projNum.length || projNum.length !== clientIDs.length) {
-    throw new Error("Input arrays must have the same length.");
-  }
-
-  // Loop through the arrays and insert projects one by one
-  for (let i = 0; i < names.length; i++) {
-    const name = names[i];
-    const projectNumber = projNum[i];
-    const clientID = clientIDs[i];
-
-    try {
-      const projectData = await InsertProject(name, projectNumber, clientID); // Call to insert a single project
-      insertedProjects.push(projectData); // Store the successful insert result
-    } catch (error) {
-      console.error(`Failed to insert project: ${name}`, error);
-      failedProjects.push(name); // Store the failed project name
-    }
-  }
-
-  // Return the results: successful insertions and failed ones
-  return {
-    insertedProjects,
-    failedProjects,
-  };
-}*/
-
-/*export async function InsertMultipleClients(names: string[]) {
-  const insertedClients: any[] = []; // Array to store successfully inserted clients
-  const failedClients: string[] = []; // Array to store client names that failed to insert
-
-  for (let name of names) {
-    try {
-      const clientData = await InsertClient(name); // Call the single client insert function
-      insertedClients.push(clientData); // Store the successful insert result
-    } catch (error) {
-      console.error(`Failed to insert client: ${name}`, error);
-      failedClients.push(name); // Store the failed client name
-    }
-  }
-
-  // Return the results
-  return {
-    insertedClients,
-    failedClients,
-  };
-}*/
-
-/*const clients = await GetClients();*/
-
-/*const cID = clients.clientIDs;
-console.log(cID);
-const projects = ["project1", "project2","project3","project4"];
-const  projNumbers = ["projNumber1","projNumber2","projNumber3","projNumber4"];*/
-
-/*InsertProject(projects[0],projNumbers[0],cID[0]);
-InsertProject(projects[1],projNumbers[1],cID[1]);
-InsertProject(projects[2],projNumbers[2],cID[2]);
-InsertProject(projects[3],projNumbers[3],cID[3]);*/
-
-/*const clientNames = ["Client4"]; // Example client names
-
-InsertMultipleClients(clientNames)
-  .then((result) => {
-    console.log("Successfully inserted clients:", result.insertedClients);
-    console.log("Failed to insert clients:", result.failedClients);
-  })
-  .catch((error) => {
-    console.error("Error inserting clients:", error);
-  });*/
+class UserNotFoundErr extends Error { }
 
 export async function GetClients() {
   try {
@@ -159,21 +43,6 @@ export async function GetClients() {
     throw error;
   }
 }
-
-/*async function fetchData() {
-  const clients = await GetClients();
-  const cID = clients.clientIDs;
-  console.log(cID);
-  const projects = ["project1", "project2", "project3", "project4"];
-  const projNumbers = ["projNumber1", "projNumber2", "projNumber3", "projNumber4"];
- 
-  await InsertProject(projects[0], projNumbers[0], cID[0]);
-  await InsertProject(projects[1], projNumbers[1], cID[1]);
-  await InsertProject(projects[2], projNumbers[2], cID[2]);
-  await InsertProject(projects[3], projNumbers[3], cID[3]);
-}*/
-
-//fetchData().catch(console.error);
 
 export async function GetProjects() {
   try {
@@ -232,11 +101,9 @@ export async function GetFormStats() {
   }
 }
 
-
-
 export async function GetForms() {
   try {
-    
+
     const { data: forms, errors } = await client.models.Form.list();
 
     if (errors) {
@@ -245,7 +112,7 @@ export async function GetForms() {
     }
     //console.log("Forms:", forms);
     return forms;
-    
+
   } catch (error) {
     console.error("Error fetching forms:", error);
     return [];
@@ -268,7 +135,6 @@ export async function GetFormById(id: string) {
 
     let projectName = null;
     let clientName = null;
-    let shareURL = null;
 
     if (form.projID) {
       const { data: projectData, errors: projectErrors } = await client.models.Projectt.list({
@@ -299,7 +165,7 @@ export async function GetFormById(id: string) {
       }
     }
 
-    // Retornar também visitas e submissões
+
     return {
       form,
       projectName,
@@ -344,24 +210,7 @@ export async function saveFormAction(formData: FormData) {
   // Call your existing server-side function (UpdateFormContent)
   await UpdateFormContent(id, content);
 }
-/*const data = [
-  ['Section 1', 'A', 'B', 'C', 'D', 'E', 'F'],
-  ['E', 'F', 'G', 'H', 'I'],
-  ['J', 'K', 'L', 'M', 'N'],
-];
 
-// Convert the data to a JSON string
-const content = JSON.stringify(data);
-
-
-UpdateFormContent("b5a11d77-fef7-4330-8479-db5d7aea3aff", content)
-  .then(updatedForm => {
-    console.log('Form updated:', updatedForm);
-  })
-  .catch(error => {
-    console.error('Error updating form:', error);
-  });
-*/
 
 export async function PublishForm(id: string, content: string, shareURL: string) {
   try {
@@ -397,7 +246,7 @@ export async function publishFormAction(formData: FormData) {
 
 export async function GetFormContentByUrl(formUrl: string) {
   try {
-    
+
     //const formURL = `/submit/${formUrl}`;
     const formURL = formUrl.startsWith('/submit/') ? formUrl : `/submit/${formUrl}`;
     const { data: forms, errors } = await client.models.Form.list({
@@ -438,7 +287,7 @@ export async function SubmitForm(formId: string, tagId: string, content: string)
     content,
     createdAt: new Date().toISOString(),
   };
-  
+
   const { data: submissionData } = await client.models.FormSubmissions.create(submission);
 
   if (!submissionData?.id) throw new Error("Error to create the submssion");
@@ -472,10 +321,20 @@ export async function SubmitForm(formId: string, tagId: string, content: string)
 
 export async function submitFormAction(formData: FormData) {
   const formId = formData.get("formId") as string;
-  const tagId = formData.get("tagId") as string;
+  const formtagId = formData.get("formtagID") as string;
   const rawResponses = formData.get("responses") as string;
   const rawFormContent = formData.get("formContent") as string;
+  
+  let tagId = formData.get("tagId") as string;
 
+  if (!tagId && formId && formtagId) {
+    const fetchedTagId = await GetTagIDWithFormIdandFormTagID(formId, formtagId);
+    if (fetchedTagId) {
+      tagId = fetchedTagId;
+    } else {
+      throw new Error("Tag ID could not be retrieved.");
+    }
+  }
   const submission = {
     responses: JSON.parse(rawResponses),
     formContent: JSON.parse(rawFormContent),
@@ -546,7 +405,7 @@ export async function GetSubmissionWithTagInfo(submissionId: string) {
   const formTag = formTagsResponse.data[0];
 
   const equipmentTagResponse = await client.models.EquipmentTag2.get({
-    id: formTag.tagID ?? "", 
+    id: formTag.tagID ?? "",
   });
 
   if (!equipmentTagResponse.data) {
@@ -564,60 +423,56 @@ export async function GetSubmissionWithTagInfo(submissionId: string) {
 
 export async function GetFormWithSubmissionDetails(id: string) {
   try {
-    // Fetch the form with submissions
     const { data: form, errors: formErrors } = await client.models.Form.get({ id });
-
-    if (formErrors) {
-      console.error(formErrors);
+    if (formErrors || !form) {
+      console.error(formErrors || "Form not found.");
       return null;
     }
 
-    if (!form) {
-      throw new Error("Form not found.");
+    const { data: formTags, errors: tagErrors } = await client.models.FormTag2.list({
+      filter: { formID: { eq: form.id } },
+    });
+    if (tagErrors) {
+      console.error(tagErrors);
+      return null;
     }
 
-    // Fetch the submissions related to the form
     const { data: submissions, errors: submissionErrors } = await client.models.FormSubmissions.list({
       filter: { formId: { eq: form.id } },
     });
-
     if (submissionErrors) {
       console.error(submissionErrors);
       return null;
     }
 
-    // Fetch additional tag and equipment details for each submission
     const submissionDetails = await Promise.all(
-      submissions.map(async (submission) => {
-        const formId = submission.formId;
-        const submissionId = submission.id;
+      formTags.map(async (tag) => {
+        const contentTestIds = tag.contentTest?.split(",").map((s) => s.trim()) || [];
 
-        // Fetch the associated tag and equipment info
-        const formTagsResponse = await client.models.FormTag2.list({
-          filter: {
-            contentTest: { contains: submissionId }, // Find related tags by submission ID
-          },
-        });
+        // Check if any submission.id is present in contentTest
+        const matchedSubmission = submissions.find((submission) =>
+          contentTestIds.includes(submission.id)
+        );
 
-        if (!formTagsResponse.data.length) {
-          return { ...submission, error: "No form tag found for this submission." };
-        }
-
-        const formTag = formTagsResponse.data[0];
         const equipmentTagResponse = await client.models.EquipmentTag2.get({
-          id: formTag.tagID ?? "", // Use the tagID from FormTag2
+          id: tag.tagID ?? "",
         });
 
-        if (!equipmentTagResponse.data) {
-          return { ...submission, error: "No equipment tag found for this submission." };
-        }
+        const equipmentTag = equipmentTagResponse.data;
+
+        const formStatus = matchedSubmission ? "submitted" : "not submitted";
+        const buttonText = matchedSubmission ? "View Form" : "Resume Form";
 
         return {
-          formId,
-          submissionId,
-          submittedAt: submission.createdAt,
-          equipmentName: equipmentTagResponse.data.EquipmentName ?? "No Equipment Name",
-          tag: equipmentTagResponse.data.Tag ?? "No Equipment Tag",
+          formId: form.id,
+          submissionId: matchedSubmission?.id ?? null,
+          submittedAt: matchedSubmission?.createdAt ?? null,
+          equipmentName: equipmentTag?.EquipmentName ?? "No Equipment Name",
+          tag: equipmentTag?.Tag ?? "No Equipment Tag",
+          contentTest: contentTestIds,
+          formtagId: tag.id,
+          formStatus,
+          buttonText,
         };
       })
     );
@@ -632,6 +487,63 @@ export async function GetFormWithSubmissionDetails(id: string) {
   }
 }
 
+
+export async function getMatchingFormSubmissions(submissionId: string) {
+  try {
+    // Fetch form tags where contentTest contains the submissionId
+    const { data: formSubmitted, errors } = await client.models.FormTag2.list({
+      filter: { contentTest: { contains: submissionId } },
+    });
+
+    if (errors) {
+      console.error("Error fetching form submissions:", errors);
+      return null;
+    }
+    console.log("Form Submitted:", formSubmitted); // Debugging
+    // Return the first matching FormTag2 ID or null if no match found
+    return formSubmitted.length > 0 ? formSubmitted[0].id : null;
+  } catch (error) {
+    console.error("Error in getMatchingFormSubmissions:", error);
+    return null;
+  }
+}
+
+export async function ResumeTest(formTagId: string) {
+  try {
+    const { data: formTag, errors } = await client.models.FormTag2.get({ id: formTagId });
+
+    if (errors || !formTag) {
+      console.error("Error fetching formTag2:", errors);
+      return null;
+    }
+
+    // Assuming formTag.contentTest holds the content in the correct format
+    const contentTest = formTag.contentTest;
+    
+    if (!contentTest) {
+      console.error("No contentTest found in formTag.");
+      return null;
+    }
+
+    const parsedContent = JSON.parse(contentTest); // Parse the contentTest to get formContent and responses
+    const responses = parsedContent.responses;
+    const elements = parsedContent.formContent;
+
+    // Extract formId from formTag
+    const formId = formTag.formID;
+
+    return {
+      formId,  // Include formId in the return
+      elements,  // form elements
+      responses, // form responses
+    };
+  } catch (error) {
+    console.error("Error in ResumeTest:", error);
+    return null;
+  }
+}
+
+
 export async function GetFormSubmissionById(submissionId: string) {
 
   try {
@@ -643,7 +555,7 @@ export async function GetFormSubmissionById(submissionId: string) {
     if (!content) {
       throw new Error("Content not found.");
     }
-    return  content ;
+    return content;
   } catch (error) {
     console.error("Error in GetFormSubmissionById:", error);
     return null;
@@ -680,7 +592,7 @@ export async function GetEquipmentTagsForForm(id: string) {
       return { form, equipmentTags: [] };
     }
 
-      // Fetch related equipment details for each tag
+    // Fetch related equipment details for each tag
     const equipmentDetails = await Promise.all(
       equipmentTags.map(async (tag) => {
         // Ensure that tag.tagID is valid before making the API call
@@ -694,7 +606,7 @@ export async function GetEquipmentTagsForForm(id: string) {
         }
       })
     );
-    
+
     return { form, equipmentTags: equipmentDetails.filter(tag => tag !== null) };
 
   } catch (error) {
@@ -729,10 +641,6 @@ export async function GetClientWithProjects(ClientID: string) {
     throw error;
   }
 }
-
-/*GetClientWithProjects("1ad74bce-bd9d-4131-83ef-effecba74c7d")
-  .then((data) => console.log("Client with Projects:", data))
-  .catch((error) => console.error("Error fetching client with projects:", error));*/
 
 export async function GetFormsWithClient(ClientID: string) {
   const { userId } = await getCurrentUser();
@@ -774,10 +682,6 @@ export async function GetFormsWithClient(ClientID: string) {
     throw new Error("Failed to fetch forms for the client.");
   }
 }
-
-/*GetFormsWithClient("1ad74bce-bd9d-4131-83ef-effecba74c7d")
-.then((forms) => console.log("Forms:", forms))
-.catch((error) => console.error("Error:", error));*/
 
 export async function GetFormsInformation() {
   try {
@@ -917,7 +821,7 @@ export async function CreateForm(
 
 
 export const runForm = async (
-  formUrl:string,
+  formUrl: string,
   EquipName: string,
   EquipTag: string,
 ): Promise<{
@@ -925,10 +829,9 @@ export const runForm = async (
   createdTagID?: string;
   tagCreatedAt?: string;
 }> => {
-  //console.log("runForm called with:", formUrl, EquipName, EquipTag);
   try {
     const formResp = await GetFormContentByUrl(formUrl);
-    
+
     if (!formResp) {
       console.error("Form not found with the provided TestName and ProjectID");
       return { success: false };
@@ -945,6 +848,9 @@ export const runForm = async (
 
     const existingTag = existingTagResp.data?.[0];
 
+    let tagID: string;
+    let tagCreatedAt: string | undefined = undefined;
+
     if (existingTag) {
       const linkedFormResp = await client.models.FormTag2.list({
         filter: {
@@ -954,22 +860,14 @@ export const runForm = async (
       });
 
       if (linkedFormResp.data?.length > 0) {
-        console.error(
-          "This equipment and tag are already associated with this form and project.",
-        );
-        alert(
-          "Error: This equipment and tag are already associated with this form and project.",
-        );
+        console.error("This equipment and tag are already associated with this form and project.");
+        alert("Error: This equipment and tag are already associated with this form and project.");
         return { success: false };
       }
-    }
 
-    let createResp = null;
-    let createdTagID: string | undefined = undefined;
-    let tagCreatedAt: string | undefined = undefined;
-
-    if (!existingTag) {
-      createResp = await client.models.EquipmentTag2.create({
+      tagID = existingTag.id;
+    } else {
+      const createResp = await client.models.EquipmentTag2.create({
         Tag: EquipTag,
         EquipmentName: EquipName,
       });
@@ -979,15 +877,13 @@ export const runForm = async (
         return { success: false };
       }
 
-      createdTagID = createResp.data.id;
-      tagCreatedAt = new Date(createResp.data.createdAt)
-        .toISOString()
-        .split("T")[0];
+      tagID = createResp.data.id;
+      tagCreatedAt = new Date(createResp.data.createdAt).toISOString().split("T")[0];
     }
 
     const formTagResp = await client.models.FormTag2.create({
       formID: form.id,
-      tagID: existingTag ? existingTag.id : createdTagID,
+      tagID,
     });
 
     if (!formTagResp.data) {
@@ -995,40 +891,12 @@ export const runForm = async (
       return { success: false };
     }
 
-    return { success: true, createdTagID, tagCreatedAt };
+    return { success: true, createdTagID: tagID, tagCreatedAt };
   } catch (error) {
     console.error("Error executing runForm:", error);
     return { success: false };
   }
 };
-
-// Fetch formId by TestName and ProjectID
-const fetchFormByNameAndProject = async (
-  TestName: string,
-  ProjectID: string,
-) => {
-  try {
-    //console.log("Fetching form with TestName:", TestName, "and ProjectID:", ProjectID);
-    const formResp = await client.models.Form.list({
-      filter: {
-        name: { eq: TestName },
-        projID: { eq: ProjectID },
-      },
-    });
-
-    //console.log("Form fetch response:", formResp);
-
-    // If form exists, return the first result
-    return formResp.data?.[0];
-  } catch (error) {
-    console.error("Error fetching form:", error);
-    return null;
-  }
-};
-
-/*await runForm("Test name 1", "HE101P001", "Compressor X", "TAG-001")
-.then((newEquipmentTag) => console.log("Created FormTag:", newEquipmentTag))
-.catch((error) => console.error("Error:", error)); // Handle any errors */
 
 export async function GetFormsByClientName(ClientName: string) {
   // 1. Fetch the Client ID
@@ -1141,14 +1009,6 @@ export async function GetFormsByClientName(ClientName: string) {
   }));
 }
 
-/*await GetFormsByClientName("Rio Tinto")
-  .then((flattenedForms) => {
-    console.log("✅ Forms from client:", flattenedForms);
-  })
-  .catch((error) => {
-    console.error("❌ Error fetching forms:", error);
-  });*/
-
 export async function SaveFormAfterTest(
   FormID: string,
   TagID: string,
@@ -1179,20 +1039,65 @@ export async function SaveFormAfterTest(
       contentTest: content,
     });
 
-    console.log("Updated:", updated);
+    //console.log("Updated:", updated);
     return updated;
   } catch (err) {
     console.error("Error SaveFormAfterTest:", err);
   }
 }
 
-/*  SaveFormAfterTest("96a34ca0-03a2-4f79-8853-495e7ea3d060", "40df5981-e8d0-45e1-b8f4-9922f5ccce52", "Test content")
-.then((updatedForm) => {
-  console.log("Form updated successfully:", updatedForm);
-})
-.catch((error) => {
-  console.error("Error updating form:", error);
-});*/
+export async function SaveFormAfterTestAction(formData: FormData) {
+  const formId = formData.get("formId") as string;
+  const formtagId = formData.get("formtagID") as string;
+  const rawResponses = formData.get("responses") as string;
+  const rawFormContent = formData.get("formContent") as string;
+  
+  let tagId = formData.get("tagId") as string;
+
+  if (!tagId && formId && formtagId) {
+    const fetchedTagId = await GetTagIDWithFormIdandFormTagID(formId, formtagId);
+    if (fetchedTagId) {
+      tagId = fetchedTagId;
+    } else {
+      throw new Error("Tag ID could not be retrieved.");
+    }
+  }
+
+  const submission = {
+    responses: JSON.parse(rawResponses),
+    formContent: JSON.parse(rawFormContent),
+  };
+
+  const jsonContent = JSON.stringify(submission);
+  await SaveFormAfterTest(formId, tagId, jsonContent);
+}
+
+
+export async function GetTagIDWithFormIdandFormTagID(formId: string, formtagID: string): Promise<string | null> {
+  try {
+    const { data, errors } = await client.models.FormTag2.list({
+      filter: {
+        formID: { eq: formId },
+        id: { eq: formtagID },
+      },
+    });
+
+    if (errors) {
+      console.error("Error:", errors);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      console.warn("No matching FormTag2 found");
+      return null;
+    }
+
+    return data[0].tagID || null;
+  } catch (err) {
+    console.error("Error GetTagIDWithFormIdandFormTagID:", err);
+    return null;
+  }
+}
 
 export async function getContentByFormIDandTagID(
   FormID: string,
@@ -1227,14 +1132,6 @@ export async function getContentByFormIDandTagID(
   }
 }
 
-/*getContentByFormIDandTagID("2e069dfa-3e6d-42d2-be06-544b5aa99b40", "9399935a-59ea-413f-8303-41b8fc4f97b7")
-.then((updatedForm) => {
-  console.log("Form updated successfully:", updatedForm);
-})
-.catch((error) => {
-  console.error("Error updating form:", error);
-});*/
-
 export async function getEquipmentTagID(
   equipmentName: string,
   equipmentTag: string,
@@ -1267,11 +1164,3 @@ export async function getEquipmentTagID(
     console.error("Error in getEquipmentTagID:", err);
   }
 }
-
-/*getEquipmentTagID("Equip1", "Tag1")
-.then((updatedForm) => {
-  console.log("Equip TAG ID:", updatedForm);
-})
-.catch((error) => {
-  console.error("Error updating form:", error);
-});*/

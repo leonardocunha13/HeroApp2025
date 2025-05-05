@@ -59,26 +59,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/view-submitted/[submissionID]/page.js"
     ],
-    "/(dashboard)/builder/[id]/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/builder/[id]/layout.js"
-    ],
-    "/(dashboard)/builder/[id]/error": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/builder/[id]/error.js"
-    ],
-    "/(dashboard)/builder/[id]/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/builder/[id]/loading.js"
-    ],
-    "/(dashboard)/builder/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/builder/[id]/page.js"
-    ],
     "/submit/[formUrl]/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -98,6 +78,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/submit/[formUrl]/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

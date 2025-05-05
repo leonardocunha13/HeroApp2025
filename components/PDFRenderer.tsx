@@ -1,93 +1,74 @@
 "use client";
 
-import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import { FormElementInstance } from "./FormElements";
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { useState } from 'react';
 
-interface Props {
-  elements: FormElementInstance[];
-  responses: { [key: string]: any };
+// Function to render data on a PDF template
+async function renderFormToPdf(pdfUrl: string, formData: any) {
+  try {
+    // Fetch the existing PDF template
+    const existingPdfBytes = await fetch(pdfUrl).then((res) => res.arrayBuffer());
+
+    if (!existingPdfBytes) {
+      console.error('Failed to load PDF template.');
+      return;
+    }
+
+    // Load the PDF template
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+
+    // Add text for form data to the first page (you can customize the coordinates)
+    const font = await pdfDoc.embedStandardFont(StandardFonts.Helvetica);
+    
+    let yOffset = 700; // Start from a certain Y position on the page
+
+    // Loop through formData and add text to the PDF at different Y positions
+    for (const [key, value] of Object.entries(formData)) {
+      const text = `${key}: ${value}`;
+
+      firstPage.drawText(text, {
+        x: 50, // X position
+        y: yOffset, // Y position
+        font: font,
+        size: 12,
+        color: rgb(0, 0, 0),
+      });
+
+      yOffset -= 20; // Move down the Y position for the next line
+    }
+
+    // Serialize the PDF to bytes
+    const pdfBytes = await pdfDoc.save();
+
+    // Create a blob from the PDF and trigger the download
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `filled_form.pdf`;
+    link.click();
+  } catch (error) {
+    console.error('Error rendering PDF:', error);
+  }
 }
 
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontSize: 12,
-    fontFamily: "Helvetica",
-    flexDirection: "column",
-    gap: 10,
-  },
-  fieldBlock: {
-    marginBottom: 12,
-  },
-  label: {
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  textValue: {
-    marginBottom: 4,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    objectFit: "contain",
-    marginBottom: 10,
-  },
-  tableRow: {
-    flexDirection: "row",
-  },
-  tableCell: {
-    border: "1px solid black",
-    padding: 4,
-    width: 100,
-    fontSize: 10,
-  },
-});
+const PDFRenderer = ({ pdfUrl, formData }: { pdfUrl: string, formData: any }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
 
-export default function PDFSubmissionRenderer({ elements, responses }: Props) {
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    await renderFormToPdf(pdfUrl, formData);
+    setIsDownloading(false);
+  };
+
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {elements.map((element) => {
-          const value = responses[element.id];
-          const label = element.extraAttributes?.label || element.type;
-
-      
-          if (element.type === "ImageField" && typeof value === "string") {
-            return (
-              <View key={element.id} style={styles.fieldBlock}>
-                <Text style={styles.label}>{label}</Text>
-                <Image style={styles.image} src={value} />
-              </View>
-            );
-          }
-
-
-          if (element.type === "TableField" && Array.isArray(value)) {
-            return (
-              <View key={element.id} style={styles.fieldBlock}>
-                <Text style={styles.label}>{label}</Text>
-                {value.map((row: string[], rowIndex: number) => (
-                  <View key={rowIndex} style={styles.tableRow}>
-                    {row.map((cell: string, colIndex: number) => (
-                      <Text key={colIndex} style={styles.tableCell}>
-                        {cell}
-                      </Text>
-                    ))}
-                  </View>
-                ))}
-              </View>
-            );
-          }
-
-          
-          return (
-            <View key={element.id} style={styles.fieldBlock}>
-              <Text style={styles.label}>{label}</Text>
-              <Text style={styles.textValue}>{String(value ?? "")}</Text>
-            </View>
-          );
-        })}
-      </Page>
-    </Document>
+    <div>
+      <button onClick={handleDownload} disabled={isDownloading}>
+        {isDownloading ? 'Downloading...' : 'Download PDF'}
+      </button>
+    </div>
   );
-}
+};
+
+export default PDFRenderer;

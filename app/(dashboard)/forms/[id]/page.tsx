@@ -1,18 +1,14 @@
-import { GetEquipmentTagsForForm, GetFormById, GetFormWithSubmissions, GetFormWithSubmissionDetails  } from "../../../../actions/form";
+import { GetFormById, GetFormWithSubmissionDetails } from "../../../../actions/form";
 import FormLinkShare from "../../../../components/FormLinkShare";
 import VisitBtn from "../../../../components/VisitBtn";
-import { ReactNode } from "react";
+import ResumeTestBtn from "../../../../components/ResumeTestBtn";
 import { StatsCard } from "../../page";
 import { LuView } from "react-icons/lu";
 import { FaWpforms } from "react-icons/fa";
 import { HiCursorClick } from "react-icons/hi";
 import { TbArrowBounce } from "react-icons/tb";
-import { ElementsType, FormElementInstance } from "../../../../components/FormElements";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table";
-import { format } from "date-fns";
 import { formatDistance } from "date-fns/formatDistance";
-import { Badge } from "../../../../components/ui/badge";
-import { Checkbox } from "../../../../components/ui/checkbox";
 import { Button } from "../../../../components/ui/button";
 import { MdPreview } from "react-icons/md";
 
@@ -100,8 +96,6 @@ async function FormDetailPage({
       </div>
 
       <div className="container pt-10">
-        {/*<EquipmentTagsTable id={form.form.id} />
-        <SubmissionsTable id={form.form.id} />*/}
         <ProjectLogTable id={form.form.id} />
       </div>
     </>
@@ -109,132 +103,6 @@ async function FormDetailPage({
 }
 
 export default FormDetailPage;
-
-type Row = { [key: string]: string } & {
-  submittedAt: Date;
-};
-
-async function SubmissionsTable({ id }: { id: string }) {
-  // Get form with submissions from the API
-  const formWithSubmissions = await GetFormWithSubmissions(id);
-
-  // Check if the form with submissions exists
-  if (!formWithSubmissions) {
-    throw new Error("Form not found or you don't have access.");
-  }
-
-  // Destructure the form and submissions from the returned object
-  const { form, submissions } = formWithSubmissions; // Now form and submissions should be available here
-
-  // Parse the form content to extract form elements
-  let formElements: FormElementInstance[] = [];
-
-  try {
-    const parsed = JSON.parse(form.content ?? "[]");
-    if (Array.isArray(parsed)) {
-      formElements = parsed;
-    }
-  } catch (error) {
-    console.error("Failed to parse form content:", error);
-  }
-  // Prepare rows for the table by mapping over the submissions
-  const rows: Row[] = [];
-
-  // If there are submissions, parse and push into the rows array
-  if (Array.isArray(submissions)) {
-    submissions.forEach((submission) => {
-      try {
-        const content = JSON.parse((submission.content ?? "[]")); // Parse the submission content
-        rows.push({
-          ...content, // Include all parsed content fields
-          submittedAt: submission.createdAt, // Add the submission date
-        });
-      } catch (error) {
-        console.error("Error parsing submission content", error);
-      }
-    });
-  }
-
-  // Define the columns for the table
-  const columns = formElements.map((element) => ({
-    id: element.id,
-    label: element.label,
-    type: element.type,
-  }));
-
-
-
-  return (
-    <>
-      <h1 className="text-2xl font-bold my-4">Submissions</h1>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead key={column.id} className="uppercase">
-                  {column.label}
-                </TableHead>
-              ))}
-              <TableHead className="text-muted-foreground text-right uppercase">Submitted at</TableHead>
-              <TableHead className="text-muted-foreground text-center uppercase">View</TableHead>
-
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.length > 0 ? (
-              rows.map((row, index) => (
-                <TableRow key={index}>
-                  {columns.map((column) => (
-                    <RowCell key={column.id} type={column.type} value={row[column.id]} />
-                  ))}
-                  <TableCell className="text-muted-foreground text-right">
-                    {formatDistance(new Date(row.submittedAt), new Date(), {
-                      addSuffix: true,
-                    })}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <a href={`/view-submitted/${submissions[index].id}`}>
-                      <Button variant={"outline"} className="gap-2">
-                        <MdPreview className="h-6 w-6" />
-                        View Form
-                      </Button>
-                    </a>
-                  </TableCell>
-
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length + 2} className="text-center text-muted-foreground">
-                  No submissions yet
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </>
-  );
-}
-
-function RowCell({ type, value }: { type: ElementsType; value: string }) {
-  let node: ReactNode = value;
-
-  switch (type) {
-    case "DateField":
-      if (!value) break;
-      const date = new Date(value);
-      node = <Badge variant={"outline"}>{format(date, "dd/MM/yyyy")}</Badge>;
-      break;
-    case "CheckboxField":
-      const checked = value === "true";
-      node = <Checkbox checked={checked} disabled />;
-      break;
-  }
-
-  return <TableCell>{node}</TableCell>;
-}
 
 export async function ProjectLogTable({ id }: { id: string }) {
   try {
@@ -248,7 +116,7 @@ export async function ProjectLogTable({ id }: { id: string }) {
 
     return (
       <div>
-        <h1 className="text-2xl font-bold my-4">Project Log and Tags</h1>
+        <h1 className="text-2xl font-bold my-4">Project Log</h1>
         <div className="rounded-md border">
           <Table className="min-w-full border-collapse">
             <TableHeader>
@@ -262,32 +130,43 @@ export async function ProjectLogTable({ id }: { id: string }) {
             <TableBody>
               {submissions.length > 0 ? (
                 submissions.map((s, i) => {
+                  // Check if `tag` exists in the submission object
                   if ("tag" in s) {
+                    const wasSubmitted = Array.isArray(s.contentTest)
+                      ? s.contentTest.includes(s.submissionId ?? "")
+                      : false;
                     return (
                       <TableRow key={i}>
                         <TableCell className="border p-2">{s.equipmentName}</TableCell>
                         <TableCell className="border p-2">{s.tag}</TableCell>
                         <TableCell className="border p-2 text-right">
                           {s.submittedAt
-                            ? formatDistance(new Date(s.submittedAt), new Date(), { addSuffix: true })
-                            : ""}
+                            ? formatDistance(new Date(s.submittedAt), new Date(), {
+                              addSuffix: true,
+                            })
+                            : "Not Submitted"}
                         </TableCell>
                         <TableCell className="border p-2 text-center">
-                        <a href={`/view-submitted/${submissions[i].submissionId}`}>
-                            <Button variant="outline" className="gap-2">
-                              <MdPreview className="h-6 w-6" />
-                              View Form
-                            </Button>
-                          </a>
+                          {wasSubmitted ? (
+                            <a href={`/view-submitted/${s.submissionId}`}>
+                              <Button variant="outline" className="gap-2">
+                                <MdPreview className="h-6 w-6" />
+                                View Form
+                              </Button>
+                            </a>
+                          ) : (
+                            <ResumeTestBtn formTag2Id={s.formtagId} />
+                          )}
                         </TableCell>
                       </TableRow>
                     );
                   } else {
+                    // If there's an error property, show it in a row
                     return (
                       <TableRow key={i}>
-                        <TableCell colSpan={4} className="text-center text-sm text-muted-foreground italic">
+                        {/*<TableCell colSpan={4} className="text-center text-sm text-muted-foreground italic">
                           {s.error}
-                        </TableCell>
+                        </TableCell>*/}
                       </TableRow>
                     );
                   }
@@ -309,4 +188,6 @@ export async function ProjectLogTable({ id }: { id: string }) {
     return <div>Error loading data</div>;
   }
 }
+
+
 

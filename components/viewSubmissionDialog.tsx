@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "./ui/dialog";
 import SubmissionRenderer from "../components/submissionRenderer";
+import PDFRenderer from "../components/PDFRenderer";
 
 
 interface ViewSubmissionClientProps {
@@ -26,8 +27,13 @@ export default function ViewSubmissionClient({ elements, responses }: ViewSubmis
         <div className="w-[1000px] h-[90vh] flex flex-col overflow-y-auto rounded-2xl bg-background p-8">
           <SubmissionRenderer elements={elements} responses={responses} />
         </div>
+        {/*<div className="mt-4">
+           Render PDFRenderer component here with the form data 
+          <PDFRenderer pdfUrl="/Template.pdf" formData={elements} />
+        </div>*/}
       </DialogContent>
+
     </Dialog>
   );
-  
+
 }
