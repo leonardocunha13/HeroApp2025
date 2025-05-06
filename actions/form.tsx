@@ -246,40 +246,42 @@ export async function publishFormAction(formData: FormData) {
 
 export async function GetFormContentByUrl(formUrl: string) {
   try {
+    const formURL = formUrl.startsWith("/submit/") ? formUrl : `/submit/${formUrl}`;
 
-    //const formURL = `/submit/${formUrl}`;
-    const formURL = formUrl.startsWith('/submit/') ? formUrl : `/submit/${formUrl}`;
     const { data: forms, errors } = await client.models.Form.list({
       filter: { shareURL: { eq: formURL } },
     });
 
     if (errors || !forms || forms.length === 0) {
-      console.error(errors || "Form not found, please try again.");
       throw new Error("Form not found.");
     }
 
-    const form = forms[0];
-    const updatedVisits = form.visits ? form.visits + 1 : 1;
-
-    const updatedForm = {
-      id: form.id,
-      visits: updatedVisits,
-    };
-
-    const { errors: updateErrors } =
-      await client.models.Form.update(updatedForm);
-
-    if (updateErrors) {
-      console.error(updateErrors);
-      throw new Error("Failed to update form visits.");
-    }
-    //console.log("form:", form);
-    return form;
+    return forms[0];
   } catch (error) {
     console.error("Error fetching form content by URL:", error);
     throw new Error("Error fetching form content by URL.");
   }
 }
+
+  export async function updateVisitCount(formUrl: string) {
+    try {
+      const { data: forms } = await client.models.Form.list({
+        filter: { shareURL: { eq: `/submit/${formUrl}` } },
+      });
+  
+      if (forms && forms.length > 0) {
+        const form = forms[0];
+        const updatedVisits = (form.visits ?? 0) + 1;
+  
+        await client.models.Form.update({
+          id: form.id,
+          visits: updatedVisits,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update visit count:", error);
+    }
+  }
 
 export async function SubmitForm(formId: string, tagId: string, content: string) {
   const submission = {

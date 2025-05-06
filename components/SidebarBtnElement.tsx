@@ -1,10 +1,10 @@
 import { FormElement } from "./FormElements";
 import { useDraggable } from "@dnd-kit/core";
-import { Button, Text, Flex, useTheme } from "@aws-amplify/ui-react";  // Import Amplify UI components
+import { Text, Flex } from "@aws-amplify/ui-react";  // Import Amplify UI components
+import { Button } from "./ui/button";
 
 function SidebarBtnElement({ formElement }: { formElement: FormElement }) {
-  const { tokens } = useTheme(); // Use theme tokens from Amplify UI
-
+  
   if (!formElement || !formElement.designerBtnElement) {
     console.error("SidebarBtnElement received an invalid formElement:", formElement);
     return null;
@@ -23,45 +23,31 @@ function SidebarBtnElement({ formElement }: { formElement: FormElement }) {
   return (
     <Button
       ref={draggable.setNodeRef}
-      variation="link" // 'link' or any other style you need
-      height="80px"      isFullWidth={true}
-      borderRadius={tokens.radii.medium} // Use design tokens
-      border={`1px solid ${tokens.colors.border.primary}`} // Use design tokens for border color
-      backgroundColor={tokens.colors.background.primary} // Use design tokens
-      color={tokens.colors.font.primary} // Use design tokens
-      style={{ cursor: "grab" }} // Apply cursor style directly
-      gap={tokens.space.xxxs} // Use design tokens
-      className={draggable.isDragging ? 'ring-2 ring-primary' : ''}
+      className={`w-[100%] h-20 rounded-md border border-gray-300 dark:border-gray-600 
+                bg-white dark:bg-neutral-800 text-gray-900 dark:text-white 
+                flex items-center justify-center gap-2 cursor-grab 
+                ${draggable.isDragging ? "ring-2 ring-blue-500" : ""}`}
       {...draggable.listeners}
       {...draggable.attributes}
     >
-      <Flex direction="row" alignItems="center" justifyContent="center">
-        <Icon  />
-        <Text fontSize={tokens.fontSizes.xs}>{label}</Text>
-      </Flex>
+      <Icon className="w-5 h-5" />
+      <Text className="text-sm">{label}</Text>
     </Button>
   );
 }
 
 export function SidebarBtnElementDragOverlay({ formElement }: { formElement: FormElement }) {
-  const { tokens } = useTheme(); // Use theme tokens from Amplify UI
   const { label, icon: Icon } = formElement.designerBtnElement;
 
   return (
     <Button
-      variation="link"
-      isFullWidth={false}
-
-      borderRadius={tokens.radii.medium} // Use design tokens
-      border={`1px solid ${tokens.colors.border.primary}`} // Use design tokens
-      backgroundColor={tokens.colors.background.secondary} // Use design tokens
-      color={tokens.colors.font.primary} // Use design tokens
-      style={{ cursor: "grab" }} // Apply cursor style directly
-      gap={tokens.space.xs} // Use design tokens
+    className="px-4 py-3 rounded-md border border-gray-300 dark:border-gray-600 
+    bg-gray-100 dark:bg-neutral-700 text-gray-900 dark:text-white 
+    flex flex-col items-center justify-center gap-1 cursor-grab"
     >
-      <Flex direction="column" alignItems="center" justifyContent="center">
+      <Flex  alignItems="center" justifyContent="center">
         <Icon className="h-8 w-8 text-primary" />
-        <Text fontSize={tokens.fontSizes.xs}>{label}</Text>
+        <Text className="text-sm">{label}</Text>
       </Flex>
     </Button>
   );

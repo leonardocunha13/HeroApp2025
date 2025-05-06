@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { HiCursorClick } from "react-icons/hi";
 import { toast } from "./ui/use-toast";
 import { ImSpinner2 } from "react-icons/im";
-import { submitFormAction, SaveFormAfterTestAction } from "../actions/form";
+import { submitFormAction, SaveFormAfterTestAction, updateVisitCount } from "../actions/form";
 
 function FormSubmitComponent({ formUrl, content }: { content: FormElementInstance[]; formUrl: string }) {
   const formValues = useRef<{ [key: string]: string }>({});
@@ -39,6 +39,20 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
       setTagId(storedTagId);
     }
   }, []);
+
+  useEffect(() => {
+    if (!tagId) return;
+    console.log("tagid formsubmitcompontet", tagId);
+    const storageKey = `visited-${formUrl}-${tagId}`;
+    const alreadyVisited = sessionStorage.getItem(storageKey);
+  
+    if (!alreadyVisited) {
+      updateVisitCount(formUrl);
+      sessionStorage.setItem(storageKey, "true");
+    }
+  }, [formUrl, tagId]);
+  
+
   const submitValue = useCallback((key: string, value: string) => {
     formValues.current[key] = value;
   }, []);
@@ -100,6 +114,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
       toast({
         title: "Progress saved",
         description: "Your progress has been saved successfully.",
+        className: "bg-green-500 text-white",
       });
     } catch (error) {
       toast({
@@ -114,7 +129,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
   if (submitted) {
     return (
       <div className="flex justify-center w-full h-full items-center p-8">
-        <div className="max-w-[1000px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded">
+        <div className="flex flex-col gap-4 flex-grow bg-background w-full h-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded">
           <h1 className="text-2xl font-bold">Form submitted</h1>
           <p className="text-muted-foreground">Thank you for submitting the form, you can close this page now.</p>
         </div>
@@ -126,7 +141,7 @@ function FormSubmitComponent({ formUrl, content }: { content: FormElementInstanc
     <div className="flex justify-center w-full h-full items-center p-8">
       <div
         key={renderKey}
-        className="max-w-[1000px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded"
+        className="flex flex-col gap-4 flex-grow bg-background w-full h-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded"
       >
         {content.map((element) => {
           const FormElement = FormElements[element.type].formComponent;

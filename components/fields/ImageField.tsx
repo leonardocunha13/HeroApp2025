@@ -9,9 +9,9 @@ import { Label } from "../ui/label";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef} from "react";
+import { useEffect, useRef } from "react";
 import useDesigner from "../hooks/useDesigner";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import {
   Form,
   FormLabel,
@@ -26,10 +26,12 @@ const type: ElementsType = "ImageField";
 
 const extraAttributes = {
   imageUrl: "",
+  position: "center",
 };
 
 const propertiesSchema = z.object({
   imageUrl: z.string().url("Must be a valid URL").optional(),
+  position: z.enum(["left", "center", "right"]),
 });
 
 export const ImageFieldFormElement: FormElement = {
@@ -60,7 +62,20 @@ function DesignerComponent({
   elementInstance: FormElementInstance;
 }) {
   const element = elementInstance as CustomInstance;
-  const { imageUrl } = element.extraAttributes;
+  const { imageUrl, position = "center" } = element.extraAttributes;
+
+  let alignmentClass = "";
+  switch (position) {
+    case "left":
+      alignmentClass = "ml-0 mr-auto";
+      break;
+    case "right":
+      alignmentClass = "ml-auto mr-0";
+      break;
+    case "center":
+    default:
+      alignmentClass = "mx-auto";
+  }
 
   return (
     <div className="flex flex-col gap-2 w-full items-start">
@@ -69,7 +84,11 @@ function DesignerComponent({
         <img
           src={imageUrl}
           alt="Uploaded"
-          className="rounded-md border shadow max-h-48 w-auto object-contain"
+          className={`block ${alignmentClass} rounded-md border shadow max-h-48 w-auto object-contain`}
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+          }}
         />
       ) : (
         <p className="text-sm text-muted-foreground italic">No image uploaded</p>
@@ -86,23 +105,32 @@ function FormComponent({
 }) {
   const element = elementInstance as CustomInstance;
   const imageUrl = element.extraAttributes.imageUrl;
+  const position = element.extraAttributes.position || "center";
+
+  const justifyClass =
+    position === "left"
+      ? "justify-start"
+      : position === "right"
+        ? "justify-end"
+        : "justify-center";
 
   if (!imageUrl) return <p className="text-muted-foreground">No image selected</p>;
 
   return (
-    <img
-      src={imageUrl}
-      alt="Uploaded"
-      style={{
-        height: element.height ? `${element.height}px` : "auto",
-        width: "auto",
-        maxWidth: "100%", 
-        objectFit: "contain",
-      }}
-    />
+    <div className={`w-full flex ${justifyClass}`}>
+      <img
+        src={imageUrl}
+        alt="Uploaded"
+        style={{
+          height: element.height ? `${element.height}px` : "auto",
+          width: "auto",
+          maxWidth: "100%",
+          objectFit: "contain",
+        }}
+      />
+    </div>
   );
 }
-
 
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 
@@ -120,17 +148,18 @@ function PropertiesComponent({
       imageUrl: element.extraAttributes.imageUrl,
     },
   });
-  
+
   useEffect(() => {
-    form.reset(element.extraAttributes);
+    form.reset(element.extraAttributes as propertiesFormSchemaType);
   }, [element, form]);
 
   function applyChanges(values: propertiesFormSchemaType) {
-    const { imageUrl } = values;
+    const { imageUrl, position } = values;
     updateElement(element.id, {
       ...element,
       extraAttributes: {
         imageUrl: imageUrl || "",
+        position,
       },
     });
   }
@@ -138,33 +167,35 @@ function PropertiesComponent({
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-  
+
     const reader = new FileReader();
-  
+
     reader.onloadend = () => {
       const base64 = reader.result as string;
-      
+
       const img = new Image();
       img.onload = () => {
-        const height = img.naturalHeight;
-        console.log("altura", height);
+        const naturalHeight = img.naturalHeight;
+        const minHeight = 60;
+        const finalHeight = Math.max(naturalHeight, minHeight);
+
         updateElement(element.id, {
           ...element,
           extraAttributes: {
             ...element.extraAttributes,
             imageUrl: base64,
           },
-          height: height,
-          
+          height: finalHeight,
         });
       };
       img.src = base64;
     };
-    
+
+
     reader.readAsDataURL(file);
   }
-  
-  
+
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleUploadClick() {
@@ -178,7 +209,7 @@ function PropertiesComponent({
         className="space-y-3"
       >
         <div className="space-y-1">
-          <FormLabel>Upload from computer</FormLabel>
+          <FormLabel> </FormLabel>
           <Button
             type="button"
             onClick={handleUploadClick}
@@ -196,7 +227,22 @@ function PropertiesComponent({
             className="hidden"
           />
         </div>
-
+        <div className="space-y-1">
+          <FormLabel>Image Position</FormLabel>
+          <Select
+            onValueChange={(value) => form.setValue("position", value as "left" | "center" | "right")}
+            value={form.watch("position")}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select position" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="left">Left</SelectItem>
+              <SelectItem value="center">Center</SelectItem>
+              <SelectItem value="right">Right</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </form>
     </Form>
   );

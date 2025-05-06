@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useTransition } from "react";
+import { useState, useRef, useCallback, useTransition } from "react";
 import { FormElementInstance, FormElements } from "./FormElements";
 import { Button } from "./ui/button";
 import { HiCursorClick } from "react-icons/hi";
@@ -89,6 +89,7 @@ function ResumeTestRenderer({
       toast({
         title: "Progress saved",
         description: "Your progress has been saved successfully.",
+        className: "bg-green-500 text-white",
       });
     } catch (error) {
       toast({
@@ -102,7 +103,7 @@ function ResumeTestRenderer({
   if (submitted) {
     return (
       <div className="flex justify-center w-full h-full items-center p-8">
-        <div className="max-w-[1000px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded">
+        <div className="flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded">
           <h1 className="text-2xl font-bold">Form submitted</h1>
           <p className="text-muted-foreground">Thank you for submitting the form, you can close this page now.</p>
         </div>
@@ -114,7 +115,7 @@ function ResumeTestRenderer({
     <div className="flex justify-center w-full h-full items-center p-8">
       <div
         key={renderKey}
-        className="max-w-[1000px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded"
+        className="flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl shadow-blue-700 rounded"
       >
         {elements.map((element) => {
           const FormElement = FormElements[element.type].formComponent;

@@ -169,13 +169,31 @@ function FormComponent({
   const [editableData, setEditableData] = useState<string[][]>(initialData);
 
   const [editableCells] = useState(() =>
-    [...Array(rows)].map((_, row) =>
-      [...Array(columns)].map((_, col) => !initialData[row]?.[col])
+    Array.from({ length: rows }, (_, row) =>
+      Array.from({ length: columns }, (_, col) => !initialData[row]?.[col])
     )
   );
+
   const handleCellChange = (row: number, col: number, value: string) => {
     const newData = [...editableData];
+    if (!newData[row]) newData[row] = [];
     newData[row][col] = value;
+    setEditableData(newData);
+    if (!readOnly) {
+      designer.updateElement(element.id, {
+        ...element,
+        extraAttributes: {
+          ...element.extraAttributes,
+          data: newData,
+        },
+      });
+    }
+  };
+
+  const handleCheckboxChange = (row: number, col: number, checked: boolean) => {
+    const newData = [...editableData];
+    if (!newData[row]) newData[row] = [];
+    newData[row][col] = checked ? "[checkbox:true]" : "[checkbox:false]";
     setEditableData(newData);
     if (!readOnly) {
       designer.updateElement(element.id, {
@@ -194,27 +212,45 @@ function FormComponent({
       <Table>
         <TableHeader>
           <TableRow>
-            {[...Array(columns)].map((_, col) => (
+            {Array.from({ length: columns }, (_, col) => (
               <TableHead key={col}>{columnHeaders[col] || `Col ${col + 1}`}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {[...Array(rows)].map((_, row) => (
+          {Array.from({ length: rows }, (_, row) => (
             <TableRow key={row}>
-              {[...Array(columns)].map((_, col) => (
-                <TableCell key={col}>
-                  {!readOnly && editableCells[row][col] ? (
+              {Array.from({ length: columns }, (_, col) => {
+                const cellValue = editableData[row]?.[col] || "";
+                const isCheckbox = cellValue.startsWith("[checkbox");
+                const checked = cellValue === "[checkbox:true]";
+
+                return (
+                  <TableCell key={col} className="justify-center items-center">
+                  {isCheckbox ? (
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 flex justify-center items-center"
+                      checked={checked}
+                      onChange={(e) =>
+                        handleCheckboxChange(row, col, e.target.checked)
+                      }
+                      disabled={readOnly}
+                    />
+                  ) : !readOnly && editableCells[row][col] ? (
                     <Input
-                      value={editableData[row]?.[col] || ""}
-                      onChange={(e) => handleCellChange(row, col, e.target.value)}
+                      value={cellValue}
+                      onChange={(e) =>
+                        handleCellChange(row, col, e.target.value)
+                      }
                     />
                   ) : (
-                    <div>{editableData[row]?.[col] || ""}</div>
+                    <div>{cellValue}</div>
                   )}
-
                 </TableCell>
-              ))}
+                
+                );
+              })}
             </TableRow>
           ))}
         </TableBody>
@@ -222,6 +258,8 @@ function FormComponent({
     </div>
   );
 }
+
+
 
 
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
@@ -416,7 +454,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
               <div className="space-y-0.5">
                 <FormLabel>Required</FormLabel>
                 <FormDescription>Marks the table field as required.</FormDescription>
-              </div>
+                </div>
               <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
               <FormMessage />
             </FormItem>
@@ -424,7 +462,10 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         />
         <Divider orientation="horizontal" size="small" color="gray" marginTop="1rem" marginBottom="1rem" />
         <div className="flex justify-between items-center">
+        <div className="space-y-0.5">
           <FormLabel>Table Content</FormLabel>
+          <FormDescription> Use <code>[checkbox]</code> as the cell value to display a checkbox.</FormDescription>
+          </div>
           <Button type="button" onClick={handleImportClick}>
             Import Excel
           </Button>
