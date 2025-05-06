@@ -36,6 +36,7 @@ function PublishFormBtn({ id }: { id: string }) {
         toast({
           title: "Success",
           description: "Your form is now available to the public",
+          className: "bg-green-500 text-white",
         });
         router.refresh();
       } catch (error) {
@@ -55,7 +56,7 @@ function PublishFormBtn({ id }: { id: string }) {
           Publish
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-white dark:bg-neutral-900 text-black dark:text-white opacity-100 shadow-xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>

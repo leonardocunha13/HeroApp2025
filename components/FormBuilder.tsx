@@ -68,7 +68,7 @@ function FormBuilder({ formID, form, projectName, clientName, formName}: { formI
             <div className="flex flex-col items-center justify-center h-full w-full">
                 <div className="max-w-md">
                     <h1 className="text-center text-4xl font-bold text-primary border-b pb-2 mb-10">
-                        🎊🎊 Form Published 🎊🎊
+                        🎊 Form Published 🎊
                     </h1>
                     <h2 className="text-2xl">Share this form</h2>
                     <h3 className="text-xl text-muted-foreground border-b pb-10">

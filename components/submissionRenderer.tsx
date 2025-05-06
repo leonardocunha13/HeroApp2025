@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { FormElementInstance, FormElements } from "./FormElements";
+import { Button } from "./ui/button";
 
 interface Props {
   elements: FormElementInstance[];
@@ -11,10 +12,13 @@ interface Props {
 export default function SubmissionRenderer({ elements, responses }: Props) {
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  const handleRightClick = async (event: React.MouseEvent) => {
-    event.preventDefault();
-
+  const generatePDF = async () => {
     if (!contentRef.current) return;
+
+    const originalClass = contentRef.current.className;
+    contentRef.current.className = originalClass + " max-w-[1000px] mx-auto";
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
 
     const element = contentRef.current;
     const canvas = await html2canvas(element, {
@@ -22,27 +26,20 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
       useCORS: true,
     });
 
-    const imgData = canvas.toDataURL("image/png");
+    contentRef.current.className = originalClass;
 
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    const imgProps = {
-      width: canvas.width,
-      height: canvas.height,
-    };
-
-    const imgHeightMM = (imgProps.height * 0.264583);
-    const imgWidthMM = (imgProps.width * 0.264583);
-
+    const imgHeightMM = canvas.height * 0.264583;
+    const imgWidthMM = canvas.width * 0.264583;
     const ratio = Math.min(pdfWidth / imgWidthMM, 1);
     const adjustedWidth = imgWidthMM * ratio;
     const adjustedHeight = imgHeightMM * ratio;
 
     let position = 0;
 
-    // Add pages until all content fits
     while (position < adjustedHeight) {
       const canvasPage = document.createElement("canvas");
       canvasPage.width = canvas.width;
@@ -74,23 +71,29 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
+      <Button
+        onClick={generatePDF}
+        className="fixed top-4 left-4 z-50 mb-4 px-4 py-2 rounded"
+      >
+        Export as PDF
+      </Button>
+
       <div
         ref={contentRef}
-        className="max-w-[1000px] flex flex-col gap-4 flex-grow bg-background h-full w-full rounded-2xl p-8 overflow-y-auto"
-        onContextMenu={handleRightClick}
+        className="w-full flex flex-col gap-4 flex-grow bg-background h-full rounded-2xl p-8 overflow-y-auto"
       >
         {elements.map((element) => {
           const FormComponent = FormElements[element.type].formComponent;
           const value = responses[element.id];
 
           return (
-            <div key={element.id} className="pointer-events-none opacity-70">
+            <div key={element.id} className="pointer-events-none opacity-100">
               <FormComponent
                 elementInstance={element}
                 defaultValue={value}
                 isInvalid={false}
-                submitValue={() => {}}
+                submitValue={() => { }}
                 readOnly={true}
               />
             </div>

@@ -121,10 +121,10 @@ export async function ProjectLogTable({ id }: { id: string }) {
           <Table className="min-w-full border-collapse">
             <TableHeader>
               <TableRow>
-                <TableHead className="border p-2 uppercase">Equipment Name</TableHead>
-                <TableHead className="border p-2 uppercase">Equipment Tag</TableHead>
-                <TableHead className="border p-2 uppercase text-right">Submitted At</TableHead>
-                <TableHead className="border p-2 uppercase text-center">View</TableHead>
+                <TableHead className="text-center border p-2 uppercase">Equipment Name</TableHead>
+                <TableHead className="text-center border p-2 uppercase">Equipment Tag</TableHead>
+                <TableHead className="text-center border p-2 uppercase">Submitted At</TableHead>
+                <TableHead className="text-center border p-2 uppercase">View</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -139,7 +139,7 @@ export async function ProjectLogTable({ id }: { id: string }) {
                       <TableRow key={i}>
                         <TableCell className="border p-2">{s.equipmentName}</TableCell>
                         <TableCell className="border p-2">{s.tag}</TableCell>
-                        <TableCell className="border p-2 text-right">
+                        <TableCell className="border p-2">
                           {s.submittedAt
                             ? formatDistance(new Date(s.submittedAt), new Date(), {
                               addSuffix: true,
