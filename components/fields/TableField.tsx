@@ -106,7 +106,7 @@ function DesignerComponent({ elementInstance }: { elementInstance: FormElementIn
             {[...Array(columns)].map((_, col) => (
               <TableHead key={col}
                 style={{
-                  maxWidth: "200px",
+                  maxWidth: "auto",
                   minWidth: "50px",
                   width: "auto",
                   whiteSpace: "normal",
@@ -123,7 +123,7 @@ function DesignerComponent({ elementInstance }: { elementInstance: FormElementIn
               {[...Array(columns)].map((_, col) => (
                 <TableCell key={col}
                   style={{
-                    maxWidth: "200px",
+                    maxWidth: "auto",
                     minWidth: "50px",
                     width: "auto",
                     whiteSpace: "normal",
@@ -190,10 +190,10 @@ function FormComponent({
     }
   };
 
-  const handleCheckboxChange = (row: number, col: number, checked: boolean) => {
+  const handleCheckboxChange = (row: number, col: number, state: "checked" | "unchecked" | "neutral") => {
     const newData = [...editableData];
     if (!newData[row]) newData[row] = [];
-    newData[row][col] = checked ? "[checkbox:true]" : "[checkbox:false]";
+    newData[row][col] = state === "checked" ? "[checkbox:true]" : state === "unchecked" ? "[checkbox:false]" : "[checkbox:neutral]";
     setEditableData(newData);
     if (!readOnly) {
       designer.updateElement(element.id, {
@@ -227,28 +227,42 @@ function FormComponent({
 
                 return (
                   <TableCell key={col} className="justify-center items-center">
-                  {isCheckbox ? (
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 flex justify-center items-center"
-                      checked={checked}
-                      onChange={(e) =>
-                        handleCheckboxChange(row, col, e.target.checked)
-                      }
-                      disabled={readOnly}
-                    />
-                  ) : !readOnly && editableCells[row][col] ? (
-                    <Input
-                      value={cellValue}
-                      onChange={(e) =>
-                        handleCellChange(row, col, e.target.value)
-                      }
-                    />
-                  ) : (
-                    <div>{cellValue}</div>
-                  )}
-                </TableCell>
-                
+                    {isCheckbox ? (
+                      <div
+                        onClick={() => {
+                          const nextState =
+                            cellValue === "[checkbox:true]"
+                              ? "unchecked"
+                              : cellValue === "[checkbox:false]"
+                                ? "neutral"
+                                : "checked";
+                          handleCheckboxChange(row, col, nextState as "checked" | "unchecked" | "neutral");
+                        }}
+                        className={`flex justify-center items-center h-6 w-6 border rounded-sm cursor-pointer
+        ${cellValue === "[checkbox:true]"
+                            ? "bg-green-500 text-white"
+                            : cellValue === "[checkbox:false]"
+                              ? "bg-gray-300 text-black"
+                              : "bg-white text-gray-400 border-gray-500"
+                          }`}
+                      >
+                        {cellValue === "[checkbox:true]"
+                          ? "V"
+                          : cellValue === "[checkbox:false]"
+                            ? "X"
+                            : ""}
+                      </div>
+                    ) : !readOnly && editableCells[row][col] ? (
+                      <Input
+                        value={cellValue}
+                        onChange={(e) => handleCellChange(row, col, e.target.value)}
+                      />
+                    ) : (
+                      <div>{cellValue}</div>
+                    )}
+                  </TableCell>
+
+
                 );
               })}
             </TableRow>
@@ -403,6 +417,37 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     };
   }, [form, element, updateElement]);
 
+  function deleteRow(rowIndex: number) {
+    const newData = data.filter((_, i) => i !== rowIndex);
+    form.setValue("rows", newData.length);
+    setData(newData);
+    updateElement(element.id, {
+      ...element,
+      extraAttributes: {
+        ...element.extraAttributes,
+        rows: newData.length,
+        data: newData,
+      },
+    });
+  }
+
+  function deleteColumn(colIndex: number) {
+    const newData = data.map(row => row.filter((_, i) => i !== colIndex));
+    const newHeaders = columnHeaders.filter((_, i) => i !== colIndex);
+    form.setValue("columns", newHeaders.length);
+    setData(newData);
+    setColumnHeaders(newHeaders);
+    updateElement(element.id, {
+      ...element,
+      extraAttributes: {
+        ...element.extraAttributes,
+        columns: newHeaders.length,
+        data: newData,
+        columnHeaders: newHeaders,
+      },
+    });
+  }
+
   return (
     <Form {...form}>
       <form onBlur={form.handleSubmit(applyChanges)}
@@ -454,7 +499,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
               <div className="space-y-0.5">
                 <FormLabel>Required</FormLabel>
                 <FormDescription>Marks the table field as required.</FormDescription>
-                </div>
+              </div>
               <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
               <FormMessage />
             </FormItem>
@@ -462,9 +507,9 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         />
         <Divider orientation="horizontal" size="small" color="gray" marginTop="1rem" marginBottom="1rem" />
         <div className="flex justify-between items-center">
-        <div className="space-y-0.5">
-          <FormLabel>Table Content</FormLabel>
-          <FormDescription> Use <code>[checkbox]</code> as the cell value to display a checkbox.</FormDescription>
+          <div className="space-y-0.5">
+            <FormLabel>Table Content</FormLabel>
+            <FormDescription> Use <code>[checkbox]</code> as the cell value to display a checkbox.</FormDescription>
           </div>
           <Button type="button" onClick={handleImportClick}>
             Import Excel
@@ -481,10 +526,15 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
             <TableRow>
               {[...Array(watchColumns)].map((_, col) => (
                 <TableHead key={col}>
+                  <Button variant="ghost" size="icon" onClick={() => deleteColumn(col)}>
+                    ✕
+                  </Button>
                   <Input
+                    className="w-full"
                     value={columnHeaders[col] || ""}
                     onChange={(e) => handleHeaderChange(col, e.target.value)}
                   />
+
                 </TableHead>
               ))}
             </TableRow>
@@ -500,6 +550,11 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
                     />
                   </TableCell>
                 ))}
+                <TableCell>
+                  <Button variant="ghost" size="icon" onClick={() => deleteRow(row)}>
+                    ✕
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -508,5 +563,3 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
     </Form>
   );
 }
-
-

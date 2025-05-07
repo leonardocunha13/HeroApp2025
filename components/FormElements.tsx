@@ -10,6 +10,7 @@ import { TextFieldFormElement } from "./fields/TextField";
 import { TitleFieldFormElement } from "./fields/TitleField";
 import { TableFieldFormElement } from "./fields/TableField";
 import {ImageFieldFormElement} from "./fields/ImageField";
+import {PageBreakFieldFormElement} from "./fields/PageBreakField";
 
 export type ElementsType =
   | "TextField"
@@ -24,6 +25,7 @@ export type ElementsType =
   | "CheckboxField"
   | "TableField"
   | "ImageField"
+  | "PageBreakField"
 
 
 export type SubmitFunction = (key: string, value: string) => void;
@@ -80,5 +82,6 @@ export const FormElements: FormElementsType = {
   CheckboxField: CheckboxFieldFormElement,
   TableField: TableFieldFormElement,
   ImageField: ImageFieldFormElement,
+  PageBreakField: PageBreakFieldFormElement,
 };
 
