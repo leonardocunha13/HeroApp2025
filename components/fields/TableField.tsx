@@ -153,15 +153,17 @@ function FormComponent({
   elementInstance,
   defaultValue,
   readOnly,
+  isInvalid,
+  submitValue,
+  updateElement,
 }: {
   elementInstance: FormElementInstance;
   defaultValue?: any;
   isInvalid?: boolean;
   submitValue?: SubmitFunction;
   readOnly?: boolean;
+  updateElement?: (id: string, element: FormElementInstance) => void;
 }) {
-  const designer = useDesigner();
-
   const element = elementInstance as CustomInstance;
   const { rows, columns, label, columnHeaders = [] } = element.extraAttributes;
   const initialData: string[][] = defaultValue || element.extraAttributes.data || [];
@@ -174,13 +176,10 @@ function FormComponent({
     )
   );
 
-  const handleCellChange = (row: number, col: number, value: string) => {
-    const newData = [...editableData];
-    if (!newData[row]) newData[row] = [];
-    newData[row][col] = value;
+  const updateData = (newData: string[][]) => {
     setEditableData(newData);
-    if (!readOnly) {
-      designer.updateElement(element.id, {
+    if (!readOnly && updateElement) {
+      updateElement(element.id, {
         ...element,
         extraAttributes: {
           ...element.extraAttributes,
@@ -190,20 +189,21 @@ function FormComponent({
     }
   };
 
+  const handleCellChange = (row: number, col: number, value: string) => {
+    const newData = [...editableData];
+    if (!newData[row]) newData[row] = [];
+    newData[row][col] = value;
+    updateData(newData);
+  };
+
   const handleCheckboxChange = (row: number, col: number, state: "checked" | "unchecked" | "neutral") => {
     const newData = [...editableData];
     if (!newData[row]) newData[row] = [];
-    newData[row][col] = state === "checked" ? "[checkbox:true]" : state === "unchecked" ? "[checkbox:false]" : "[checkbox:neutral]";
-    setEditableData(newData);
-    if (!readOnly) {
-      designer.updateElement(element.id, {
-        ...element,
-        extraAttributes: {
-          ...element.extraAttributes,
-          data: newData,
-        },
-      });
-    }
+    newData[row][col] =
+      state === "checked" ? "[checkbox:true]" :
+      state === "unchecked" ? "[checkbox:false]" :
+      "[checkbox:neutral]";
+    updateData(newData);
   };
 
   return (
@@ -223,25 +223,27 @@ function FormComponent({
               {Array.from({ length: columns }, (_, col) => {
                 const cellValue = editableData[row]?.[col] || "";
                 const isCheckbox = cellValue.startsWith("[checkbox");
-                const checked = cellValue === "[checkbox:true]";
 
                 return (
                   <TableCell key={col} className="justify-center items-center">
                     {isCheckbox ? (
                       <div
                         onClick={() => {
+                          if (readOnly) return;
                           const nextState =
                             cellValue === "[checkbox:true]"
                               ? "unchecked"
                               : cellValue === "[checkbox:false]"
-                                ? "neutral"
-                                : "checked";
-                          handleCheckboxChange(row, col, nextState as "checked" | "unchecked" | "neutral");
+                              ? "neutral"
+                              : "checked";
+                          handleCheckboxChange(row, col, nextState as any);
                         }}
-                        className={`flex justify-center items-center h-6 w-6 border rounded-sm cursor-pointer
-        ${cellValue === "[checkbox:true]"
-                            ? "bg-green-500 text-white"
-                            : cellValue === "[checkbox:false]"
+                        className={`flex justify-center items-center h-6 w-6 border rounded-sm
+                          ${readOnly ? "cursor-default" : "cursor-pointer"}
+                          ${
+                            cellValue === "[checkbox:true]"
+                              ? "bg-green-500 text-white"
+                              : cellValue === "[checkbox:false]"
                               ? "bg-gray-300 text-black"
                               : "bg-white text-gray-400 border-gray-500"
                           }`}
@@ -249,8 +251,8 @@ function FormComponent({
                         {cellValue === "[checkbox:true]"
                           ? "V"
                           : cellValue === "[checkbox:false]"
-                            ? "X"
-                            : ""}
+                          ? "X"
+                          : ""}
                       </div>
                     ) : !readOnly && editableCells[row][col] ? (
                       <Input
@@ -261,8 +263,6 @@ function FormComponent({
                       <div>{cellValue}</div>
                     )}
                   </TableCell>
-
-
                 );
               })}
             </TableRow>
@@ -272,6 +272,7 @@ function FormComponent({
     </div>
   );
 }
+
 
 
 
