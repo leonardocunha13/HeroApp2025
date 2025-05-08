@@ -114,7 +114,6 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Export Button */}
       <Button
         onClick={generatePDF}
         className="fixed top-4 left-4 z-50 mb-4 px-4 py-2 rounded"
@@ -122,11 +121,11 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
         Export as PDF
       </Button>
 
-      {/* Form content */}
+  
       <div
         ref={contentRef}
         className="w-full flex flex-col gap-4 flex-grow bg-background h-full rounded-2xl p-8 overflow-y-auto"
-        style={{ visibility: "hidden" }} // Make sure to hide until fully rendered
+        style={{ visibility: "hidden" }} 
       >
         {(() => {
           const pageGroups: FormElementInstance[][] = [];

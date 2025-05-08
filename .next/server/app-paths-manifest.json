@@ -1,8 +1,8 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/(dashboard)/page": "app/(dashboard)/page.js",
-  "/submit/[formUrl]/page": "app/submit/[formUrl]/page.js",
   "/view-submitted/[submissionID]/page": "app/view-submitted/[submissionID]/page.js",
+  "/submit/[formUrl]/page": "app/submit/[formUrl]/page.js",
+  "/(dashboard)/page": "app/(dashboard)/page.js",
   "/(dashboard)/builder/[id]/page": "app/(dashboard)/builder/[id]/page.js",
   "/(dashboard)/forms/[id]/page": "app/(dashboard)/forms/[id]/page.js"
 }
