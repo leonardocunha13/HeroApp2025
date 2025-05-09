@@ -18,8 +18,8 @@ import {
 } from "../ui/form";
 import { MdImage } from "react-icons/md";
 
-import { Button } from "../ui/button"; // certifique-se de ter isso importado
-import { Upload } from "lucide-react"; // ícone opcional, pode ser trocado
+import { Button } from "../ui/button";
+import { Upload } from "lucide-react";
 
 
 const type: ElementsType = "ImageField";
@@ -27,12 +27,16 @@ const type: ElementsType = "ImageField";
 const extraAttributes = {
   imageUrl: "",
   position: "center",
+  repeatOnPageBreak: false,
 };
+
 
 const propertiesSchema = z.object({
   imageUrl: z.string().url("Must be a valid URL").optional(),
   position: z.enum(["left", "center", "right"]),
+  repeatOnPageBreak: z.boolean(),
 });
+
 
 export const ImageFieldFormElement: FormElement = {
   type,
@@ -146,20 +150,26 @@ function PropertiesComponent({
     mode: "onBlur",
     defaultValues: {
       imageUrl: element.extraAttributes.imageUrl,
+      position: ["center", "left", "right"].includes(element.extraAttributes.position)
+        ? (element.extraAttributes.position as "center" | "left" | "right")
+        : "center",
+      repeatOnPageBreak: element.extraAttributes.repeatOnPageBreak,
     },
   });
+
 
   useEffect(() => {
     form.reset(element.extraAttributes as propertiesFormSchemaType);
   }, [element, form]);
 
   function applyChanges(values: propertiesFormSchemaType) {
-    const { imageUrl, position } = values;
+    const { imageUrl, position, repeatOnPageBreak } = values;
     updateElement(element.id, {
       ...element,
       extraAttributes: {
         imageUrl: imageUrl || "",
         position,
+        repeatOnPageBreak,
       },
     });
   }
@@ -243,6 +253,22 @@ function PropertiesComponent({
             </SelectContent>
           </Select>
         </div>
+        <div className="space-y-1">
+          <Label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={form.watch("repeatOnPageBreak")}
+              onChange={(e) =>
+                form.setValue("repeatOnPageBreak", e.target.checked, {
+                  shouldDirty: true,
+                })
+              }
+              className="mr-2"
+            />
+            <span>Repeat on page break</span>
+          </Label>
+        </div>
+
       </form>
     </Form>
   );

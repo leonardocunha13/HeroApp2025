@@ -274,9 +274,6 @@ function FormComponent({
 }
 
 
-
-
-
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 
 function PropertiesComponent({ elementInstance }: { elementInstance: FormElementInstance }) {

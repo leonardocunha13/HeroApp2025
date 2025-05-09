@@ -751,7 +751,6 @@ console.log('Form Info:', formsInfo);*/
 
 export async function GetProjectsFromClientName(ClientName: string) {
   try {
-    // Fetch Client based on ClientName
     const { errors, data: clientData } = await client.models.Client.list({
       filter: { ClientName: { eq: ClientName } },
     });
@@ -761,31 +760,36 @@ export async function GetProjectsFromClientName(ClientName: string) {
       throw new Error("Client not found.");
     }
 
-    // Assuming each client has an array of projects
-    const Clients = clientData[0]; // Assuming the first client in the list is the one we're interested in
-    const { data: projects, errors: projectErrors } =
-      await client.models.Projectt.list({
-        filter: { ClientID: { eq: Clients.id } },
-      });
+    const clientInfo = clientData[0];
+
+    const { data: projects, errors: projectErrors } = await client.models.Projectt.list({
+      filter: { ClientID: { eq: clientInfo.id } },
+    });
 
     if (projectErrors) {
       console.error("Error fetching projects:", projectErrors);
     }
-    const projectNames = projects.map((project) => project.projectName);
-    // Return client and associated projects
-    return { projectNames };
+
+    const projectList = projects.map(
+      (project) => `${project.projectName} (${project.projectID})`
+    );
+
+    return { projectList };
   } catch (error) {
     console.error("Error:", error);
     throw error;
   }
 }
 
+
 export async function CreateForm(
   name: string,
   description: string,
-  projectName: string,
+  fullProjectName: string, 
 ) {
-  // Fetch the project details using projectName
+
+  const projectName = fullProjectName.split(" (")[0];
+
   const { errors: projectErrors, data: projectsData } =
     await client.models.Projectt.list({
       filter: { projectName: { eq: projectName } },
@@ -800,10 +804,10 @@ export async function CreateForm(
     throw new Error(`Project with name "${projectName}" not found.`);
   }
 
-  // Get the first matching project's ID
+  // Pega o projectID (campo string definido por você)
   const projID = projectsData[0].projectID;
 
-  // Now create the form using projID
+  // Cria o form
   const { errors: formerrors, data: form } = await client.models.Form.create({
     projID: projID,
     name: name,

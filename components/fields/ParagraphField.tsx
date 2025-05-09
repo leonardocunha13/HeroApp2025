@@ -5,9 +5,7 @@ import {
   FormElement,
   FormElementInstance,
 } from "../FormElements";
-
-import { z } from "zod";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BsTextParagraph } from "react-icons/bs";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
@@ -15,7 +13,6 @@ import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Underline from "@tiptap/extension-underline";
 import { Button } from "../ui/button";
-import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { Input } from "../ui/input";
 
@@ -51,30 +48,34 @@ export const ParagprahFieldFormElement: FormElement = {
 export function DesignerComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
   const element = elementInstance as CustomInstance;
   const contentRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number>(0);
 
   useEffect(() => {
     if (!contentRef.current) return;
 
     const observer = new ResizeObserver((entries) => {
       for (let entry of entries) {
-        const height = entry.contentRect.height;
-        elementInstance.height = Math.round(height); // arredondar se quiser
+        const contentHeight = Math.round(entry.contentRect.height + 50);
+        if (contentHeight !== elementInstance.height) {
+          elementInstance.height = contentHeight;
+          setHeight(contentHeight);
+        }
       }
     });
 
     observer.observe(contentRef.current);
-
     return () => observer.disconnect();
   }, [elementInstance]);
 
   return (
-    <div
-      ref={contentRef}
-      className="p-2 border rounded-md w-full text-sm break-words whitespace-pre-wrap min-h-[60px]"
-      dangerouslySetInnerHTML={{ __html: element.extraAttributes.text }}
-    />
+    <div style={{ height: `${height}px` }}>
+      <div
+        ref={contentRef}
+        className="p-2 border rounded-md w-full text-sm break-words whitespace-pre-wrap min-h-[60px]"
+        dangerouslySetInnerHTML={{ __html: element.extraAttributes.text }}
+      />
+    </div>
   );
-  
 }
 export function FormComponent({ elementInstance }: { elementInstance: FormElementInstance }) {
   const element = elementInstance as CustomInstance;
@@ -105,6 +106,7 @@ export function PropertiesComponent({ elementInstance }: { elementInstance: Form
       TextStyle, 
       Color,
       TextAlign.configure({ types: ["paragraph"] }),
+      Underline,
     ],
     content: element.extraAttributes.text,
     onUpdate({ editor }) {
@@ -112,6 +114,7 @@ export function PropertiesComponent({ elementInstance }: { elementInstance: Form
       element.extraAttributes.text = html;
     },
   });
+  
 
   useEffect(() => {
     if (editor && element.extraAttributes.text !== editor.getHTML()) {

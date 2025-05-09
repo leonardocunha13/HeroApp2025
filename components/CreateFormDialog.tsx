@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardHeader } from "../components/ui/card";
 import {
   Button,
   View,
@@ -53,9 +53,9 @@ const CreateFormDialog: React.FC<CreateFormDialogProps> = ({
   useEffect(() => {
     const fetchProjects = async () => {
       if (selectedClient) {
-        const { projectNames } =
+        const { projectList } =
           await GetProjectsFromClientName(selectedClient);
-        setProjects(projectNames);
+        setProjects(projectList);
       } else {
         setProjects([]);
       }

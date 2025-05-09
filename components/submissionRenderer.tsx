@@ -31,19 +31,27 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
     const pageGroups: FormElementInstance[][] = [];
     let currentGroup: FormElementInstance[] = [];
 
-    elements.forEach((el) => {
-      if (el.type === "PageBreakField") {
-        if (currentGroup.length > 0) pageGroups.push(currentGroup);
-        currentGroup = [];
-      } else {
-        currentGroup.push(el);
-      }
-    });
-    if (currentGroup.length > 0) pageGroups.push(currentGroup);
+let repeatables: FormElementInstance[] = [];
+
+elements.forEach((el) => {
+  if (el.type === "PageBreakField") {
+    if (currentGroup.length > 0) {
+      pageGroups.push([...repeatables, ...currentGroup]);
+    }
+    currentGroup = [];
+  } else {
+    if (el.extraAttributes?.repeatAfterBreak) {
+      repeatables.push(el); // store for repetition
+    }
+    currentGroup.push(el);
+  }
+});
+if (currentGroup.length > 0) {
+  pageGroups.push([...repeatables, ...currentGroup]);
+}
 
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
 
     // We now render pages and handle page breaks inside the loop
     for (let i = 0; i < pageGroups.length; i++) {
