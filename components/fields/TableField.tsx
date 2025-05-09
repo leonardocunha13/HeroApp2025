@@ -153,8 +153,6 @@ function FormComponent({
   elementInstance,
   defaultValue,
   readOnly,
-  isInvalid,
-  submitValue,
   updateElement,
 }: {
   elementInstance: FormElementInstance;
@@ -201,8 +199,8 @@ function FormComponent({
     if (!newData[row]) newData[row] = [];
     newData[row][col] =
       state === "checked" ? "[checkbox:true]" :
-      state === "unchecked" ? "[checkbox:false]" :
-      "[checkbox:neutral]";
+        state === "unchecked" ? "[checkbox:false]" :
+          "[checkbox:neutral]";
     updateData(newData);
   };
 
@@ -234,26 +232,34 @@ function FormComponent({
                             cellValue === "[checkbox:true]"
                               ? "unchecked"
                               : cellValue === "[checkbox:false]"
-                              ? "neutral"
-                              : "checked";
+                                ? "neutral"
+                                : "checked";
                           handleCheckboxChange(row, col, nextState as any);
                         }}
-                        className={`flex justify-center items-center h-6 w-6 border rounded-sm
-                          ${readOnly ? "cursor-default" : "cursor-pointer"}
-                          ${
-                            cellValue === "[checkbox:true]"
-                              ? "bg-green-500 text-white"
-                              : cellValue === "[checkbox:false]"
+                        className={`flex justify-center items-center h-7 w-7 border rounded-sm
+                                text-sm leading-none select-none
+                                ${readOnly ? "cursor-default" : "cursor-pointer"}
+                                ${cellValue === "[checkbox:true]"
+                            ? "bg-green-500 text-white"
+                            : cellValue === "[checkbox:false]"
                               ? "bg-gray-300 text-black"
                               : "bg-white text-gray-400 border-gray-500"
                           }`}
+                        style={{
+                          fontFamily: 'Arial, sans-serif',
+                          lineHeight: "1",
+                          fontSize: "1rem",
+                          padding: "0",
+                          textAlign: 'center',
+                        }}
                       >
                         {cellValue === "[checkbox:true]"
-                          ? "V"
+                          ? "✔"
                           : cellValue === "[checkbox:false]"
-                          ? "X"
-                          : ""}
+                            ? "✖"
+                            : ""}
                       </div>
+
                     ) : !readOnly && editableCells[row][col] ? (
                       <Input
                         value={cellValue}

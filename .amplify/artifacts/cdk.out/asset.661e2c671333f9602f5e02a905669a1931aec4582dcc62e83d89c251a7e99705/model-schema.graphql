@@ -1,0 +1,22 @@
+type Form @model @auth(rules: [{allow: public, provider: apiKey}])
+{
+  userId: String
+  createdAt: AWSDateTime
+  equipment: String
+  published: Boolean @default(value: "false")
+  name: String
+  description: String @default(value: "")
+  content: String @default(value: "[]")
+  visits: Int @default(value: "0")
+  submissions: Int @default(value: "0")
+  shareURL: String
+  FormSubmissions: [FormSubmissions] @hasMany(references: ["formId"])
+}
+
+type FormSubmissions @model @auth(rules: [{allow: public, provider: apiKey}])
+{
+  formId: String
+  createdAt: AWSDateTime
+  content: String
+  form: Form @belongsTo(references: ["formId"])
+}

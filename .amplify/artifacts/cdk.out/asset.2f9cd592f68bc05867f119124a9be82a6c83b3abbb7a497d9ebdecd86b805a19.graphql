@@ -1,0 +1,622 @@
+type Form @aws_iam @aws_api_key {
+  userId: String
+  createdAt: AWSDateTime
+  published: Boolean
+  name: String
+  description: String
+  content: String
+  visits: Int
+  submissions: Int
+  shareURL: String
+  FormSubmissions(filter: ModelFormSubmissionsFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelFormSubmissionsConnection
+  projID: ID
+  projects: Projectt
+  equipmentTAGs(filter: ModelFormTagFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelFormTagConnection
+  id: ID!
+  updatedAt: AWSDateTime!
+}
+
+type Client @aws_iam @aws_api_key {
+  ClientName: String!
+  projects(filter: ModelProjecttFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelProjecttConnection
+  id: ID!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Projectt @aws_iam @aws_api_key {
+  projectID: String!
+  projectName: String!
+  ClientID: ID
+  client: Client
+  forms(filter: ModelFormFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelFormConnection
+  id: ID!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EquipmentTag1 @aws_iam @aws_api_key {
+  Tag: String!
+  EquipmentName: String!
+  forms(filter: ModelFormTagFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelFormTagConnection
+  id: ID!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type FormTag @aws_iam @aws_api_key {
+  formID: ID
+  tagID: ID
+  equipmentTag: EquipmentTag1
+  form: Form
+  id: ID!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type FormSubmissions @aws_iam @aws_api_key {
+  formId: String
+  createdAt: AWSDateTime
+  content: String
+  form: Form
+  id: ID!
+  updatedAt: AWSDateTime!
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelSubscriptionStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  in: [String]
+  notIn: [String]
+}
+
+input ModelSubscriptionIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  in: [Int]
+  notIn: [Int]
+}
+
+input ModelSubscriptionFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  in: [Float]
+  notIn: [Float]
+}
+
+input ModelSubscriptionBooleanInput {
+  ne: Boolean
+  eq: Boolean
+}
+
+input ModelSubscriptionIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  in: [ID]
+  notIn: [ID]
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelFormConnection @aws_api_key @aws_iam {
+  items: [Form]!
+  nextToken: String
+}
+
+input ModelFormFilterInput {
+  userId: ModelStringInput
+  createdAt: ModelStringInput
+  published: ModelBooleanInput
+  name: ModelStringInput
+  description: ModelStringInput
+  content: ModelStringInput
+  visits: ModelIntInput
+  submissions: ModelIntInput
+  shareURL: ModelStringInput
+  projID: ModelIDInput
+  id: ModelIDInput
+  updatedAt: ModelStringInput
+  and: [ModelFormFilterInput]
+  or: [ModelFormFilterInput]
+  not: ModelFormFilterInput
+}
+
+type Query {
+  getForm(id: ID!): Form @aws_api_key @aws_iam
+  listForms(filter: ModelFormFilterInput, limit: Int, nextToken: String): ModelFormConnection @aws_api_key @aws_iam
+  getClient(id: ID!): Client @aws_api_key @aws_iam
+  listClients(filter: ModelClientFilterInput, limit: Int, nextToken: String): ModelClientConnection @aws_api_key @aws_iam
+  getProjectt(id: ID!): Projectt @aws_api_key @aws_iam
+  listProjectts(filter: ModelProjecttFilterInput, limit: Int, nextToken: String): ModelProjecttConnection @aws_api_key @aws_iam
+  getEquipmentTag1(id: ID!): EquipmentTag1 @aws_api_key @aws_iam
+  listEquipmentTag1s(filter: ModelEquipmentTag1FilterInput, limit: Int, nextToken: String): ModelEquipmentTag1Connection @aws_api_key @aws_iam
+  getFormTag(id: ID!): FormTag @aws_api_key @aws_iam
+  listFormTags(filter: ModelFormTagFilterInput, limit: Int, nextToken: String): ModelFormTagConnection @aws_api_key @aws_iam
+  getFormSubmissions(id: ID!): FormSubmissions @aws_api_key @aws_iam
+  listFormSubmissions(filter: ModelFormSubmissionsFilterInput, limit: Int, nextToken: String): ModelFormSubmissionsConnection @aws_api_key @aws_iam
+}
+
+input ModelFormConditionInput {
+  userId: ModelStringInput
+  createdAt: ModelStringInput
+  published: ModelBooleanInput
+  name: ModelStringInput
+  description: ModelStringInput
+  content: ModelStringInput
+  visits: ModelIntInput
+  submissions: ModelIntInput
+  shareURL: ModelStringInput
+  projID: ModelIDInput
+  and: [ModelFormConditionInput]
+  or: [ModelFormConditionInput]
+  not: ModelFormConditionInput
+  updatedAt: ModelStringInput
+}
+
+input CreateFormInput {
+  userId: String
+  createdAt: AWSDateTime
+  published: Boolean
+  name: String
+  description: String
+  content: String
+  visits: Int
+  submissions: Int
+  shareURL: String
+  projID: ID
+  id: ID
+}
+
+input UpdateFormInput {
+  userId: String
+  createdAt: AWSDateTime
+  published: Boolean
+  name: String
+  description: String
+  content: String
+  visits: Int
+  submissions: Int
+  shareURL: String
+  projID: ID
+  id: ID!
+}
+
+input DeleteFormInput {
+  id: ID!
+}
+
+type Mutation {
+  createForm(input: CreateFormInput!, condition: ModelFormConditionInput): Form @aws_api_key @aws_iam
+  updateForm(input: UpdateFormInput!, condition: ModelFormConditionInput): Form @aws_api_key @aws_iam
+  deleteForm(input: DeleteFormInput!, condition: ModelFormConditionInput): Form @aws_api_key @aws_iam
+  createClient(input: CreateClientInput!, condition: ModelClientConditionInput): Client @aws_api_key @aws_iam
+  updateClient(input: UpdateClientInput!, condition: ModelClientConditionInput): Client @aws_api_key @aws_iam
+  deleteClient(input: DeleteClientInput!, condition: ModelClientConditionInput): Client @aws_api_key @aws_iam
+  createProjectt(input: CreateProjecttInput!, condition: ModelProjecttConditionInput): Projectt @aws_api_key @aws_iam
+  updateProjectt(input: UpdateProjecttInput!, condition: ModelProjecttConditionInput): Projectt @aws_api_key @aws_iam
+  deleteProjectt(input: DeleteProjecttInput!, condition: ModelProjecttConditionInput): Projectt @aws_api_key @aws_iam
+  createEquipmentTag1(input: CreateEquipmentTag1Input!, condition: ModelEquipmentTag1ConditionInput): EquipmentTag1 @aws_api_key @aws_iam
+  updateEquipmentTag1(input: UpdateEquipmentTag1Input!, condition: ModelEquipmentTag1ConditionInput): EquipmentTag1 @aws_api_key @aws_iam
+  deleteEquipmentTag1(input: DeleteEquipmentTag1Input!, condition: ModelEquipmentTag1ConditionInput): EquipmentTag1 @aws_api_key @aws_iam
+  createFormTag(input: CreateFormTagInput!, condition: ModelFormTagConditionInput): FormTag @aws_api_key @aws_iam
+  updateFormTag(input: UpdateFormTagInput!, condition: ModelFormTagConditionInput): FormTag @aws_api_key @aws_iam
+  deleteFormTag(input: DeleteFormTagInput!, condition: ModelFormTagConditionInput): FormTag @aws_api_key @aws_iam
+  createFormSubmissions(input: CreateFormSubmissionsInput!, condition: ModelFormSubmissionsConditionInput): FormSubmissions @aws_api_key @aws_iam
+  updateFormSubmissions(input: UpdateFormSubmissionsInput!, condition: ModelFormSubmissionsConditionInput): FormSubmissions @aws_api_key @aws_iam
+  deleteFormSubmissions(input: DeleteFormSubmissionsInput!, condition: ModelFormSubmissionsConditionInput): FormSubmissions @aws_api_key @aws_iam
+}
+
+input ModelSubscriptionFormFilterInput {
+  userId: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  published: ModelSubscriptionBooleanInput
+  name: ModelSubscriptionStringInput
+  description: ModelSubscriptionStringInput
+  content: ModelSubscriptionStringInput
+  visits: ModelSubscriptionIntInput
+  submissions: ModelSubscriptionIntInput
+  shareURL: ModelSubscriptionStringInput
+  projID: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionFormFilterInput]
+  or: [ModelSubscriptionFormFilterInput]
+}
+
+type Subscription {
+  onCreateForm(filter: ModelSubscriptionFormFilterInput): Form @aws_subscribe(mutations: ["createForm"]) @aws_api_key @aws_iam
+  onUpdateForm(filter: ModelSubscriptionFormFilterInput): Form @aws_subscribe(mutations: ["updateForm"]) @aws_api_key @aws_iam
+  onDeleteForm(filter: ModelSubscriptionFormFilterInput): Form @aws_subscribe(mutations: ["deleteForm"]) @aws_api_key @aws_iam
+  onCreateClient(filter: ModelSubscriptionClientFilterInput): Client @aws_subscribe(mutations: ["createClient"]) @aws_api_key @aws_iam
+  onUpdateClient(filter: ModelSubscriptionClientFilterInput): Client @aws_subscribe(mutations: ["updateClient"]) @aws_api_key @aws_iam
+  onDeleteClient(filter: ModelSubscriptionClientFilterInput): Client @aws_subscribe(mutations: ["deleteClient"]) @aws_api_key @aws_iam
+  onCreateProjectt(filter: ModelSubscriptionProjecttFilterInput): Projectt @aws_subscribe(mutations: ["createProjectt"]) @aws_api_key @aws_iam
+  onUpdateProjectt(filter: ModelSubscriptionProjecttFilterInput): Projectt @aws_subscribe(mutations: ["updateProjectt"]) @aws_api_key @aws_iam
+  onDeleteProjectt(filter: ModelSubscriptionProjecttFilterInput): Projectt @aws_subscribe(mutations: ["deleteProjectt"]) @aws_api_key @aws_iam
+  onCreateEquipmentTag1(filter: ModelSubscriptionEquipmentTag1FilterInput): EquipmentTag1 @aws_subscribe(mutations: ["createEquipmentTag1"]) @aws_api_key @aws_iam
+  onUpdateEquipmentTag1(filter: ModelSubscriptionEquipmentTag1FilterInput): EquipmentTag1 @aws_subscribe(mutations: ["updateEquipmentTag1"]) @aws_api_key @aws_iam
+  onDeleteEquipmentTag1(filter: ModelSubscriptionEquipmentTag1FilterInput): EquipmentTag1 @aws_subscribe(mutations: ["deleteEquipmentTag1"]) @aws_api_key @aws_iam
+  onCreateFormTag(filter: ModelSubscriptionFormTagFilterInput): FormTag @aws_subscribe(mutations: ["createFormTag"]) @aws_api_key @aws_iam
+  onUpdateFormTag(filter: ModelSubscriptionFormTagFilterInput): FormTag @aws_subscribe(mutations: ["updateFormTag"]) @aws_api_key @aws_iam
+  onDeleteFormTag(filter: ModelSubscriptionFormTagFilterInput): FormTag @aws_subscribe(mutations: ["deleteFormTag"]) @aws_api_key @aws_iam
+  onCreateFormSubmissions(filter: ModelSubscriptionFormSubmissionsFilterInput): FormSubmissions @aws_subscribe(mutations: ["createFormSubmissions"]) @aws_api_key @aws_iam
+  onUpdateFormSubmissions(filter: ModelSubscriptionFormSubmissionsFilterInput): FormSubmissions @aws_subscribe(mutations: ["updateFormSubmissions"]) @aws_api_key @aws_iam
+  onDeleteFormSubmissions(filter: ModelSubscriptionFormSubmissionsFilterInput): FormSubmissions @aws_subscribe(mutations: ["deleteFormSubmissions"]) @aws_api_key @aws_iam
+}
+
+type ModelClientConnection @aws_api_key @aws_iam {
+  items: [Client]!
+  nextToken: String
+}
+
+input ModelClientFilterInput {
+  ClientName: ModelStringInput
+  id: ModelIDInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelClientFilterInput]
+  or: [ModelClientFilterInput]
+  not: ModelClientFilterInput
+}
+
+input ModelClientConditionInput {
+  ClientName: ModelStringInput
+  and: [ModelClientConditionInput]
+  or: [ModelClientConditionInput]
+  not: ModelClientConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateClientInput {
+  ClientName: String!
+  id: ID
+}
+
+input UpdateClientInput {
+  ClientName: String
+  id: ID!
+}
+
+input DeleteClientInput {
+  id: ID!
+}
+
+input ModelSubscriptionClientFilterInput {
+  ClientName: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionClientFilterInput]
+  or: [ModelSubscriptionClientFilterInput]
+}
+
+type ModelProjecttConnection @aws_iam @aws_api_key {
+  items: [Projectt]!
+  nextToken: String
+}
+
+input ModelProjecttFilterInput {
+  projectID: ModelStringInput
+  projectName: ModelStringInput
+  ClientID: ModelIDInput
+  id: ModelIDInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelProjecttFilterInput]
+  or: [ModelProjecttFilterInput]
+  not: ModelProjecttFilterInput
+}
+
+input ModelProjecttConditionInput {
+  projectID: ModelStringInput
+  projectName: ModelStringInput
+  ClientID: ModelIDInput
+  and: [ModelProjecttConditionInput]
+  or: [ModelProjecttConditionInput]
+  not: ModelProjecttConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateProjecttInput {
+  projectID: String!
+  projectName: String!
+  ClientID: ID
+  id: ID
+}
+
+input UpdateProjecttInput {
+  projectID: String
+  projectName: String
+  ClientID: ID
+  id: ID!
+}
+
+input DeleteProjecttInput {
+  id: ID!
+}
+
+input ModelSubscriptionProjecttFilterInput {
+  projectID: ModelSubscriptionStringInput
+  projectName: ModelSubscriptionStringInput
+  ClientID: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionProjecttFilterInput]
+  or: [ModelSubscriptionProjecttFilterInput]
+}
+
+type ModelEquipmentTag1Connection @aws_api_key @aws_iam {
+  items: [EquipmentTag1]!
+  nextToken: String
+}
+
+input ModelEquipmentTag1FilterInput {
+  Tag: ModelStringInput
+  EquipmentName: ModelStringInput
+  id: ModelIDInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEquipmentTag1FilterInput]
+  or: [ModelEquipmentTag1FilterInput]
+  not: ModelEquipmentTag1FilterInput
+}
+
+input ModelEquipmentTag1ConditionInput {
+  Tag: ModelStringInput
+  EquipmentName: ModelStringInput
+  and: [ModelEquipmentTag1ConditionInput]
+  or: [ModelEquipmentTag1ConditionInput]
+  not: ModelEquipmentTag1ConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEquipmentTag1Input {
+  Tag: String!
+  EquipmentName: String!
+  id: ID
+}
+
+input UpdateEquipmentTag1Input {
+  Tag: String
+  EquipmentName: String
+  id: ID!
+}
+
+input DeleteEquipmentTag1Input {
+  id: ID!
+}
+
+input ModelSubscriptionEquipmentTag1FilterInput {
+  Tag: ModelSubscriptionStringInput
+  EquipmentName: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEquipmentTag1FilterInput]
+  or: [ModelSubscriptionEquipmentTag1FilterInput]
+}
+
+type ModelFormTagConnection @aws_iam @aws_api_key {
+  items: [FormTag]!
+  nextToken: String
+}
+
+input ModelFormTagFilterInput {
+  formID: ModelIDInput
+  tagID: ModelIDInput
+  id: ModelIDInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelFormTagFilterInput]
+  or: [ModelFormTagFilterInput]
+  not: ModelFormTagFilterInput
+}
+
+input ModelFormTagConditionInput {
+  formID: ModelIDInput
+  tagID: ModelIDInput
+  and: [ModelFormTagConditionInput]
+  or: [ModelFormTagConditionInput]
+  not: ModelFormTagConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateFormTagInput {
+  formID: ID
+  tagID: ID
+  id: ID
+}
+
+input UpdateFormTagInput {
+  formID: ID
+  tagID: ID
+  id: ID!
+}
+
+input DeleteFormTagInput {
+  id: ID!
+}
+
+input ModelSubscriptionFormTagFilterInput {
+  formID: ModelSubscriptionIDInput
+  tagID: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionFormTagFilterInput]
+  or: [ModelSubscriptionFormTagFilterInput]
+}
+
+type ModelFormSubmissionsConnection @aws_iam @aws_api_key {
+  items: [FormSubmissions]!
+  nextToken: String
+}
+
+input ModelFormSubmissionsFilterInput {
+  formId: ModelStringInput
+  createdAt: ModelStringInput
+  content: ModelStringInput
+  id: ModelIDInput
+  updatedAt: ModelStringInput
+  and: [ModelFormSubmissionsFilterInput]
+  or: [ModelFormSubmissionsFilterInput]
+  not: ModelFormSubmissionsFilterInput
+}
+
+input ModelFormSubmissionsConditionInput {
+  formId: ModelStringInput
+  createdAt: ModelStringInput
+  content: ModelStringInput
+  and: [ModelFormSubmissionsConditionInput]
+  or: [ModelFormSubmissionsConditionInput]
+  not: ModelFormSubmissionsConditionInput
+  updatedAt: ModelStringInput
+}
+
+input CreateFormSubmissionsInput {
+  formId: String
+  createdAt: AWSDateTime
+  content: String
+  id: ID
+}
+
+input UpdateFormSubmissionsInput {
+  formId: String
+  createdAt: AWSDateTime
+  content: String
+  id: ID!
+}
+
+input DeleteFormSubmissionsInput {
+  id: ID!
+}
+
+input ModelSubscriptionFormSubmissionsFilterInput {
+  formId: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  content: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionFormSubmissionsFilterInput]
+  or: [ModelSubscriptionFormSubmissionsFilterInput]
+}

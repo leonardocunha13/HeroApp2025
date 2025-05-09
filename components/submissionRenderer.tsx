@@ -31,24 +31,24 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
     const pageGroups: FormElementInstance[][] = [];
     let currentGroup: FormElementInstance[] = [];
 
-let repeatables: FormElementInstance[] = [];
+    let repeatables: FormElementInstance[] = [];
 
-elements.forEach((el) => {
-  if (el.type === "PageBreakField") {
+    elements.forEach((el) => {
+      if (el.type === "PageBreakField") {
+        if (currentGroup.length > 0) {
+          pageGroups.push([...repeatables, ...currentGroup]);
+        }
+        currentGroup = [];
+      } else {
+        if (el.extraAttributes?.repeatAfterBreak) {
+          repeatables.push(el); // store for repetition
+        }
+        currentGroup.push(el);
+      }
+    });
     if (currentGroup.length > 0) {
       pageGroups.push([...repeatables, ...currentGroup]);
     }
-    currentGroup = [];
-  } else {
-    if (el.extraAttributes?.repeatAfterBreak) {
-      repeatables.push(el); // store for repetition
-    }
-    currentGroup.push(el);
-  }
-});
-if (currentGroup.length > 0) {
-  pageGroups.push([...repeatables, ...currentGroup]);
-}
 
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -75,7 +75,7 @@ if (currentGroup.length > 0) {
             elementInstance={el}
             defaultValue={value}
             isInvalid={false}
-            submitValue={() => {}}
+            submitValue={() => { }}
             readOnly={true}
           />
         );
@@ -129,12 +129,14 @@ if (currentGroup.length > 0) {
         Export as PDF
       </Button>
 
-  
+
       <div
         ref={contentRef}
-        className="w-full flex flex-col gap-4 flex-grow bg-background h-full rounded-2xl p-8 overflow-y-auto"
-        style={{ visibility: "hidden" }} 
+        className="w-full flex flex-col gap-4 flex-grow bg-background h-full rounded-2xl p-8 pt-24 overflow-y-auto"
+        style={{ visibility: "hidden", paddingTop: "20rem" }}
+
       >
+
         {(() => {
           const pageGroups: FormElementInstance[][] = [];
           let currentGroup: FormElementInstance[] = [];
@@ -160,7 +162,7 @@ if (currentGroup.length > 0) {
                       elementInstance={element}
                       defaultValue={value}
                       isInvalid={false}
-                      submitValue={() => {}}
+                      submitValue={() => { }}
                       readOnly={true}
                     />
                   </div>
