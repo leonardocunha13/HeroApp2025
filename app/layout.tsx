@@ -8,7 +8,6 @@ import { Authenticator } from "@aws-amplify/ui-react";
 import DesignerContextProvider from "../components/context/DesignerContext";
 import { ThemeProvider as NextThemeProvider } from "../components/providers/ThemeProvider";
 import { Toaster } from "../components/ui/toaster";
-//import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { Amplify } from "aws-amplify";

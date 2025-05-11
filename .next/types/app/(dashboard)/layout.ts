@@ -1,4 +1,4 @@
-// File: C:\Users\ldejesus.HERO\OneDrive - Hero Engineering\Desktop\HeroAuditApp2025\HeroAuditApp2025\app\(dashboard)\layout.tsx
+// File: C:\Users\ingmi\OneDrive\Desktop\Hero Apps Forked\HeroApp2025\app\(dashboard)\layout.tsx
 import * as entry from '../../../../app/(dashboard)/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
