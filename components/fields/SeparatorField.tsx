@@ -14,7 +14,7 @@ export const SeparatorFieldFormElement: FormElement = {
     id,
     type,
     label: "Separator field",
-    height: 50,
+    height: 60,
   }),
   designerBtnElement: {
     icon: RiSeparator,

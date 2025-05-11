@@ -15,9 +15,9 @@ function SaveFormBtn({ id }: { id: string }) {
   // Handle form submission
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     setLoading(true);
-    
+
     const formData = new FormData();
     formData.append("id", id);  // Include the form ID
     formData.append("content", JSON.stringify(elements));  // Include the form content
@@ -28,6 +28,7 @@ function SaveFormBtn({ id }: { id: string }) {
       toast({
         title: "Success",
         description: "Your form has been saved",
+        className: "bg-green-500 text-white",
       });
     } catch (error) {
       toast({

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "./ui/dialog";
 import SubmissionRenderer from "../components/submissionRenderer";
-import PDFRenderer from "../components/PDFRenderer";
+
 
 
 interface ViewSubmissionClientProps {
@@ -23,8 +23,8 @@ export default function ViewSubmissionClient({ elements, responses }: ViewSubmis
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
-      <DialogContent className="h-screen max-h-screen max-w-full flex items-center justify-center p-0">
-        <div className="w-[1000px] h-[90vh] flex flex-col overflow-y-auto rounded-2xl bg-background p-8">
+      <DialogContent className="h-screen max-h-screen justify-center max-w-full flex items-center  p-0">
+        <div className="w-full h-full flex flex-col justify-center overflow-y-auto rounded-2xl bg-background p-8">
           <SubmissionRenderer elements={elements} responses={responses} />
         </div>
         {/*<div className="mt-4">

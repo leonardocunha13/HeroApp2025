@@ -35,7 +35,6 @@ function VisitBtn({ shareUrl }: { shareUrl: string }) {
     // Execute the runForm function
     const { success, createdTagID } = await runForm(shareUrl, equipmentName, equipmentTag);
     
-    console.log("tagId", createdTagID);
     if (success && createdTagID) {
       // If form creation is successful, navigate to the new page
       localStorage.setItem("tagId", createdTagID); // ou FormTag2Id se preferir
