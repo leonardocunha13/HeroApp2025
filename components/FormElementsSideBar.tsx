@@ -19,7 +19,7 @@ function FormElementsSidebar() {
         rowGap={tokens.space.xxxs}
         templateColumns={["1fr", "1fr 1fr"]}
         alignItems="start"
-        width="100%"
+        width="80%"
         height="100%"
 
       >

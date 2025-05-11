@@ -26,6 +26,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Switch } from "../ui/switch";
 import { Divider } from "@aws-amplify/ui-react";
 import { Button } from "../ui/button";
+import ReactDatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const type: ElementsType = "TableField";
 
@@ -224,31 +227,104 @@ function FormComponent({
                 const cellValue = editableData[row]?.[col] || "";
                 const isCheckbox = cellValue.startsWith("[checkbox");
                 const checked = cellValue === "[checkbox:true]";
+                const isSelect = cellValue.startsWith("[select");
+                const isNumber = cellValue.startsWith("[number");
+                const numberValue = isNumber ? cellValue.match(/^\[number:(.*?)\]$/)?.[1] ?? "" : "";
+                const isDate = cellValue.startsWith("[date:");
+                const dateValue = isDate ? cellValue.match(/^\[date:(.*?)\]$/)?.[1] ?? "" : "";
+
+                let isSelectValue = "";
+                let isSelectOptionsArray: string[] = [];
+
+                if (isSelect) {
+                  try {
+                    const match = cellValue.match(/^\[select:"(.*?)":(\[.*\])\]$/);
+                    if (match) {
+                      isSelectValue = match[1];
+                      isSelectOptionsArray = JSON.parse(match[2]);
+                    } else {
+                      console.warn("Select format didn't match:", cellValue);
+                    }
+                  } catch (error) {
+                    console.warn("Failed to parse select options from cellValue:", cellValue, error);
+                    isSelectValue = "";
+                    isSelectOptionsArray = [];
+                  }
+                }
+
+                let isSelectValueArray: string[] = [];
+                try {
+                  isSelectValueArray = isSelectValue ? JSON.parse(isSelectValue) : [];
+                } catch (error) {
+                  console.warn("Failed to parse isSelectValue:", isSelectValue);
+                  isSelectValueArray = [];
+                }
+
 
                 return (
                   <TableCell key={col} className="justify-center items-center">
-                  {isCheckbox ? (
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 flex justify-center items-center"
-                      checked={checked}
-                      onChange={(e) =>
-                        handleCheckboxChange(row, col, e.target.checked)
-                      }
-                      disabled={readOnly}
-                    />
-                  ) : !readOnly && editableCells[row][col] ? (
-                    <Input
-                      value={cellValue}
-                      onChange={(e) =>
-                        handleCellChange(row, col, e.target.value)
-                      }
-                    />
-                  ) : (
-                    <div>{cellValue}</div>
-                  )}
-                </TableCell>
-                
+                    {isCheckbox ? (
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 flex justify-center items-center"
+                        checked={checked}
+                        onChange={(e) => handleCheckboxChange(row, col, e.target.checked)}
+                        disabled={readOnly}
+                      />
+                    ) : isSelect ? (
+                      <select
+                        className="border rounded px-2 py-1"
+                        style={{ width: "100%" }}
+                        value={isSelectValue}
+                        onChange={(e) => {
+                          const newValue = `[select:"${e.target.value}":${JSON.stringify(isSelectOptionsArray)}]`;
+                          handleCellChange(row, col, newValue);
+                        }}
+                        disabled={readOnly}
+                      >
+                        {isSelectOptionsArray.map((option: string, index: number) => (
+                          <option key={index} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : isNumber ? (
+                      <input
+                        type="number"
+                        className="border rounded px-2 py-1"
+                        value={numberValue}
+                        onChange={(e) =>
+                          handleCellChange(row, col, `[number:${e.target.value}]`)
+                        }
+                        disabled={readOnly}
+                      />
+                    ) : isDate ? (
+                      <ReactDatePicker
+                        className="border rounded px-2 py-1"
+                        selected={dateValue ? new Date(dateValue) : null}
+                        onChange={(date: Date | null) => {
+                          if (date) {
+                            handleCellChange(row, col, `[date:${date.toISOString().split("T")[0]}]`);
+                          }
+                        }}
+                        disabled={readOnly}
+                        dateFormat="yyyy-MM-dd"
+                      />
+
+                    ) : !readOnly && editableCells[row]?.[col] ? (
+                      <Input
+                        value={cellValue}
+                        onChange={(e) => handleCellChange(row, col, e.target.value)}
+                      />
+                    ) : (
+                      // Fallback for readonly display
+                      <div>{cellValue}</div>
+                    )}
+                  </TableCell>
+
+
+
+
                 );
               })}
             </TableRow>
@@ -454,7 +530,7 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
               <div className="space-y-0.5">
                 <FormLabel>Required</FormLabel>
                 <FormDescription>Marks the table field as required.</FormDescription>
-                </div>
+              </div>
               <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
               <FormMessage />
             </FormItem>
@@ -462,9 +538,9 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         />
         <Divider orientation="horizontal" size="small" color="gray" marginTop="1rem" marginBottom="1rem" />
         <div className="flex justify-between items-center">
-        <div className="space-y-0.5">
-          <FormLabel>Table Content</FormLabel>
-          <FormDescription> Use <code>[checkbox]</code> as the cell value to display a checkbox.</FormDescription>
+          <div className="space-y-0.5">
+            <FormLabel>Table Content</FormLabel>
+            <FormDescription> Use <code>[checkbox]</code> as the cell value to display a checkbox.</FormDescription>
           </div>
           <Button type="button" onClick={handleImportClick}>
             Import Excel

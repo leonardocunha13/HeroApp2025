@@ -17,9 +17,11 @@ import { BiRightArrowAlt } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
 import { type Schema } from '../../amplify/data/resource';
 
+
 type Form = Schema['Form']['type'];
 
 export default function Home() {
+
   return (
     <div className="container pt-4">
       <Suspense fallback={<StatsCards loading={true} />}>
