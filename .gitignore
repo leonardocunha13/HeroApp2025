@@ -1,3 +1,5 @@
-node_modules
-.next
-.next/cache/webpack/client-development
+node_modules/
+.next/
+.next/cache/webpack/client-development/
+.HeroApp2025.git/
+.HeroApp2025.git.bfg-report
