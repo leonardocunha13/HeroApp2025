@@ -3,3 +3,4 @@ node_modules/
 .next/cache/webpack/client-development/
 .HeroApp2025.git/
 .HeroApp2025.git.bfg-report
+.HeroAuditApp2025-backup/
