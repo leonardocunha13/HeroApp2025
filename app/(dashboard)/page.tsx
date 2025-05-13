@@ -15,9 +15,9 @@ import { Button } from "../../components/ui/button";
 import Link from "next/link";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
-import { type Schema } from '../../amplify/data/resource';
+//import { type Schema } from '../../amplify/data/resource';
 
-type Form = Schema['Form']['type'];
+//type Form = Schema['Form']['type'];
 
 export default function Home() {
   return (
@@ -142,7 +142,6 @@ function FormCardSkeleton() {
 async function FormCards() {
   const formsInfo = await GetFormsInformation();
 
-  // Achata a estrutura: transforma array de arrays em um array simples
   const allForms = formsInfo.flatMap((entry) =>
     entry.forms.map((form) => ({
       ...form,

@@ -75,7 +75,6 @@ export async function GetFormStats() {
       return { visits: 0, submissions: 0, submissionRate: 0, bounceRate: 0 };
     }
 
-    // Calcular stats com TODOS os forms (sem filtrar userId)
     const visits = forms.reduce((sum, form) => sum + (form.visits || 0), 0);
     const submissions = forms.reduce(
       (sum, form) => sum + (form.submissions || 0),
@@ -804,10 +803,8 @@ export async function CreateForm(
     throw new Error(`Project with name "${projectName}" not found.`);
   }
 
-  // Pega o projectID (campo string definido por você)
   const projID = projectsData[0].projectID;
 
-  // Cria o form
   const { errors: formerrors, data: form } = await client.models.Form.create({
     projID: projID,
     name: name,
@@ -972,7 +969,7 @@ export async function GetFormsByClientName(ClientName: string) {
                 equipmentTag: equipment.Tag,
                 tagCreatedAt: new Date(equipment.createdAt)
                   .toISOString()
-                  .split("T")[0], // <-- Adicionado aqui
+                  .split("T")[0],
               }));
             }),
           );
@@ -1009,7 +1006,7 @@ export async function GetFormsByClientName(ClientName: string) {
     equipmentDetails: formDetail.equipment.map((equipment) => ({
       equipmentName: equipment?.equipmentName || "Unknown",
       equipmentTag: equipment?.equipmentTag || "Unknown",
-      tagCreatedAt: equipment?.tagCreatedAt || "Unknown", // <-- Adicionado aqui também
+      tagCreatedAt: equipment?.tagCreatedAt || "Unknown",
     })),
     submission: formDetail.submission,
   }));

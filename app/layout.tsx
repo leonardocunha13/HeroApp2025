@@ -64,19 +64,28 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={inter.className}>
         <NextTopLoader />
 
-        <Authenticator>
-          {({ user: _user, signOut: _signOut }) => (
-            <AmplifyThemeProvider theme={theme} colorMode={colorMode}>
-              <DesignerContextProvider>
-                <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                  {children}
-                  <Toaster />
-                </NextThemeProvider>
-              </DesignerContextProvider>
-            </AmplifyThemeProvider>
-          )}
-        </Authenticator>
+        <AmplifyThemeProvider theme={theme} colorMode={colorMode}>
+          <DesignerContextProvider>
 
+            <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <div className="h-screen flex items-center justify-center">
+                
+                <Authenticator >
+
+                  {({ user: _user, signOut: _signOut }) => (
+                    <>
+                      {/* Add any custom components for the authenticated state */}
+                      
+                      {children}
+                      
+                      <Toaster />
+                    </>
+                  )}
+                </Authenticator>
+              </div>
+            </NextThemeProvider>
+          </DesignerContextProvider>
+        </AmplifyThemeProvider>
       </body>
     </html>
   );
