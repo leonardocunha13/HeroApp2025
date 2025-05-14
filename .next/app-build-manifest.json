@@ -18,31 +18,68 @@
       "static/css/app/(dashboard)/page.css",
       "static/chunks/app/(dashboard)/page.js"
     ],
-    "/(dashboard)/builder/[id]/layout": [
+    "/(dashboard)/forms/[id]/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/builder/[id]/layout.js"
+      "static/chunks/app/(dashboard)/forms/[id]/layout.js"
     ],
-    "/(dashboard)/builder/[id]/error": [
+    "/(dashboard)/forms/[id]/error": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/builder/[id]/error.js"
+      "static/chunks/app/(dashboard)/forms/[id]/error.js"
     ],
-    "/(dashboard)/builder/[id]/loading": [
+    "/(dashboard)/forms/[id]/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/builder/[id]/loading.js"
+      "static/chunks/app/(dashboard)/forms/[id]/loading.js"
     ],
-    "/(dashboard)/builder/[id]/page": [
+    "/(dashboard)/forms/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/builder/[id]/page.css",
-      "static/chunks/app/(dashboard)/builder/[id]/page.js"
+      "static/css/app/(dashboard)/forms/[id]/page.css",
+      "static/chunks/app/(dashboard)/forms/[id]/page.js"
     ],
-    "/_not-found/page": [
+    "/view-submitted/[submissionID]/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/view-submitted/[submissionID]/layout.js"
+    ],
+    "/view-submitted/[submissionID]/error": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/view-submitted/[submissionID]/error.js"
+    ],
+    "/view-submitted/[submissionID]/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/view-submitted/[submissionID]/loading.js"
+    ],
+    "/view-submitted/[submissionID]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/view-submitted/[submissionID]/page.css",
+      "static/chunks/app/view-submitted/[submissionID]/page.js"
+    ],
+    "/submit/[formUrl]/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/submit/[formUrl]/layout.js"
+    ],
+    "/submit/[formUrl]/error": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/submit/[formUrl]/error.js"
+    ],
+    "/submit/[formUrl]/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/submit/[formUrl]/loading.js"
+    ],
+    "/submit/[formUrl]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/submit/[formUrl]/page.css",
+      "static/chunks/app/submit/[formUrl]/page.js"
     ]
   }
 }

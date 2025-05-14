@@ -213,7 +213,7 @@ function FormComponent({
         <TableHeader>
           <TableRow>
             {Array.from({ length: columns }, (_, col) => (
-              <TableHead key={col}>{columnHeaders[col] || `Col ${col + 1}`}</TableHead>
+              <TableHead key={col} style={{ minWidth: "50px" }}>{columnHeaders[col] || `Col ${col + 1}`}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -223,7 +223,6 @@ function FormComponent({
               {Array.from({ length: columns }, (_, col) => {
                 const cellValue = editableData[row]?.[col] || "";
                 const isCheckbox = cellValue.startsWith("[checkbox");
-                const checked = cellValue === "[checkbox:true]";
                 const isSelect = cellValue.startsWith("[select");
                 const isNumber = cellValue.startsWith("[number");
                 const numberValue = isNumber ? cellValue.match(/^\[number:(.*?)\]$/)?.[1] ?? "" : "";
@@ -248,16 +247,8 @@ function FormComponent({
                   }
                 }
 
-                let isSelectValueArray: string[] = [];
-                try {
-                  isSelectValueArray = isSelectValue ? JSON.parse(isSelectValue) : [];
-                } catch (error) {
-                  console.warn("Failed to parse isSelectValue:", isSelectValue);
-                  isSelectValueArray = [];
-                }
-
                 return (
-                  <TableCell key={col} className="justify-center items-center">
+                  <TableCell key={col} className="justify-center items-center" style={{ minWidth: "50px" }}>
                     {isCheckbox ? (
                       <div
                         onClick={() => {
@@ -297,7 +288,11 @@ function FormComponent({
                     ) : isSelect ? (
                       <select
                         className="border rounded px-2 py-1"
-                        style={{ width: "100%" }}
+                        style={{ 
+                            minWidth: "100px", 
+                            maxWidth: "300px", 
+                            wordWrap: "break-word",
+                            width: "100%" }}
                         value={isSelectValue}
                         onChange={(e) => {
                           const newValue = `[select:"${e.target.value}":${JSON.stringify(isSelectOptionsArray)}]`;
@@ -312,36 +307,50 @@ function FormComponent({
                         ))}
                       </select>
                     ) : isNumber ? (
-                      <input
-                        type="number"
-                        className="border rounded px-2 py-1"
-                        value={numberValue}
-                        onChange={(e) =>
-                          handleCellChange(row, col, `[number:${e.target.value}]`)
-                        }
-                        disabled={readOnly}
-                      />
-                    ) : isDate ? (
-                      <ReactDatePicker
-                        className="border rounded px-2 py-1"
-                        selected={dateValue ? new Date(dateValue) : null}
-                        onChange={(date: Date | null) => {
-                          if (date) {
-                            handleCellChange(row, col, `[date:${date.toISOString().split("T")[0]}]`);
+                      readOnly ? (
+                        <div
+                          className="px-2 py-1 text-sm"
+                          style={{
+                            minWidth: "100px", 
+                            maxWidth: "300px", 
+                            wordWrap: "break-word",
+                            overflowWrap: "break-word",  
+                            whiteSpace: "normal", 
+                          }}
+                        >
+                          {numberValue || "-"}
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          className="border rounded px-2 py-1 w-full " 
+                          value={numberValue}
+                          onChange={(e) =>
+                            handleCellChange(row, col, `[number:${e.target.value}]`)
                           }
-                        }}
-                        disabled={readOnly}
-                        dateFormat="yyyy-MM-dd"
-                      />
-
-                    ) : !readOnly && editableCells[row][col] ? (
-                      <Input
-                        value={cellValue}
-                        onChange={(e) => handleCellChange(row, col, e.target.value)}
-                      />
-                    ) : (
-                      <div>{cellValue}</div>
-                    )}
+                          disabled={readOnly}
+                        />
+                      )
+                    ) : isDate ? (
+                        <ReactDatePicker
+                          className="border rounded px-2 py-1 max-w-[200px]  "
+                          selected={dateValue ? new Date(dateValue) : null}
+                          onChange={(date: Date | null) => {
+                            if (date) {
+                              handleCellChange(row, col, `[date:${date.toISOString().split("T")[0]}]`);
+                            }
+                          }}
+                          disabled={readOnly}
+                          dateFormat="dd-MM-yyyy"
+                        />
+                      ) : !readOnly && editableCells[row][col] ? (
+                        <Input
+                          value={cellValue}
+                          onChange={(e) => handleCellChange(row, col, e.target.value)}
+                        />
+                      ) : (
+                        <div>{cellValue}</div>
+                      )}
                   </TableCell>
                 );
               })}
@@ -587,13 +596,13 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         <div className="flex justify-between items-center">
           <div className="space-y-0.5">
             <FormLabel>Table Content</FormLabel>
-            <FormDescription>           
+            <FormDescription>
               Use <code>[checkbox]</code> as the cell value to display a checkbox. <br />
               Use <code>[select:"Option1":["Option1","Option2"]]</code> to display a dropdown with options.<br />
               Use <code>[number:]</code> to display a number input field.<br />
               Use <code>[date:]</code> to display a date picker.<br />
               For a regular editable text field, leave the cell blank.
-              </FormDescription>
+            </FormDescription>
           </div>
 
 

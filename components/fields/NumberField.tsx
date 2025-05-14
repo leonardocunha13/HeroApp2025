@@ -102,11 +102,13 @@ function FormComponent({
   submitValue,
   isInvalid,
   defaultValue,
+  readOnly,
 }: {
   elementInstance: FormElementInstance;
   submitValue?: SubmitFunction;
   isInvalid?: boolean;
   defaultValue?: string;
+  readOnly?: boolean;
 }) {
   const element = elementInstance as CustomInstance;
 
@@ -140,6 +142,7 @@ function FormComponent({
           submitValue(element.id, e.target.value);
         }}
         value={value}
+        disabled={readOnly}
       />
       {helperText && (
         <p

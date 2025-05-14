@@ -25,13 +25,6 @@ import {
 } from "../ui/form";
 import { Switch } from "../ui/switch";
 import { cn } from "../../lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { Separator } from "../ui/divider";
 import { Button } from "../ui/button";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
@@ -101,11 +94,15 @@ function DesignerComponent({
         {label}
         {required && "*"}
       </Label>
-      <Select>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder={placeHolder} />
-        </SelectTrigger>
-      </Select>
+      <select
+        className="w-full border rounded px-2 py-1"
+        defaultValue=""
+      >
+        <option value="" disabled hidden>
+          {placeHolder}
+        </option>
+      </select>
+
       {helperText && (
         <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>
       )}
@@ -118,11 +115,13 @@ function FormComponent({
   submitValue,
   isInvalid,
   defaultValue,
+  readOnly,
 }: {
   elementInstance: FormElementInstance;
   submitValue?: SubmitFunction;
   isInvalid?: boolean;
   defaultValue?: string;
+  readOnly?: boolean;
 }) {
   const element = elementInstance as CustomInstance;
 
@@ -141,27 +140,28 @@ function FormComponent({
         {label}
         {required && "*"}
       </Label>
-      <Select
-        defaultValue={value}
-        onValueChange={(value) => {
-          setValue(value);
+      <select
+        className={cn("w-full border rounded px-2 py-1", error && "border-red-500")}
+        value={value}
+        onChange={(e) => {
+          const selectedValue = e.target.value;
+          setValue(selectedValue);
           if (!submitValue) return;
-          const valid = SelectFieldFormElement.validate(element, value);
+          const valid = SelectFieldFormElement.validate(element, selectedValue);
           setError(!valid);
-          submitValue(element.id, value);
+          submitValue(element.id, selectedValue);
         }}
+        disabled={readOnly}
       >
-        <SelectTrigger className={cn("w-full", error && "border-red-500")}>
-          <SelectValue placeholder={placeHolder} />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option} value={option}>
-              {option}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        <option value="" disabled hidden>
+          {placeHolder}
+        </option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
       {helperText && (
         <p
           className={cn(
@@ -327,7 +327,7 @@ function PropertiesComponent({
                     />
                     <Button
                       className="ghost icon"
-                      onClick={(e) => {
+                      onClick={() => {
                         const newOptions = [...(field.value ?? [])];
                         newOptions.splice(index, 1);
                         field.onChange(newOptions);

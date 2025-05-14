@@ -1,22 +1,41 @@
-import { useRef, useEffect } from "react";
+"use client";
+import { useRef, useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { FormElementInstance, FormElements } from "./FormElements";
 import { Button } from "./ui/button";
+import { GetFormNameFromSubmissionId } from "../actions/form";
 
 interface Props {
   elements: FormElementInstance[];
   responses: { [key: string]: any };
+  submissionID: string;
 }
 
-export default function SubmissionRenderer({ elements, responses }: Props) {
+export default function SubmissionRenderer({ submissionID, elements, responses }: Props) {
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const [formName, setFormName] = useState<string | null>(null); // Use state to store form name
 
+  // Fetch form name when submissionID changes
   useEffect(() => {
-    // Adding event listener to ensure proper page load before rendering PDF
+    const fetchFormName = async () => {
+      try {
+        const result = await GetFormNameFromSubmissionId(submissionID);
+        setFormName(result.formName); // Store form name in state
+      } catch (error) {
+        console.error("Error fetching form name:", error);
+      }
+    };
+
+    fetchFormName();
+  }, [submissionID]); // Only fetch when submissionID changes
+
+  // Handle page load to make content visible
+  useEffect(() => {
     const handlePageLoad = () => {
       if (contentRef.current) {
         contentRef.current.style.visibility = "visible";
+        contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     };
     window.addEventListener("load", handlePageLoad);
@@ -25,43 +44,49 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
     };
   }, []);
 
+  // Generate PDF with formName included
   const generatePDF = async () => {
-    if (!contentRef.current) return;
+    if (!contentRef.current || !formName) return; // Ensure formName is available
 
     const pageGroups: FormElementInstance[][] = [];
     let currentGroup: FormElementInstance[] = [];
-
     let repeatables: FormElementInstance[] = [];
+
+    let firstPage = true;
 
     elements.forEach((el) => {
       if (el.type === "PageBreakField") {
         if (currentGroup.length > 0) {
-          pageGroups.push([...repeatables, ...currentGroup]);
+          pageGroups.push(firstPage ? [...currentGroup] : [...repeatables, ...currentGroup]);
+          firstPage = false;
         }
         currentGroup = [];
       } else {
-        if (el.extraAttributes?.repeatAfterBreak) {
-          repeatables.push(el); // store for repetition
+        if (el.extraAttributes?.repeatOnPageBreak) {
+          repeatables.push(el);
         }
         currentGroup.push(el);
       }
     });
+
     if (currentGroup.length > 0) {
-      pageGroups.push([...repeatables, ...currentGroup]);
+      pageGroups.push(firstPage ? [...currentGroup] : [...repeatables, ...currentGroup]);
     }
 
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
 
-    // We now render pages and handle page breaks inside the loop
+    let currentPage = 1;
+
+    const documentNumber = formName || "Unknown Document Number"; // Use formName here
+
     for (let i = 0; i < pageGroups.length; i++) {
       const group = pageGroups[i];
-
       const tempContainer = document.createElement("div");
       tempContainer.style.position = "absolute";
       tempContainer.style.left = "-9999px";
       tempContainer.style.top = "0";
-      tempContainer.style.width = "1000px"; // ensure large enough width for rendering
+      tempContainer.style.width = "1000px";
       tempContainer.style.padding = "2rem";
       tempContainer.style.backgroundColor = "white";
 
@@ -80,7 +105,6 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
           />
         );
 
-        // Use ReactDOM to render the element asynchronously
         import("react-dom/client").then(({ createRoot }) => {
           createRoot(wrapper).render(elementRoot);
         });
@@ -89,18 +113,15 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
       });
 
       document.body.appendChild(tempContainer);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      await new Promise((resolve) => setTimeout(resolve, 500)); // delay to allow rendering
-
-      // Force the content to render completely, especially for complex elements like tables
       const canvas = await html2canvas(tempContainer, {
         scale: 2,
-        useCORS: true,  // Ensure external resources (like fonts) are used
-        logging: true,  // Log for debugging to see what might be wrong
+        useCORS: true,
+        logging: true,
         allowTaint: true,
-        ignoreElements: (element) => {
-          return element.tagName === "BUTTON"; // Ignore buttons or other unnecessary elements
-        }
+        removeContainer: true,
+        ignoreElements: (el) => el.tagName === "BUTTON",
       });
 
       const imgHeightMM = canvas.height * 0.264583;
@@ -113,6 +134,13 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
 
       if (i > 0) pdf.addPage();
       pdf.addImage(imgData, "PNG", 0, 0, adjustedWidth, adjustedHeight);
+      pdf.setFontSize(12);
+      pdf.text(`${documentNumber}`, 10, 10);
+      const pageNumberText = `Page ${currentPage} of ${pageGroups.length}`;
+      pdf.setFontSize(10);
+      pdf.text(pageNumberText, pdfWidth / 2 - pdf.getStringUnitWidth(pageNumberText) * pdf.internal.scaleFactor / 2, pdf.internal.pageSize.height - 10);
+
+      currentPage++;
 
       document.body.removeChild(tempContainer);
     }
@@ -129,14 +157,15 @@ export default function SubmissionRenderer({ elements, responses }: Props) {
         Export as PDF
       </Button>
 
-
       <div
         ref={contentRef}
-        className="w-full flex flex-col gap-4 flex-grow bg-background h-full rounded-2xl p-8 pt-24 overflow-y-auto"
-        style={{ visibility: "hidden", paddingTop: "20rem" }}
-
+        className="w-full flex flex-col gap-4 flex-grow bg-background h-full rounded-2xl p-8 pt-8 overflow-y-auto"
+        style={{
+          visibility: "hidden",
+          maxHeight: "100vh",
+          overflowY: "auto",
+        }}
       >
-
         {(() => {
           const pageGroups: FormElementInstance[][] = [];
           let currentGroup: FormElementInstance[] = [];

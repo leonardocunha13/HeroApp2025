@@ -11,7 +11,7 @@ import { Input } from "../ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useDesigner from "../hooks/useDesigner";
 
 import {
@@ -106,48 +106,72 @@ function FormComponent({
   submitValue,
   isInvalid,
   defaultValue,
+  readOnly,
 }: {
   elementInstance: FormElementInstance;
   submitValue?: SubmitFunction;
   isInvalid?: boolean;
   defaultValue?: string;
+  readOnly?: boolean;
 }) {
   const element = elementInstance as CustomInstance;
 
   const [value, setValue] = useState(defaultValue || "");
   const [error, setError] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const { label, required, placeHolder, helperText } = element.extraAttributes;
 
   useEffect(() => {
     setError(isInvalid === true);
   }, [isInvalid]);
 
-  const { label, required, placeHolder, helperText, rows } =
-    element.extraAttributes;
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [value]);
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label className={cn(error && "text-red-500")}>
         {label}
         {required && "*"}
       </Label>
-      <Textarea
-        className={cn(error && "border-red-500")}
-        rows={rows}
-        placeholder={placeHolder}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={(e) => {
-          if (!submitValue) return;
-          const valid = TextAreaFormElement.validate(element, e.target.value);
-          setError(!valid);
-          if (!valid) return;
-          submitValue(element.id, e.target.value);
-        }}
-        value={value}
-      />
+
+      {readOnly ? (
+        <div
+          className="w-full border rounded p-2 text-sm whitespace-pre-wrap break-words min-h-[2.5rem]"
+        >
+          {value || "-"}
+        </div>
+      ) : (
+        <textarea
+          ref={textareaRef}
+          className={cn(
+            "resize-none overflow-hidden w-full border rounded p-2 text-sm",
+            error && "border-red-500"
+          )}
+          placeholder={placeHolder}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={(e) => {
+            if (!submitValue) return;
+            const valid = TextAreaFormElement.validate(element, e.target.value);
+            setError(!valid);
+            if (!valid) return;
+            submitValue(element.id, e.target.value);
+          }}
+          value={value}
+          disabled={readOnly}
+        />
+      )}
+
       {helperText && (
         <p
           className={cn(
             "text-muted-foreground text-[0.8rem]",
-            error && "text-red-500",
+            error && "text-red-500"
           )}
         >
           {helperText}
@@ -156,6 +180,7 @@ function FormComponent({
     </div>
   );
 }
+
 
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 

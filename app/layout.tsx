@@ -60,33 +60,33 @@ const theme: Theme = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <NextTopLoader />
+    <html lang="en" className="light" style={{ colorScheme: "light" }}>
+    <body className={inter.className}>
+      <NextTopLoader />
 
-        <AmplifyThemeProvider theme={theme} colorMode={colorMode}>
-          <DesignerContextProvider>
+      <AmplifyThemeProvider theme={theme} colorMode={colorMode}>
+        <DesignerContextProvider>
 
-            <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <div className="h-screen flex items-center justify-center">
-                
-                <Authenticator >
+          <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <div className="h-screen flex items-center justify-center">
 
-                  {({ user: _user, signOut: _signOut }) => (
-                    <>
-                      {/* Add any custom components for the authenticated state */}
-                      
-                      {children}
-                      
-                      <Toaster />
-                    </>
-                  )}
-                </Authenticator>
-              </div>
-            </NextThemeProvider>
-          </DesignerContextProvider>
-        </AmplifyThemeProvider>
-      </body>
-    </html>
+              <Authenticator >
+
+                {({ user: _user, signOut: _signOut }) => (
+                  <>
+                    {/* Add any custom components for the authenticated state */}
+
+                    {children}
+
+                    <Toaster />
+                  </>
+                )}
+              </Authenticator>
+            </div>
+          </NextThemeProvider>
+        </DesignerContextProvider>
+      </AmplifyThemeProvider>
+    </body>
+    </html >
   );
 }

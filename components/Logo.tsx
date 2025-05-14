@@ -7,9 +7,15 @@ function Logo() {
   return (
     <div className="flex items-center">
       <Link href="/">
-        <Image src={LogoImg} alt="Logo" width={150} height={60} className="hover:cursor-pointer" />
+        <Image
+          src={LogoImg}
+          alt="Logo"
+          width={150} // Specify the width
+          // height is automatically calculated based on the aspect ratio
+          className="hover:cursor-pointer"
+          priority // Optimize the LCP image
+        />
       </Link>
-
     </div>
   );
 }

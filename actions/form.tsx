@@ -1167,3 +1167,44 @@ export async function getEquipmentTagID(
     console.error("Error in getEquipmentTagID:", err);
   }
 }
+
+export async function GetFormNameFromSubmissionId(FormSubmissionsId: string) {
+  try {
+    console.log("FormSubmissionsId:", FormSubmissionsId);
+    // Fetch the FormSubmission using the FormSubmissions ID
+    const { errors, data: formSubmissionData } = await client.models.FormSubmissions.list({
+      filter: { id: { eq: FormSubmissionsId } },
+    });
+
+    if (errors || formSubmissionData.length === 0) {
+      console.error("Error fetching form submission or submission not found:", errors);
+      throw new Error("Form submission not found.");
+    }
+
+    const formSubmission = formSubmissionData[0];
+
+    // Extract the formId from the FormSubmission
+    const formId = formSubmission.formId;
+    
+    if (!formId) {
+      throw new Error("Form ID not found in submission.");
+    }
+
+    // Fetch the Form using the formId
+    const { data: formData, errors: formErrors } = await client.models.Form.list({
+      filter: { id: { eq: formId } },
+    });
+
+    if (formErrors) {
+      console.error("Error fetching form:", formErrors);
+      throw new Error("Form not found.");
+    }
+
+    const formName = formData.length > 0 ? formData[0].name : null;
+
+    return { formName };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
