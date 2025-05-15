@@ -28,6 +28,7 @@ import { Divider } from "@aws-amplify/ui-react";
 import { Button } from "../ui/button";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import React from "react";
 
 const type: ElementsType = "TableField";
 
@@ -156,6 +157,7 @@ function FormComponent({
   defaultValue,
   readOnly,
   updateElement,
+  pdf,
 }: {
   elementInstance: FormElementInstance;
   defaultValue?: any;
@@ -163,6 +165,7 @@ function FormComponent({
   submitValue?: SubmitFunction;
   readOnly?: boolean;
   updateElement?: (id: string, element: FormElementInstance) => void;
+  pdf?: boolean;
 }) {
   const element = elementInstance as CustomInstance;
   const { rows, columns, label, columnHeaders = [] } = element.extraAttributes;
@@ -206,6 +209,78 @@ function FormComponent({
     updateData(newData);
   };
 
+  const parseCell = (cellValue: string): string => {
+    if (cellValue.startsWith("[checkbox")) {
+      return cellValue === "[checkbox:true]" ? "✔" :
+        cellValue === "[checkbox:false]" ? "✖" : "-";
+    }
+    if (cellValue.startsWith("[select")) {
+      const match = cellValue.match(/^\[select:"(.*?)":/);
+      return match?.[1] || "-";
+    }
+    if (cellValue.startsWith("[number:")) {
+      return cellValue.match(/^\[number:(.*?)\]$/)?.[1] || "-";
+    }
+    if (cellValue.startsWith("[date:")) {
+      const isoDate = cellValue.match(/^\[date:(.*?)\]$/)?.[1];
+      if (!isoDate) return "-";
+
+      const dateObj = new Date(isoDate);
+      if (isNaN(dateObj.getTime())) return "-";
+
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const year = dateObj.getFullYear();
+
+      return `${day}.${month}.${year}`;
+    }
+    return cellValue || "-";
+  };
+
+  if (pdf) {
+    return (
+      <div>
+        <p className="font-medium mb-2">{label}</p>
+        <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "14px" }}>
+          <thead>
+            <tr>
+              {Array.from({ length: columns }, (_, col) => (
+                <th key={col} style={{ border: "1px solid #ccc", padding: "4px", backgroundColor: "#f0f0f0" }}>
+                  {columnHeaders[col] || `Col ${col + 1}`}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: rows }, (_, row) => (
+              <tr key={row}>
+                {Array.from({ length: columns }, (_, col) => {
+                  const cellValue = editableData[row]?.[col] || "";
+                  return (
+                    <td key={col} className="table-cell-wrap" style={{ border: "1px solid #ccc", padding: "4px" }}>
+                      {parseCell(cellValue)}
+                    </td>
+
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+  function parseLocalDate(dateStr: string) {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day, 12, 0, 0);
+  }
+
+  function DatePickerInput(props: any, ref: any) {
+    return <Input ref={ref} {...props} />;
+  }
+
+  const CustomInput = React.forwardRef(DatePickerInput);
+
   return (
     <div>
       <p className="font-medium mb-2">{label}</p>
@@ -248,7 +323,7 @@ function FormComponent({
                 }
 
                 return (
-                  <TableCell key={col} className="justify-center items-center" style={{ minWidth: "50px" }}>
+                  <TableCell key={col} className="justify-center items-center">
                     {isCheckbox ? (
                       <div
                         onClick={() => {
@@ -277,6 +352,7 @@ function FormComponent({
                           padding: "0",
                           textAlign: 'center',
                         }}
+
                       >
                         {cellValue === "[checkbox:true]"
                           ? "✔"
@@ -288,11 +364,11 @@ function FormComponent({
                     ) : isSelect ? (
                       <select
                         className="border rounded px-2 py-1"
-                        style={{ 
-                            minWidth: "100px", 
-                            maxWidth: "300px", 
-                            wordWrap: "break-word",
-                            width: "100%" }}
+                        style={{
+                          minWidth: "100px",
+                          maxWidth: "300px",
+                          width: "100%"
+                        }}
                         value={isSelectValue}
                         onChange={(e) => {
                           const newValue = `[select:"${e.target.value}":${JSON.stringify(isSelectOptionsArray)}]`;
@@ -311,11 +387,11 @@ function FormComponent({
                         <div
                           className="px-2 py-1 text-sm"
                           style={{
-                            minWidth: "100px", 
-                            maxWidth: "300px", 
+                            minWidth: "100px",
+                            maxWidth: "300px",
                             wordWrap: "break-word",
-                            overflowWrap: "break-word",  
-                            whiteSpace: "normal", 
+                            overflowWrap: "break-word",
+                            whiteSpace: "normal",
                           }}
                         >
                           {numberValue || "-"}
@@ -323,7 +399,7 @@ function FormComponent({
                       ) : (
                         <Input
                           type="number"
-                          className="border rounded px-2 py-1 w-full " 
+                          className="border rounded px-2 py-1 w-full "
                           value={numberValue}
                           onChange={(e) =>
                             handleCellChange(row, col, `[number:${e.target.value}]`)
@@ -332,25 +408,25 @@ function FormComponent({
                         />
                       )
                     ) : isDate ? (
-                        <ReactDatePicker
-                          className="border rounded px-2 py-1 max-w-[200px]  "
-                          selected={dateValue ? new Date(dateValue) : null}
-                          onChange={(date: Date | null) => {
-                            if (date) {
-                              handleCellChange(row, col, `[date:${date.toISOString().split("T")[0]}]`);
-                            }
-                          }}
-                          disabled={readOnly}
-                          dateFormat="dd-MM-yyyy"
-                        />
-                      ) : !readOnly && editableCells[row][col] ? (
-                        <Input
-                          value={cellValue}
-                          onChange={(e) => handleCellChange(row, col, e.target.value)}
-                        />
-                      ) : (
-                        <div>{cellValue}</div>
-                      )}
+                      <ReactDatePicker
+                        selected={dateValue ? parseLocalDate(dateValue) : null}
+                        onChange={(date: Date | null) => {
+                          if (date) {
+                            handleCellChange(row, col, `[date:${date.toISOString().split("T")[0]}]`);
+                          }
+                        }}
+                        disabled={readOnly}
+                        dateFormat="dd.MM.yyyy"
+                        customInput={<CustomInput />}
+                      />
+                    ) : !readOnly && editableCells[row][col] ? (
+                      <Input
+                        value={cellValue}
+                        onChange={(e) => handleCellChange(row, col, e.target.value)}
+                      />
+                    ) : (
+                      <div>{cellValue}</div>
+                    )}
                   </TableCell>
                 );
               })}

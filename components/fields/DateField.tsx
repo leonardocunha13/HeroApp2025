@@ -109,12 +109,14 @@ function FormComponent({
   isInvalid,
   defaultValue,
   readOnly,
+  pdf,
 }: {
   elementInstance: FormElementInstance;
   submitValue?: SubmitFunction;
   isInvalid?: boolean;
   defaultValue?: string;
   readOnly?: boolean;
+  pdf?: boolean;
 }) {
   const element = elementInstance as CustomInstance;
 
@@ -130,7 +132,7 @@ function FormComponent({
 
   const { label, required, helperText } = element.extraAttributes;
 
-    if (readOnly) {
+    if (pdf) {
     return (
       <div className="p-2 border rounded">
         <label className="block text-sm font-medium text-gray-700 mb-1">

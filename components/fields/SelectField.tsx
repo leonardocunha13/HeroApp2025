@@ -134,34 +134,44 @@ function FormComponent({
 
   const { label, required, placeHolder, helperText, options } =
     element.extraAttributes;
+
+  const selectedLabel = options.find((opt) => opt === value) || "";
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label className={cn(error && "text-red-500")}>
         {label}
         {required && "*"}
       </Label>
-      <select
-        className={cn("w-full border rounded px-2 py-1", error && "border-red-500")}
-        value={value}
-        onChange={(e) => {
-          const selectedValue = e.target.value;
-          setValue(selectedValue);
-          if (!submitValue) return;
-          const valid = SelectFieldFormElement.validate(element, selectedValue);
-          setError(!valid);
-          submitValue(element.id, selectedValue);
-        }}
-        disabled={readOnly}
-      >
-        <option value="" disabled hidden>
-          {placeHolder}
-        </option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
+
+      {readOnly ? (
+        <div className="border rounded px-2 py-1 bg-gray-100 text-sm text-gray-800 min-h-[2.25rem] flex items-center">
+          {selectedLabel || placeHolder || "—"}
+        </div>
+      ) : (
+        <select
+          className={cn("w-full border rounded px-2 py-1", error && "border-red-500")}
+          value={value}
+          onChange={(e) => {
+            const selectedValue = e.target.value;
+            setValue(selectedValue);
+            if (!submitValue) return;
+            const valid = SelectFieldFormElement.validate(element, selectedValue);
+            setError(!valid);
+            submitValue(element.id, selectedValue);
+          }}
+        >
+          <option value="" disabled hidden>
+            {placeHolder}
           </option>
-        ))}
-      </select>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      )}
+
       {helperText && (
         <p
           className={cn(
@@ -175,6 +185,7 @@ function FormComponent({
     </div>
   );
 }
+
 
 type propertiesFormSchemaType = z.infer<typeof propertiesSchema>;
 function PropertiesComponent({

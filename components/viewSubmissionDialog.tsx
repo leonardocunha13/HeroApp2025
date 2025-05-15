@@ -19,7 +19,6 @@ export default function ViewSubmissionClient({ submissionID, elements, responses
     setOpen(false);
     router.back();
   };
-  console.log("Submission ID in viewsubmissions: ", submissionID);
   return (
     <Dialog open={open} onOpenChange={(val) => !val && handleClose()}>
       <DialogContent

@@ -58,3 +58,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+.table-cell-wrap {
+  word-wrap: break-word;
+  word-break: break-word;
+  min-width: 100px
+}

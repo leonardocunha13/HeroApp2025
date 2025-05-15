@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { MdPreview } from "react-icons/md";
 import useDesigner from "./hooks/useDesigner";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { FormElements } from "./FormElements";
 
 function PreviewDialogBtn() {
@@ -28,13 +28,19 @@ function PreviewDialogBtn() {
           <div className="max-w-[1500px] flex flex-col gap-4 flex-grow bg-background w-full h-full rounded-2xl p-8 overflow-y-auto">
             {elements.map((element) => {
               const FormComponent = FormElements[element.type].formComponent;
-              
+
               return (
                 <FormComponent key={element.id} elementInstance={element} />
               );
             })}
           </div>
         </div>
+        <DialogTitle className="sr-only">
+          Preview Button
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          This dialog contains the details of Preview Button.
+        </DialogDescription>
       </DialogContent>
     </Dialog>
   );

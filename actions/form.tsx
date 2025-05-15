@@ -1170,7 +1170,7 @@ export async function getEquipmentTagID(
 
 export async function GetFormNameFromSubmissionId(FormSubmissionsId: string) {
   try {
-    console.log("FormSubmissionsId:", FormSubmissionsId);
+
     // Fetch the FormSubmission using the FormSubmissions ID
     const { errors, data: formSubmissionData } = await client.models.FormSubmissions.list({
       filter: { id: { eq: FormSubmissionsId } },

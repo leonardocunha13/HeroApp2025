@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { formatDistance } from "date-fns/formatDistance";
 import { Button } from "../../../../components/ui/button";
 import { MdPreview } from "react-icons/md";
+//import EditFormBtn from "../../../../components/EditFormBtn";
 
 async function FormDetailPage({
   params,
@@ -21,9 +22,9 @@ async function FormDetailPage({
 }) {
   const { id } = await params;
   const form = await GetFormById(id);
-  //console.log("form", form);
+
   const shareUrl = form?.form?.shareURL ?? '';
-  //console.log("Form URL FORM PAGE", form?.form?.shareURL);
+
   if (!form) {
     throw new Error("form not found");
   }
@@ -49,6 +50,7 @@ async function FormDetailPage({
         </div>
         <div className="flex justify-between container">
           <h3 className="text-2xl font-bold truncate">{form.projectName}</h3>
+        {/*<EditFormBtn id={id} />*/}
         </div>
       </div>
 

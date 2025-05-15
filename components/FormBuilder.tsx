@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import PreviewDialogBtn from "./PreviewDialogBtn";
+import PreviewPDFDialogBtn from "./PreviewPDFDialogBtn";
 import Designer from "./Designer";
 import {
     DndContext,
@@ -125,7 +126,8 @@ function FormBuilder({ formID, form, projectName, clientName, formName}: { formI
                         {projectName}
                     </h2>
                     <div className="flex items-center gap-2">
-                        <PreviewDialogBtn />
+                        <PreviewDialogBtn  />
+                        <PreviewPDFDialogBtn formName={formName} />
                         {!form.published && (
                             <>
                                 <SaveFormBtn id={formID}  />

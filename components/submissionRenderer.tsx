@@ -101,7 +101,7 @@ export default function SubmissionRenderer({ submissionID, elements, responses }
             defaultValue={value}
             isInvalid={false}
             submitValue={() => { }}
-            readOnly={true}
+            pdf={true}
           />
         );
 
@@ -134,7 +134,7 @@ export default function SubmissionRenderer({ submissionID, elements, responses }
 
       if (i > 0) pdf.addPage();
       pdf.addImage(imgData, "PNG", 0, 0, adjustedWidth, adjustedHeight);
-      pdf.setFontSize(12);
+      pdf.setFontSize(10);
       pdf.text(`${documentNumber}`, 10, 10);
       const pageNumberText = `Page ${currentPage} of ${pageGroups.length}`;
       pdf.setFontSize(10);

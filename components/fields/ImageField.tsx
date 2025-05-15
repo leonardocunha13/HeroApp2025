@@ -54,6 +54,7 @@ export const ImageFieldFormElement: FormElement = {
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
   validate: () => true,
+  
 };
 
 type CustomInstance = FormElementInstance & {

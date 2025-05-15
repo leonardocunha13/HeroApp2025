@@ -39,6 +39,27 @@
       "static/css/app/(dashboard)/forms/[id]/page.css",
       "static/chunks/app/(dashboard)/forms/[id]/page.js"
     ],
+    "/submit/[formUrl]/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/submit/[formUrl]/layout.js"
+    ],
+    "/submit/[formUrl]/error": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/submit/[formUrl]/error.js"
+    ],
+    "/submit/[formUrl]/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/submit/[formUrl]/loading.js"
+    ],
+    "/submit/[formUrl]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/submit/[formUrl]/page.css",
+      "static/chunks/app/submit/[formUrl]/page.js"
+    ],
     "/view-submitted/[submissionID]/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -60,26 +81,26 @@
       "static/css/app/view-submitted/[submissionID]/page.css",
       "static/chunks/app/view-submitted/[submissionID]/page.js"
     ],
-    "/submit/[formUrl]/layout": [
+    "/(dashboard)/builder/[id]/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/submit/[formUrl]/layout.js"
+      "static/chunks/app/(dashboard)/builder/[id]/layout.js"
     ],
-    "/submit/[formUrl]/error": [
+    "/(dashboard)/builder/[id]/error": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/submit/[formUrl]/error.js"
+      "static/chunks/app/(dashboard)/builder/[id]/error.js"
     ],
-    "/submit/[formUrl]/loading": [
+    "/(dashboard)/builder/[id]/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/submit/[formUrl]/loading.js"
+      "static/chunks/app/(dashboard)/builder/[id]/loading.js"
     ],
-    "/submit/[formUrl]/page": [
+    "/(dashboard)/builder/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/submit/[formUrl]/page.css",
-      "static/chunks/app/submit/[formUrl]/page.js"
+      "static/css/app/(dashboard)/builder/[id]/page.css",
+      "static/chunks/app/(dashboard)/builder/[id]/page.js"
     ]
   }
 }

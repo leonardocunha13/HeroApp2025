@@ -56,6 +56,7 @@ function FormElementsSidebar() {
         <SidebarBtnElement formElement={FormElements.SelectField} />
         <SidebarBtnElement formElement={FormElements.CheckboxField} />
         <SidebarBtnElement formElement={FormElements.TableField} />
+        <SidebarBtnElement formElement={FormElements.CameraField} />
       </Grid>
     </View>
   );

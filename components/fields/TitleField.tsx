@@ -94,8 +94,10 @@ type CustomInstance = FormElementInstance & {
 
 function FormComponent({
   elementInstance,
+
 }: {
   elementInstance: FormElementInstance;
+
 }) {
   const element = elementInstance as CustomInstance;
   const {
@@ -107,17 +109,22 @@ function FormComponent({
 
   return (
     <p
-      className="text-xl px-2 py-1 rounded"
       style={{
         backgroundColor,
         color: textColor,
         textAlign,
+        fontSize: "1.25rem", // equivalente a text-xl
+        padding: "0.25rem 0.5rem", // px-2 py-1
+        borderRadius: "0.25rem", // rounded
+        margin: 0,
       }}
     >
       {title}
     </p>
   );
 }
+
+
 
 function PropertiesComponent({
   elementInstance,
