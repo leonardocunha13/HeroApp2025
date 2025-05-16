@@ -12,6 +12,10 @@ import { formatDistance } from "date-fns/formatDistance";
 import { Button } from "../../../../components/ui/button";
 import { MdPreview } from "react-icons/md";
 //import EditFormBtn from "../../../../components/EditFormBtn";
+import { Amplify } from "aws-amplify"
+import outputs from "../../../../amplify_outputs.json"
+
+Amplify.configure(outputs)
 
 async function FormDetailPage({
   params,
@@ -51,6 +55,9 @@ async function FormDetailPage({
         <div className="flex justify-between container">
           <h3 className="text-2xl font-bold truncate">{form.projectName}</h3>
         {/*<EditFormBtn id={id} />*/}
+        </div>
+       <div className="flex justify-between container">
+          <h3 className="text-sm text-muted-foreground text-wrap max-w-[500px]">{form.FormDescription}</h3>
         </div>
       </div>
 

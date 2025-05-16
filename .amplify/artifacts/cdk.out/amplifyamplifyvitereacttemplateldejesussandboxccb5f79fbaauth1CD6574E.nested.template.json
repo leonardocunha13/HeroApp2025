@@ -1,5 +1,5 @@
 {
- "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"AmplifySandbox\",\"createdWith\":\"1.6.1\",\"stackType\":\"auth-Cognito\",\"metadata\":{}}",
+ "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"AmplifySandbox\",\"createdWith\":\"1.8.1\",\"stackType\":\"auth-Cognito\",\"metadata\":{}}",
  "Resources": {
   "amplifyAuthUserPool4BA7F805": {
    "Type": "AWS::Cognito::UserPool",
@@ -33,6 +33,21 @@
      {
       "Mutable": true,
       "Name": "email",
+      "Required": true
+     },
+     {
+      "Mutable": true,
+      "Name": "phone_number",
+      "Required": true
+     },
+     {
+      "Mutable": true,
+      "Name": "preferred_username",
+      "Required": true
+     },
+     {
+      "Mutable": true,
+      "Name": "name",
       "Required": true
      }
     ],
@@ -298,10 +313,194 @@
     "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/amplifyAuth/IdentityPoolRoleAttachment"
    }
   },
+  "amplifyAuthADMINSGroupRole474FA206": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRoleWithWebIdentity",
+       "Condition": {
+        "StringEquals": {
+         "cognito-identity.amazonaws.com:aud": {
+          "Ref": "amplifyAuthIdentityPool3FDE84CC"
+         }
+        },
+        "ForAnyValue:StringLike": {
+         "cognito-identity.amazonaws.com:amr": "authenticated"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Federated": "cognito-identity.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "amplifyAuth"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/amplifyAuth/ADMINSGroupRole/Resource"
+   }
+  },
+  "amplifyAuthADMINSGroup50EC39D2": {
+   "Type": "AWS::Cognito::UserPoolGroup",
+   "Properties": {
+    "GroupName": "ADMINS",
+    "Precedence": 0,
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "amplifyAuthADMINSGroupRole474FA206",
+      "Arn"
+     ]
+    },
+    "UserPoolId": {
+     "Ref": "amplifyAuthUserPool4BA7F805"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/amplifyAuth/ADMINSGroup"
+   }
+  },
+  "amplifyAuthuserGroupRoleF0C548A7": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRoleWithWebIdentity",
+       "Condition": {
+        "StringEquals": {
+         "cognito-identity.amazonaws.com:aud": {
+          "Ref": "amplifyAuthIdentityPool3FDE84CC"
+         }
+        },
+        "ForAnyValue:StringLike": {
+         "cognito-identity.amazonaws.com:amr": "authenticated"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Federated": "cognito-identity.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "amplifyAuth"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/amplifyAuth/userGroupRole/Resource"
+   }
+  },
+  "amplifyAuthuserGroup5EF75831": {
+   "Type": "AWS::Cognito::UserPoolGroup",
+   "Properties": {
+    "GroupName": "user",
+    "Precedence": 1,
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "amplifyAuthuserGroupRoleF0C548A7",
+      "Arn"
+     ]
+    },
+    "UserPoolId": {
+     "Ref": "amplifyAuthUserPool4BA7F805"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/amplifyAuth/userGroup"
+   }
+  },
+  "AMPLIFYAUTHUSERPOOLIDParameterCC466CA3": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Name": "/amplify/resource_reference/amplifyvitereacttemplate/ldejesus-sandbox-ccb5f79fba/AMPLIFY_AUTH_USERPOOL_ID",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "amplifyAuthUserPool4BA7F805"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/AMPLIFY_AUTH_USERPOOL_IDParameter/Resource"
+   }
+  },
+  "userpoolAccess13FEE5419": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "cognito-idp:AdminAddUserToGroup",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "amplifyAuthUserPool4BA7F805",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "userpoolAccess13FEE5419",
+    "Roles": [
+     {
+      "Ref": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambdaServiceRole800B3A6CRef"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/userpoolAccess1/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LwQ6CMBBEv8V7WYETHg0nL8ZgPJvarrpQugldJKbpvxtiUE4z82amhKLaQb7RU8iM7TJHN4hHDIL2LNp0Sk/hGg0/PAlDvAQcTsxO1Xf/84upHaGXdfUnB4teSN7LeZ0bdrgX0ebZo5ekSPcQZzgPZ01JNRh4HAwm5dkitGH7Kiooc6g2bSDKhtEL9QjNVz8WQOze1wAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12Ly4oCMRBFv8V9unzAgC7FxTAbaVpmPcR0jVN2kpJU9YiE/Lu00iqu7jl16y5gvvqA2cSepXJtV3naQ96iKLY7ta4z9iw/2fEhkjLkb8FUM3uz+Y0PHmHjCaO+Vs/LV4tRSS/j+NUb9rhWte4vvO0/E/enYsgGyMPX0N2yZk/uMuidihEJkHeaKB5qm2xAxXTrRynFNCjcJ4fFRG4RjjL9ny9hMYPl5ChEVeqjUkBo7nkFHeQNtBwBAAA="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/CDKMetadata/Default"
@@ -573,6 +772,11 @@
      ]
     }
    ]
+  }
+ },
+ "Parameters": {
+  "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambdaServiceRole800B3A6CRef": {
+   "Type": "String"
   }
  },
  "Outputs": {

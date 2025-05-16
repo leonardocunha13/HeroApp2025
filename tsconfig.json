@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "module": "esnext",
-    "target": "es5",
+    "target": "es2017",
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

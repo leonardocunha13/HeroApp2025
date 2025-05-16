@@ -15,9 +15,13 @@ import { Button } from "../../components/ui/button";
 import Link from "next/link";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { FaEdit } from "react-icons/fa";
+import { Amplify } from "aws-amplify"
+import outputs from "../../amplify_outputs.json"
+//import SearchBar from "../../components/searchBar";
 //import { type Schema } from '../../amplify/data/resource';
 
 //type Form = Schema['Form']['type'];
+Amplify.configure(outputs)
 
 export default function Home() {
   return (
@@ -29,7 +33,6 @@ export default function Home() {
       <h2 className="text-4xl font-bold col-span-2">Your forms</h2>
       <Separator className="my-6" />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-
 
         <CreateFormDialog   />
         <Suspense
@@ -207,7 +210,7 @@ function FormCard({ form }: { form: CustomForm }) {
       <CardContent className="h-[20px] truncate text-sm text-muted-foreground">
         <p>Project: {form.projectName} ({form.projectID})</p>
       </CardContent>
-      <CardContent className="h-[20px] truncate text-sm text-muted-foreground">
+      <CardContent className="h-[20px] truncate text-sm text-muted-foreground text-wrap">
       <p>Description: {form.description || "No description"}</p>
       </CardContent>
       <CardFooter>

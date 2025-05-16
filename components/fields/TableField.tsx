@@ -29,6 +29,7 @@ import { Button } from "../ui/button";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import React from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 const type: ElementsType = "TableField";
 
@@ -260,7 +261,6 @@ function FormComponent({
                     <td key={col} className="table-cell-wrap" style={{ border: "1px solid #ccc", padding: "4px" }}>
                       {parseCell(cellValue)}
                     </td>
-
                   );
                 })}
               </tr>
@@ -284,7 +284,7 @@ function FormComponent({
   return (
     <div>
       <p className="font-medium mb-2">{label}</p>
-      <Table>
+      <Table  className="max-w-[100%]">
         <TableHeader>
           <TableRow>
             {Array.from({ length: columns }, (_, col) => (
@@ -321,9 +321,8 @@ function FormComponent({
                     isSelectOptionsArray = [];
                   }
                 }
-
                 return (
-                  <TableCell key={col} className="justify-center items-center">
+                  <TableCell key={col} className="justify-center items-center table-cell-wrap">
                     {isCheckbox ? (
                       <div
                         onClick={() => {
@@ -362,33 +361,39 @@ function FormComponent({
                       </div>
 
                     ) : isSelect ? (
-                      <select
-                        className="border rounded px-2 py-1"
-                        style={{
-                          minWidth: "100px",
-                          maxWidth: "300px",
-                          width: "100%"
-                        }}
+                      <Select
                         value={isSelectValue}
-                        onChange={(e) => {
-                          const newValue = `[select:"${e.target.value}":${JSON.stringify(isSelectOptionsArray)}]`;
+                        onValueChange={(val) => {
+                          const newValue = `[select:"${val}":${JSON.stringify(isSelectOptionsArray)}]`;
                           handleCellChange(row, col, newValue);
                         }}
                         disabled={readOnly}
                       >
-                        {isSelectOptionsArray.map((option: string, index: number) => (
-                          <option key={index} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
+                        <SelectTrigger
+                          className="border rounded px-2 py-1"
+                          style={{
+                            minWidth: "100px",
+                            maxWidth: "300px",
+                            width: "100%",
+                          }}
+                        >
+                          <SelectValue placeholder="Select option" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {isSelectOptionsArray.map((option: string, index: number) => (
+                            <SelectItem key={index} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     ) : isNumber ? (
                       readOnly ? (
                         <div
                           className="px-2 py-1 text-sm"
                           style={{
                             minWidth: "100px",
-                            maxWidth: "300px",
+                            maxWidth: "200px",
                             wordWrap: "break-word",
                             overflowWrap: "break-word",
                             whiteSpace: "normal",
@@ -412,7 +417,8 @@ function FormComponent({
                         selected={dateValue ? parseLocalDate(dateValue) : null}
                         onChange={(date: Date | null) => {
                           if (date) {
-                            handleCellChange(row, col, `[date:${date.toISOString().split("T")[0]}]`);
+                            const safeDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12));
+                            handleCellChange(row, col, `[date:${safeDate.toISOString().split("T")[0]}]`);
                           }
                         }}
                         disabled={readOnly}
@@ -422,6 +428,7 @@ function FormComponent({
                     ) : !readOnly && editableCells[row][col] ? (
                       <Input
                         value={cellValue}
+                        className={"table-cell-wrap"}
                         onChange={(e) => handleCellChange(row, col, e.target.value)}
                       />
                     ) : (
@@ -631,28 +638,58 @@ function PropertiesComponent({ elementInstance }: { elementInstance: FormElement
         <FormField
           control={form.control}
           name="rows"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Rows</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const [localValue, setLocalValue] = useState(field.value);
+
+            useEffect(() => {
+              setLocalValue(field.value);
+            }, [field.value]);
+
+            return (
+              <FormItem>
+                <FormLabel>Rows</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    value={localValue}
+                    onChange={(e) => setLocalValue(Number(e.target.value))}
+                    onBlur={() => {
+                      if (!isNaN(localValue)) field.onChange(localValue);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
         <FormField
           control={form.control}
           name="columns"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Columns</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const [localValue, setLocalValue] = useState(field.value);
+
+            useEffect(() => {
+              setLocalValue(field.value);
+            }, [field.value]);
+
+            return (
+              <FormItem>
+                <FormLabel>Columns</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    value={localValue}
+                    onChange={(e) => setLocalValue(Number(e.target.value))}
+                    onBlur={() => {
+                      if (!isNaN(localValue)) field.onChange(localValue);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
         <FormField
           control={form.control}

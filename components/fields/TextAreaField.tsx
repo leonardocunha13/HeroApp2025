@@ -27,7 +27,7 @@ import { Switch } from "../ui/switch";
 import { cn } from "../../lib/utils";
 import { BsTextareaResize } from "react-icons/bs";
 import { Textarea } from "../ui/textarea";
-import { Slider } from "../ui/slider";
+//import { Slider } from "../ui/slider";
 
 const type: ElementsType = "TextAreaField";
 
@@ -36,7 +36,6 @@ const extraAttributes = {
   helperText: "Helper text",
   required: false,
   placeHolder: "Value here...",
-  rows: 3,
 };
 
 const propertiesSchema = z.object({
@@ -44,7 +43,6 @@ const propertiesSchema = z.object({
   helperText: z.string().max(200),
   required: z.boolean().default(false).optional(),
   placeHolder: z.string().max(50),
-  rows: z.number().min(1).max(10),
 });
 
 export const TextAreaFormElement: FormElement = {
@@ -107,12 +105,14 @@ function FormComponent({
   isInvalid,
   defaultValue,
   readOnly,
+  pdf,
 }: {
   elementInstance: FormElementInstance;
   submitValue?: SubmitFunction;
   isInvalid?: boolean;
   defaultValue?: string;
   readOnly?: boolean;
+  pdf?: boolean;
 }) {
   const element = elementInstance as CustomInstance;
 
@@ -133,6 +133,19 @@ function FormComponent({
     }
   }, [value]);
 
+  if (pdf) {
+    return (
+      <div className="p-2 border rounded">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label} {required && "*"}
+        </label>
+        <p className="whitespace-pre-wrap break-words text-sm min-h-[2.5rem]">
+          {value || "-"}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label className={cn(error && "text-red-500")}>
@@ -141,16 +154,14 @@ function FormComponent({
       </Label>
 
       {readOnly ? (
-        <div
-          className="w-full border rounded p-2 text-sm whitespace-pre-wrap break-words min-h-[2.5rem]"
-        >
+        <div className="w-full border rounded p-2 text-sm whitespace-pre-wrap break-words min-h-[2.5rem]">
           {value || "-"}
         </div>
       ) : (
-        <textarea
+        <Textarea
           ref={textareaRef}
           className={cn(
-            "resize-none overflow-hidden w-full border rounded p-2 text-sm",
+            "resize-none overflow-hidden w-full text-sm",
             error && "border-red-500"
           )}
           placeholder={placeHolder}
@@ -199,7 +210,6 @@ function PropertiesComponent({
       helperText: element.extraAttributes.helperText,
       required: element.extraAttributes.required,
       placeHolder: element.extraAttributes.placeHolder,
-      rows: element.extraAttributes.rows,
     },
   });
 
@@ -208,7 +218,7 @@ function PropertiesComponent({
   }, [element, form]);
 
   function applyChanges(values: propertiesFormSchemaType) {
-    const { label, helperText, placeHolder, required, rows } = values;
+    const { label, helperText, placeHolder, required } = values;
     updateElement(element.id, {
       ...element,
       extraAttributes: {
@@ -216,7 +226,6 @@ function PropertiesComponent({
         helperText,
         placeHolder,
         required,
-        rows,
       },
     });
   }
@@ -293,27 +302,7 @@ function PropertiesComponent({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="rows"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Rows {form.watch("rows")}</FormLabel>
-              <FormControl>
-                <Slider
-                  defaultValue={[field.value]}
-                  min={1}
-                  max={10}
-                  step={1}
-                  onValueChange={(value) => {
-                    field.onChange(value[0]);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
         <FormField
           control={form.control}
           name="required"

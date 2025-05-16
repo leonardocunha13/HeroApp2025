@@ -29,6 +29,7 @@ import { Separator } from "../ui/divider";
 import { Button } from "../ui/button";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "../ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 const type: ElementsType = "SelectField";
 
@@ -94,15 +95,15 @@ function DesignerComponent({
         {label}
         {required && "*"}
       </Label>
-      <select
-        className="w-full border rounded px-2 py-1"
-        defaultValue=""
-      >
-        <option value="" disabled hidden>
-          {placeHolder}
-        </option>
-      </select>
-
+      <Select defaultValue={undefined}>
+        <SelectTrigger className="w-full border rounded px-2 py-1">
+          <SelectValue placeholder={placeHolder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value=" " disabled hidden> {placeHolder}
+          </SelectItem>
+        </SelectContent>
+      </Select>
       {helperText && (
         <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>
       )}
@@ -116,12 +117,14 @@ function FormComponent({
   isInvalid,
   defaultValue,
   readOnly,
+  pdf,
 }: {
   elementInstance: FormElementInstance;
   submitValue?: SubmitFunction;
   isInvalid?: boolean;
   defaultValue?: string;
   readOnly?: boolean;
+  pdf?: boolean;
 }) {
   const element = elementInstance as CustomInstance;
 
@@ -137,6 +140,17 @@ function FormComponent({
 
   const selectedLabel = options.find((opt) => opt === value) || "";
 
+  if (pdf) {
+    return (
+      <div className="p-2 border rounded">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label} {required && "*"}
+        </label>
+        <p>{selectedLabel || "—"}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label className={cn(error && "text-red-500")}>
@@ -149,11 +163,9 @@ function FormComponent({
           {selectedLabel || placeHolder || "—"}
         </div>
       ) : (
-        <select
-          className={cn("w-full border rounded px-2 py-1", error && "border-red-500")}
+        <Select
           value={value}
-          onChange={(e) => {
-            const selectedValue = e.target.value;
+          onValueChange={(selectedValue) => {
             setValue(selectedValue);
             if (!submitValue) return;
             const valid = SelectFieldFormElement.validate(element, selectedValue);
@@ -161,15 +173,18 @@ function FormComponent({
             submitValue(element.id, selectedValue);
           }}
         >
-          <option value="" disabled hidden>
-            {placeHolder}
-          </option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className={cn("w-full", error && "border-red-500")}>
+            <SelectValue placeholder={placeHolder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option} value={option}>
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
       )}
 
       {helperText && (

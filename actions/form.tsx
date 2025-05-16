@@ -5,6 +5,7 @@ import outputs from "../amplify_outputs.json";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from "aws-amplify/auth"; // Ensure getCurrentUser is imported correctly
+//import { FormDescription } from "../components/ui/form";
 ///import { vi } from "date-fns/locale";
 //import { sub } from "date-fns";
 //import { string } from 'zod';
@@ -13,6 +14,13 @@ import { getCurrentUser } from "aws-amplify/auth"; // Ensure getCurrentUser is i
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
+
+// To add a user to a group, call this function where needed (not at the top level)
+
+/*await client.mutations.addUserToGroup({
+    groupName: "ADMINS",
+    userId: "89bef458-4041-7049-9e16-8fe6335c828e",
+});*/
 
 // UserNotFoundErr class for custom error handling
 class UserNotFoundErr extends Error { }
@@ -172,6 +180,7 @@ export async function GetFormById(id: string) {
       shareURL: form.shareURL,
       visits: form.visits ?? 0,
       submissions: form.submissions ?? 0,
+      FormDescription: form.description,
     };
   } catch (error) {
     console.error("Error fetching form by ID:", error);
@@ -694,7 +703,7 @@ export async function GetFormsInformation() {
       throw new Error("Failed to fetch forms.");
     }
 
-    let results = [];
+    const results = [];
 
     for (const clientItem of clientsData) {
       const { errors: projectErrors, data: projectsData } =

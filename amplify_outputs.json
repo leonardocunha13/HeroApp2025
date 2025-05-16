@@ -1,12 +1,15 @@
 {
   "auth": {
-    "user_pool_id": "ap-southeast-2_HvoChyNej",
+    "user_pool_id": "ap-southeast-2_KdPtv4xmq",
     "aws_region": "ap-southeast-2",
-    "user_pool_client_id": "3uk62gfn0qbvmmdv4m90gma1h9",
-    "identity_pool_id": "ap-southeast-2:fcfe265c-ab37-4371-b214-eb86e8bcb2eb",
+    "user_pool_client_id": "7smqae434i0bo65020h76l5r49",
+    "identity_pool_id": "ap-southeast-2:0386548a-8642-4612-b3e7-0ad0c402351a",
     "mfa_methods": [],
     "standard_required_attributes": [
-      "email"
+      "email",
+      "phone_number",
+      "preferred_username",
+      "name"
     ],
     "username_attributes": [
       "email"
@@ -14,7 +17,18 @@
     "user_verification_types": [
       "email"
     ],
-    "groups": [],
+    "groups": [
+      {
+        "ADMINS": {
+          "precedence": 0
+        }
+      },
+      {
+        "user": {
+          "precedence": 1
+        }
+      }
+    ],
     "mfa_configuration": "NONE",
     "password_policy": {
       "min_length": 8,
@@ -26,9 +40,9 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://n2leum5qobcstdvius6g4mnbsu.appsync-api.ap-southeast-2.amazonaws.com/graphql",
+    "url": "https://hkom745gnnbblj6un6opevo2je.appsync-api.ap-southeast-2.amazonaws.com/graphql",
     "aws_region": "ap-southeast-2",
-    "api_key": "da2-dgsq5faxp5e5rkzetcd4sbmhqa",
+    "api_key": "da2-2cvw5674erblxng6jjb7z6q3ai",
     "default_authorization_type": "API_KEY",
     "authorization_types": [
       "AMAZON_COGNITO_USER_POOLS",
@@ -680,8 +694,30 @@
         }
       },
       "enums": {},
-      "nonModels": {}
+      "nonModels": {},
+      "mutations": {
+        "addUserToGroup": {
+          "name": "addUserToGroup",
+          "isArray": false,
+          "type": "AWSJSON",
+          "isRequired": false,
+          "arguments": {
+            "userId": {
+              "name": "userId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            },
+            "groupName": {
+              "name": "groupName",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            }
+          }
+        }
+      }
     }
   },
-  "version": "1.3"
+  "version": "1.4"
 }

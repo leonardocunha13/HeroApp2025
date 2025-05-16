@@ -15,10 +15,12 @@ import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css"; // Optional, if you're using Amplify tokens
 
-//import "../src/pages/Styles/styles.css"; // Your custom styles
-const inter = Inter({ subsets: ["latin"] });
 
 Amplify.configure(outputs);
+
+const inter = Inter({ subsets: ["latin"] });
+
+
 
 // Optional: use dark mode by default
 const colorMode: ColorMode = "dark";
@@ -72,15 +74,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
               <Authenticator >
 
-                {({ user: _user, signOut: _signOut }) => (
-                  <>
-                    {/* Add any custom components for the authenticated state */}
-
                     {children}
 
                     <Toaster />
-                  </>
-                )}
               </Authenticator>
             </div>
           </NextThemeProvider>

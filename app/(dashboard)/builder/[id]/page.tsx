@@ -1,5 +1,9 @@
 import { GetFormById } from "../../../../actions/form";
 import FormBuilder from "../../../../components/FormBuilder";
+import { Amplify } from "aws-amplify"
+import outputs from "../../../../amplify_outputs.json"
+
+Amplify.configure(outputs)
 
 async function BuilderPage({ params }: { params: { id: string } }) {
   const { id } = await params;

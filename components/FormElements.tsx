@@ -11,7 +11,7 @@ import { TitleFieldFormElement } from "./fields/TitleField";
 import { TableFieldFormElement } from "./fields/TableField";
 import {ImageFieldFormElement} from "./fields/ImageField";
 import {PageBreakFieldFormElement} from "./fields/PageBreakField";
-import { CameraFieldFormElement } from "./fields/CameraField";
+//import { CameraFieldFormElement } from "./fields/CameraField";
 
 export type ElementsType =
   | "TextField"
@@ -27,7 +27,7 @@ export type ElementsType =
   | "TableField"
   | "ImageField"
   | "PageBreakField"
-  | "CameraField"
+  //| "CameraField"
 
 
 export type SubmitFunction = (key: string, value: string) => void;
@@ -86,6 +86,6 @@ export const FormElements: FormElementsType = {
   TableField: TableFieldFormElement,
   ImageField: ImageFieldFormElement,
   PageBreakField: PageBreakFieldFormElement,
-  CameraField: CameraFieldFormElement,
+  //CameraField: CameraFieldFormElement,
 };
 

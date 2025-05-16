@@ -246,7 +246,7 @@
       "Arn"
      ]
     },
-    "Runtime": "nodejs18.x",
+    "Runtime": "nodejs20.x",
     "Tags": [
      {
       "Key": "amplify:deployment-type",
@@ -293,7 +293,7 @@
       "Arn"
      ]
     },
-    "Runtime": "nodejs18.x",
+    "Runtime": "nodejs20.x",
     "Tags": [
      {
       "Key": "amplify:deployment-type",
@@ -443,7 +443,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWNyw6CMBBFv8V9GXlscCkmLo2BDyBDO5LyaBOmlZim/24AXZ1zcxY3h6y8QHrClROpxmTSHYQHsSPVOJSjwJXboHGGUNuJxO1ldj7tpOVnm4dFMeHcKYRw90Y6bc3W/h4FFy0yk2O4bhBcQOXlSK5CpihqYusXSWKvjcNem34/+4UojFUEA5/fWQl5CuVpYK2TxRunZ4L64BepQBqrzwAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWNywqDMBBFv8V9nPqgYJe10GUp+gEyJlOJxgScWCnBfy9quzrnchY3g/RyhiTChWOphtjoFsKD2JOqPcpB4MJN0DhCqJwhcXvZnU9ntPxs87BVGBxbhRDus5VeO7u1v6+C8waZyTNcNwjOoZzlQL5EplVUxG6eJIm91h47bbv97BdWYZ0i6Pn0TgvIEiiinrWOp9l6PRJUB7+7Wzm0zwAAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/AmplifyTableManager/CDKMetadata/Default"

@@ -1433,7 +1433,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/yXMPQ6CQBBA4bPYLyM/DZZCYmkBByDjMpAFnCXMLMQQ7m7Q6strXgpJfoP4gptEth2jyb1gf5IotbWiHQ1u0uySNShCKnA/MZJBEexIWqCQwXmWD1vYy44fga06z6XnzvVhwTNM2XFF4qeVluMwv0et2DvuD8O+JRjkuiY5pDHkl0Gci5bA6t4E1d8vtbryaacAAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/yXMTQqDMBBA4bO4j1N/KNhlFbrsQg8g0zhK1E4kkyhFvHuxXX28zcsgvV0hiXCTWHdTPJsX7E8ST13jUU8KN2l3yVsUIS9wP1GSQxn0RL5EIYXLIh/WsFc9PwJrbyxXlnszBIdnqKrnmsTOK7njUL9H43EwPByKbUcwymVNC8gSKKJRjIldYG/eBPXfLwAxroSnAAAA"
    },
    "Metadata": {
     "aws:cdk:path": "amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/ConnectionStack/CDKMetadata/Default"
