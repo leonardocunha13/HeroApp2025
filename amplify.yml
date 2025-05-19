@@ -11,7 +11,7 @@ backend:
     build:
       commands:
         - npm install ampx --save-dev
-        - npx ampx generate outputs --branch $AWS_BRANCH --app-id $AWS_APP_ID --debug
+        - npx ampx pipeline-deploy --branch $BRANCH --app-id $APP_ID --debug
 frontend:
   phases:
     build:
