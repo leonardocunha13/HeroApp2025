@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/75c73eb11ad7810a0944ca429c488d61985794b3bab450aa65eecf619171a905.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/d08a1739ef9e31583c8eae75b7f6b8b8acab357e79b10d89e065457c6ea9507c.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -125,18 +125,6 @@
             "data": "amplifyAuthuserGroup5EF75831"
           }
         ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/AMPLIFY_AUTH_USERPOOL_IDParameter/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "AMPLIFYAUTHUSERPOOLIDParameterCC466CA3"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/userpoolAccess1/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "userpoolAccess13FEE5419"
-          }
-        ],
         "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
@@ -147,12 +135,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "CDKMetadataAvailable"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputs.amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambdaServiceRole800B3A6CRef": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambdaServiceRole800B3A6CRef"
           }
         ],
         "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/auth/amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthUserPoolBB13E989Ref": [
@@ -309,66 +291,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "groups"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/add-user-to-group-lambda/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "addusertogrouplambdaServiceRole7118A252"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/add-user-to-group-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "addusertogrouplambdaServiceRoleDefaultPolicyFDAD0DD3"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/add-user-to-group-lambda/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "addusertogrouplambdaEEF41CC8"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/CDKMetadata/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadata"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/CDKMetadata/Condition": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadataAvailable"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambdaServiceRole800B3A6CRef": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambdaServiceRole800B3A6CRef"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Ref": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Ref"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function/amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Arn"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/function.NestedStack/function.NestedStackResource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "function1351588B"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/definedFunctions": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "definedFunctions"
           }
         ],
         "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/GraphQLAPI/Resource": [
@@ -3623,124 +3545,6 @@
             "data": "amplifyDataFormSubmissionsNestedStackFormSubmissionsNestedStackResourceB72DB6DA"
           }
         ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/HasEnvironmentParameter": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "HasEnvironmentParameter"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/FnAddUserToGroupLambdaDataSource": [
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "FnAddUserToGroupLambdaDataSource"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/FnAddUserToGroupLambdaDataSource/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "FnAddUserToGroupLambdaDataSourceServiceRole748BF117"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/FnAddUserToGroupLambdaDataSource/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "FnAddUserToGroupLambdaDataSourceServiceRoleDefaultPolicy6E4B1FEF"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/FnAddUserToGroupLambdaDataSource/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "FnAddUserToGroupLambdaDataSource"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "FnAddUserToGroupLambdaDataSource"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/InvokeFnAddUserToGroupLambdaDataSource/InvokeFnAddUserToGroupLambdaDataSource.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "InvokeFnAddUserToGroupLambdaDataSourceInvokeFnAddUserToGroupLambdaDataSourceAppSyncFunction0F521B37"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "InvokeFnAddUserToGroupLambdaDataSource"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/mutationAddUserToGroupResolver": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationaddUserToGroupResolver"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "Mutation.addUserToGroup"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/MutationAddUserToGroupAuthFN/MutationAddUserToGroupAuthFN.AppSyncFunction": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MutationAddUserToGroupAuthFNMutationAddUserToGroupAuthFNAppSyncFunction4FB21BAE"
-          },
-          {
-            "type": "graphqltransformer:resourceName",
-            "data": "MutationAddUserToGroupAuthFN"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/CDKMetadata/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadata"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/CDKMetadata/Condition": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadataAvailable"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputs.amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Arn"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbadataamplifyDataGraphQLAPI6104BF9BApiId": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbadataamplifyDataGraphQLAPI6104BF9BApiId"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthNestedStackauthNestedStackResource5FFF5B11Outputs.amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthauthenticatedUserRoleF442A7DDRef": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthNestedStackauthNestedStackResource5FFF5B11Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthauthenticatedUserRoleF442A7DDRef"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthNestedStackauthNestedStackResource5FFF5B11Outputs.amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthunauthenticatedUserRole652B8C8BRef": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthNestedStackauthNestedStackResource5FFF5B11Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthunauthenticatedUserRole652B8C8BRef"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthNestedStackauthNestedStackResource5FFF5B11Outputs.amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthIdentityPoolC1B86EB6Ref": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthNestedStackauthNestedStackResource5FFF5B11Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthIdentityPoolC1B86EB6Ref"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbadataamplifyDataGraphQLAPINONEDS983D6DC4Name": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbadataamplifyDataGraphQLAPINONEDS983D6DC4Name"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/FunctionDirectiveStack.NestedStack/FunctionDirectiveStack.NestedStackResource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifyDataFunctionDirectiveStackNestedStackFunctionDirectiveStackNestedStackResource1246A302"
-          }
-        ],
         "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyData/ConnectionStack/FormFormSubmissionsauth0Function/FormFormSubmissionsauth0Function.AppSyncFunction": [
           {
             "type": "aws:cdk:logicalId",
@@ -4369,12 +4173,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthNestedStackauthNestedStackResource5FFF5B11Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbaauthamplifyAuthIdentityPoolC1B86EB6Ref"
-          }
-        ],
-        "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/reference-to-amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputs.amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionNestedStackfunctionNestedStackResource15AEBD20Outputsamplifyamplifyvitereacttemplateldejesussandboxccb5f79fbafunctionaddusertogrouplambda83279D56Arn"
           }
         ],
         "/amplify-amplifyvitereacttemplate-ldejesus-sandbox-ccb5f79fba/data/amplifyamplifyvitereacttemplateldejesussandboxccb5f79fbadataamplifyDataGraphQLAPI6104BF9BApiId": [

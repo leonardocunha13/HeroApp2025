@@ -694,29 +694,7 @@
         }
       },
       "enums": {},
-      "nonModels": {},
-      "mutations": {
-        "addUserToGroup": {
-          "name": "addUserToGroup",
-          "isArray": false,
-          "type": "AWSJSON",
-          "isRequired": false,
-          "arguments": {
-            "userId": {
-              "name": "userId",
-              "isArray": false,
-              "type": "String",
-              "isRequired": true
-            },
-            "groupName": {
-              "name": "groupName",
-              "isArray": false,
-              "type": "String",
-              "isRequired": true
-            }
-          }
-        }
-      }
+      "nonModels": {}
     }
   },
   "version": "1.4"

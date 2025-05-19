@@ -1,5 +1,5 @@
 import { a, defineData, type ClientSchema } from "@aws-amplify/backend";
-import { addUserToGroup } from "./add-user-to-group/resource";
+//import { addUserToGroup } from "./add-user-to-group/resource";
 
 const schema = a.schema({
   Form: a
@@ -71,7 +71,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.publicApiKey()]),
 
-  addUserToGroup: a
+/*  addUserToGroup: a
     .mutation()
     .arguments({
       userId: a.string().required(),
@@ -79,7 +79,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.group("ADMINS")])
     .handler(a.handler.function(addUserToGroup))
-    .returns(a.json())
+    .returns(a.json())*/
 });
 
 // Used for code completion / highlighting when making requests from frontend
